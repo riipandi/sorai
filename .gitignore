@@ -32,6 +32,10 @@ build/
 .env*
 !.env.example
 
+# Config files
+config.toml*
+!config.toml.example
+
 # Rust
 target/
 

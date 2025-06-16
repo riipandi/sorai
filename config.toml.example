@@ -1,0 +1,24 @@
+[swift_relay]
+host = "127.0.0.1"
+port = 8000
+
+[openai]
+api_key = ""
+
+[anthropic]
+api_key = ""
+
+[bedrock]
+api_key = ""
+access_key = ""
+
+[cohere]
+api_key = ""
+
+[azure_openai]
+api_key = ""
+endpoint = ""
+
+[vertext]
+project_id = ""
+credentials = ""

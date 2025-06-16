@@ -2,11 +2,6 @@
 # ^ A shebang isn't required, but allows a justfile to be executed
 #   like a script, with `./justfile test`, for example.
 
-set dotenv-required := false
-set dotenv-load := true
-set dotenv-path := ".env"
-set export :=  true
-
 [private]
 app_identifier := "swift-relay"
 
@@ -79,12 +74,12 @@ docker-build *args:
 
 [doc('Run the Docker image')]
 docker-run *args:
-  @docker run --network=host --rm -it --env-file .env {{app_image}}:{{app_version}} {{args}}
+  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro {{app_image}}:{{app_version}} {{args}}
 
 [doc('Run the Docker image')]
 [no-exit-message]
 docker-shell:
-  @docker run --network=host --rm -it --env-file .env --entrypoint /bin/sh {{app_image}}:{{app_version}}
+  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /bin/sh {{app_image}}:{{app_version}}
 
 [doc('Get Docker image list')]
 docker-images:

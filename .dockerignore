@@ -30,3 +30,5 @@ compose*.yaml
 /storage/
 /specs/
 target/
+config.toml*
+!config.toml.example

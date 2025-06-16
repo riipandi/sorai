@@ -20,9 +20,9 @@ WORKDIR /usr/src
 FROM base AS builder
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
-  --mount=type=cache,target=/usr/src/target cargo build \
-  --release && strip -s target/release/swift-relay && \
-  mv target/release/swift-relay . && chmod +x swift-relay
+    --mount=type=cache,target=/usr/src/target cargo build \
+    --release && strip -s target/release/swift-relay \
+    && mv target/release/swift-relay . && chmod +x swift-relay
 
 # -----------------------------------------------------------------------------
 # Use the slim image for a lean production container.
@@ -57,7 +57,7 @@ COPY --from=glibc /bin/ls /bin/ls
 COPY --from=glibc /bin/sh /bin/sh
 
 # Define the host and port to listen on.
-ARG RUST_LOG=swift-relay=debug HOST=0.0.0.0 PORT=8080
+ARG RUST_LOG=swift-relay=debug HOST=0.0.0.0 PORT=8000
 ENV RUST_LOG=$RUST_LOG HOST=$HOST PORT=$PORT
 ENV TINI_SUBREAPER=true PATH="/srv:$PATH"
 

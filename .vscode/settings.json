@@ -1,0 +1,25 @@
+{
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "*.toml.example": "toml",
+        "*.yml.example": "yaml"
+    },
+    "search.exclude": {
+        "**/build": true,
+        "**/dist": true,
+        "**/target": true
+    },
+    "[dockerfile]": {
+        "editor.defaultFormatter": "docker.docker"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "darkriszty.markdown-table-prettify"
+    },
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    },
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml",
+        "editor.formatOnSave": false
+    }
+}
