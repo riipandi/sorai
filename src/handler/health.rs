@@ -10,5 +10,5 @@ pub async fn health_check() -> &'static str {
 
 /// API status endpoint handler
 pub async fn status() -> &'static str {
-    "Swift Relay Server is running"
+    "SwiftRelay Server is running"
 }

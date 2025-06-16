@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use config::Config;
 use http::HttpServer;
 
-/// Swift Relay Server
+/// SwiftRelay Server
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -33,6 +33,8 @@ enum Commands {
         #[arg(long)]
         port: Option<u16>,
     },
+    /// Display configuration values in debug mode
+    Debug,
 }
 
 #[tokio::main]
@@ -78,6 +80,22 @@ async fn main() {
                 eprintln!("Failed to start server: {}", e);
                 std::process::exit(1);
             }
+        }
+        Commands::Debug => {
+            // Convert PathBuf to String for config loading
+            let config_path = cli.config.as_ref().map(|p| p.to_string_lossy().to_string());
+
+            // Load configuration for debug display
+            let config = match Config::load(config_path).await {
+                Ok(config) => config,
+                Err(e) => {
+                    eprintln!("Failed to load config: {}", e);
+                    std::process::exit(1);
+                }
+            };
+
+            // Display configuration in table format
+            config.display_debug_table();
         }
     }
 }

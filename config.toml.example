@@ -1,24 +1,37 @@
+# SwiftRelay Server Configuration
+# Copy this file to config.toml and fill in your API keys
+
 [swift_relay]
+# Server host address (use 0.0.0.0 to bind to all interfaces, 127.0.0.1 for localhost only)
 host = "127.0.0.1"
 port = 8000
 
 [openai]
+# OpenAI API Key - Get from https://platform.openai.com/api-keys
 api_key = ""
 
 [anthropic]
+# Anthropic Claude API Key - Get from https://console.anthropic.com/
 api_key = ""
 
 [bedrock]
+# AWS Bedrock credentials - Get from AWS IAM Console
 api_key = ""
 access_key = ""
 
 [cohere]
+# Cohere API Key - Get from https://dashboard.cohere.ai/api-keys
 api_key = ""
 
 [azure_openai]
+# Azure OpenAI Service credentials - Get from Azure Portal
+# Azure OpenAI endpoint URL format: https://your-resource-name.openai.azure.com/
 api_key = ""
 endpoint = ""
 
 [vertext]
+# Google Cloud Vertex AI configuration - Get from Google Cloud Console
+# Path to your service account JSON key file (e.g., /path/to/service-account-key.json)
+# Download from Google Cloud Console > IAM & Admin > Service Accounts
 project_id = ""
 credentials = ""
