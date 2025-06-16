@@ -27,17 +27,31 @@ default:
 dev *args:
   @watchexec -r -e rs -- cargo run -q -- {{args}}
 
-[doc('Build the application')]
+[doc('Build the application (release)')]
 [no-exit-message]
-build +APP_ENV='prod':
-  @echo "Building {{app_identifier}} v{{app_version}} in {{APP_ENV}} mode..."
-  @cargo build
+build *args:
+  @echo "Building {{app_identifier}} v{{app_version}} in release mode..."
+  @cargo build --release {{args}}
+  @ls -lh target/release/{{app_identifier}}
 
-[doc('Start the application from build')]
+[doc('Build the application (debug)')]
 [no-exit-message]
-start +APP_ENV='prod':
-  @echo "Starting {{app_identifier}} v{{app_version}} in {{APP_ENV}} mode..."
-  @target/debug/{{app_identifier}}
+build-debug *args:
+  @echo "Building {{app_identifier}} v{{app_version}} in debug mode..."
+  @cargo build {{args}}
+  @ls -lh target/debug/{{app_identifier}}
+
+[doc('Start the application from build (release)')]
+[no-exit-message]
+start *args:
+  @echo "Starting {{app_identifier}} v{{app_version}} in release mode..."
+  @target/release/{{app_identifier}} {{args}}
+
+[doc('Start the application from build (debug)')]
+[no-exit-message]
+start-debug *args:
+  @echo "Starting {{app_identifier}} v{{app_version}} in debug mode..."
+  @target/debug/{{app_identifier}} {{args}}
 
 [doc('Tests the application')]
 test *args:
