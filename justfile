@@ -17,10 +17,15 @@ default:
 
 #----- Development and Build tasks --------------------------------------------
 
-[doc('Start development')]
+[doc('Start development server')]
 [no-exit-message]
 dev *args:
   @watchexec -r -e rs -- cargo run -q -- {{args}}
+
+[doc('Run development for CLI')]
+[no-exit-message]
+run *args:
+  @cargo run -q -- {{args}}
 
 [doc('Build the application (release)')]
 [no-exit-message]

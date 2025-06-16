@@ -66,4 +66,4 @@ USER nonroot:nonroot
 EXPOSE $PORT/tcp
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["swift-relay"]
+CMD ["swift-relay", "serve"]
