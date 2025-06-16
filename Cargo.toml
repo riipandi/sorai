@@ -1,6 +1,7 @@
 [package]
 name = "swift-relay"
 version = "0.0.0"
+description = "Fast LLM gateway written in Rust"
 authors = ["Aris Ripandi <aris@duck.com>"]
 repository = "https://github.com/riipandi/swift-relay"
 documentation = "https://github.com/riipandi/swift-relay"

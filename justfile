@@ -69,3 +69,27 @@ check *args:
 [confirm("Are you sure you want to cleanup the artifacts?")]
 cleanup:
   @npx --yes rimraf build dist tmp target
+
+#----- Docker related tasks ---------------------------------------------------
+
+[doc('Build the Docker image')]
+docker-build *args:
+  @docker build -f Dockerfile . -t {{app_image}}:{{app_version}} {{args}}
+  @docker image list --filter reference={{app_image}}:*
+
+[doc('Run the Docker image')]
+docker-run *args:
+  @docker run --network=host --rm -it --env-file .env {{app_image}}:{{app_version}} {{args}}
+
+[doc('Run the Docker image')]
+[no-exit-message]
+docker-shell:
+  @docker run --network=host --rm -it --env-file .env --entrypoint /bin/sh {{app_image}}:{{app_version}}
+
+[doc('Get Docker image list')]
+docker-images:
+  @docker image list --filter reference={{app_image}}:*
+
+[doc('Push the Docker image')]
+docker-push:
+  @docker push {{app_image}}:{{app_version}}
