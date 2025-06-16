@@ -20,7 +20,7 @@ default:
 [doc('Start development server')]
 [no-exit-message]
 dev *args:
-  @watchexec -r -e rs -- cargo run -q -- {{args}}
+  @watchexec -r -e rs -- cargo run -q -- serve {{args}}
 
 [doc('Run development for CLI')]
 [no-exit-message]

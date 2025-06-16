@@ -1,11 +1,14 @@
 mod config;
+mod handler;
+mod http;
+mod router;
 
-use axum::{Router, routing::get};
 use clap::{CommandFactory, Parser};
 use clap_derive::{Parser, Subcommand};
 use std::path::PathBuf;
 
 use config::Config;
+use http::HttpServer;
 
 /// Swift Relay Server
 #[derive(Parser)]
@@ -30,10 +33,6 @@ enum Commands {
         #[arg(long)]
         port: Option<u16>,
     },
-}
-
-async fn index() -> &'static str {
-    "Hello, World!!!"
 }
 
 #[tokio::main]
@@ -73,22 +72,10 @@ async fn main() {
                 config.swift_relay.port = port;
             }
 
-            let app = Router::new().route("/", get(index));
-            let address = format!("{}:{}", config.swift_relay.host, config.swift_relay.port);
-
-            println!("Starting HTTP Server...");
-            println!("Listening on: {address}");
-
-            let listener = match tokio::net::TcpListener::bind(&address).await {
-                Ok(listener) => listener,
-                Err(e) => {
-                    eprintln!("Failed to bind to address {}: {}", address, e);
-                    std::process::exit(1);
-                }
-            };
-
-            if let Err(e) = axum::serve(listener, app).await {
-                eprintln!("Server error: {}", e);
+            // Create and start HTTP server
+            let server = HttpServer::new(config);
+            if let Err(e) = server.start().await {
+                eprintln!("Failed to start server: {}", e);
                 std::process::exit(1);
             }
         }
