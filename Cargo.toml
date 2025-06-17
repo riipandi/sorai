@@ -20,14 +20,12 @@ serde_json = "1.0"
 tabled = "0.20"
 tokio = { version = "1.45", features = ["full"] }
 toml = "0.8"
-tower-http = { version = "0.6", features = ["trace"] }
+tower = { version = "0.5", features = ["full"] }
+tower-http = { version = "0.6", features = ["request-id", "trace"] }
 tracing = "0.1.41"
 tracing-appender = "0.2"
 tracing-subscriber = { version = "0.3", features = ["chrono", "env-filter", "time"] }
 uuid = { version = "1.17", features = ["v7"] }
-
-[dev-dependencies]
-tower = { version = "0.5", features = ["full"] }
 
 # Optimized for bundle size. If you want faster builds comment out/delete this section.
 # Reference: https://doc.rust-lang.org/cargo/reference/profiles.html

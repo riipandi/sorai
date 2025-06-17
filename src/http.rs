@@ -1,13 +1,17 @@
 use crate::config::Config;
 use crate::router::create_router;
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
-use axum::{http::Request, response::Response};
+use axum::http::{HeaderName, Request};
+use axum::response::Response;
 use std::time::Duration;
+use tower::ServiceBuilder;
+use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::Span;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 const LOG_NAME_PREFIX: &str = env!("CARGO_PKG_NAME");
+const REQUEST_ID_HEADER: &str = "x-request-id";
 
 /// HTTP Server handler
 pub struct HttpServer {
@@ -34,6 +38,26 @@ impl HttpServer {
             // < 1μs, show in nanoseconds
             format!("{}ns", nanos)
         }
+    }
+
+    /// Extract short request ID (first 8 characters)
+    fn extract_short_request_id(request: &Request<axum::body::Body>) -> String {
+        request
+            .headers()
+            .get(REQUEST_ID_HEADER)
+            .and_then(|v| v.to_str().ok())
+            .map(|id| id.chars().take(8).collect())
+            .unwrap_or_else(|| "unknown".to_string())
+    }
+
+    /// Extract short request ID from response headers
+    fn extract_short_request_id_from_response(response: &Response) -> String {
+        response
+            .headers()
+            .get(REQUEST_ID_HEADER)
+            .and_then(|v| v.to_str().ok())
+            .map(|id| id.chars().take(8).collect())
+            .unwrap_or_else(|| "unknown".to_string())
     }
 
     /// Parse rotation string to tracing_appender Rotation enum
@@ -175,34 +199,43 @@ impl HttpServer {
         // Initialize tracing with config
         self.init_tracing();
 
-        let app = create_router()
-            // Add TraceLayer for HTTP request/response logging
+        let x_request_id = HeaderName::from_static(REQUEST_ID_HEADER);
+
+        let middleware = ServiceBuilder::new()
+            // Set request ID layer - generates UUID for each request
+            .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
+            // Add TraceLayer for HTTP request/response logging with request ID
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|_request: &Request<_>| {
-                        // Create empty span without name to avoid field duplication
+                        // Create empty span to avoid field duplication in logs
                         tracing::Span::none()
                     })
                     .on_request(|request: &Request<_>, _span: &Span| {
-                        // Clean request log with [REQ] prefix
-                        tracing::info!("[REQ] {} {}", request.method(), request.uri().path());
+                        let request_id = Self::extract_short_request_id(request);
+                        tracing::info!("[REQ:{}] {} {}", request_id, request.method(), request.uri().path());
                     })
                     .on_response(|response: &Response, latency: Duration, _span: &Span| {
                         let status = response.status();
                         let duration_str = Self::format_duration(latency);
+                        let request_id = Self::extract_short_request_id_from_response(response);
 
                         // Clean response log with [RES] prefix and precise timing
                         if latency.as_millis() > 1000 {
-                            tracing::info!("[RES] {} {} SLOW", status.as_u16(), duration_str);
+                            tracing::info!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
                         } else {
-                            tracing::info!("[RES] {} {}", status.as_u16(), duration_str);
+                            tracing::info!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
                         }
                     })
                     .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
                         let duration_str = Self::format_duration(latency);
-                        tracing::error!("Request failed after {}: {:?}", duration_str, error);
+                        tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
                     }),
-            );
+            )
+            // Propagate request ID to response headers
+            .layer(PropagateRequestIdLayer::new(x_request_id));
+
+        let app = create_router().layer(middleware);
 
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
 
@@ -220,7 +253,6 @@ impl HttpServer {
             "📄 Log to File: {}",
             if file_logging_enabled { "enabled" } else { "disabled" }
         );
-        tracing::info!("🖥️  Log to Console: enabled");
 
         if file_logging_enabled {
             tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
