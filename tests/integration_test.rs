@@ -1,7 +1,7 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
 use serde_json::json;
-use sorai::create_router;
+use sorai::http::create_router;
 use tower::util::ServiceExt;
 
 #[tokio::test]

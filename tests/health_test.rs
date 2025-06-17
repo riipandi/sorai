@@ -1,6 +1,6 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
-use sorai::create_router;
+use sorai::http::create_router;
 use tower::util::ServiceExt;
 
 #[tokio::test]

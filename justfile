@@ -58,7 +58,7 @@ start-debug *args:
 
 [doc('Tests the application')]
 test *args:
-  @cargo test --frozen {{args}}
+  @cargo nextest run --frozen --no-fail-fast {{args}}
 
 [doc('Generate code coverage report')]
 coverage *args:
