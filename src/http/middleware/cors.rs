@@ -5,7 +5,7 @@ use tower_http::cors::CorsLayer;
 /// Create CORS layer from configuration
 pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
     if !config.cors.enabled {
-        tracing::info!("🚫 CORS is disabled");
+        tracing::debug!("🚫 CORS is disabled");
         return None;
     }
 
@@ -14,7 +14,7 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
     // Configure allowed origins
     if config.cors.allow_origins.len() == 1 && config.cors.allow_origins[0] == "*" {
         cors = cors.allow_origin(tower_http::cors::Any);
-        tracing::info!("🌐 CORS: Allow origins = * (any)");
+        tracing::debug!("🌐 CORS: Allow origins = * (any)");
     } else {
         let origins: Result<Vec<HeaderValue>, _> = config
             .cors
@@ -26,11 +26,11 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
         match origins {
             Ok(origin_values) => {
                 cors = cors.allow_origin(origin_values);
-                tracing::info!("🌐 CORS: Allow origins = {}", config.cors.allow_origins.join(", "));
+                tracing::debug!("🌐 CORS: Allow origins = {}", config.cors.allow_origins.join(", "));
             }
             Err(e) => {
                 tracing::error!("❌ Invalid CORS origin configuration: {}", e);
-                tracing::info!("🔄 Falling back to allow any origin");
+                tracing::debug!("🔄 Falling back to allow any origin");
                 cors = cors.allow_origin(tower_http::cors::Any);
             }
         }
@@ -47,11 +47,11 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
     match methods {
         Ok(method_values) => {
             cors = cors.allow_methods(method_values);
-            tracing::info!("🔧 CORS: Allow methods = {}", config.cors.allow_methods.join(", "));
+            tracing::debug!("🔧 CORS: Allow methods = {}", config.cors.allow_methods.join(", "));
         }
         Err(e) => {
             tracing::error!("❌ Invalid CORS method configuration: {}", e);
-            tracing::info!("🔄 Falling back to default methods");
+            tracing::debug!("🔄 Falling back to default methods");
             cors = cors.allow_methods([
                 Method::GET,
                 Method::POST,
@@ -76,11 +76,11 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
         match headers {
             Ok(header_values) => {
                 cors = cors.allow_headers(header_values);
-                tracing::info!("📋 CORS: Allow headers = {}", config.cors.allow_headers.join(", "));
+                tracing::debug!("📋 CORS: Allow headers = {}", config.cors.allow_headers.join(", "));
             }
             Err(e) => {
                 tracing::error!("❌ Invalid CORS header configuration: {}", e);
-                tracing::info!("🔄 Falling back to any headers");
+                tracing::debug!("🔄 Falling back to any headers");
                 cors = cors.allow_headers(tower_http::cors::Any);
             }
         }
@@ -98,7 +98,7 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
         match expose_headers {
             Ok(header_values) => {
                 cors = cors.expose_headers(header_values);
-                tracing::info!("📤 CORS: Expose headers = {}", config.cors.expose_headers.join(", "));
+                tracing::debug!("📤 CORS: Expose headers = {}", config.cors.expose_headers.join(", "));
             }
             Err(e) => {
                 tracing::error!("❌ Invalid CORS expose headers configuration: {}", e);
@@ -109,13 +109,13 @@ pub fn create_cors_layer(config: &Config) -> Option<CorsLayer> {
     // Configure credentials
     if config.cors.allow_credentials {
         cors = cors.allow_credentials(true);
-        tracing::info!("🔐 CORS: Allow credentials = true");
+        tracing::debug!("🔐 CORS: Allow credentials = true");
     }
 
     // Configure max age
     if config.cors.max_age > 0 {
         cors = cors.max_age(std::time::Duration::from_secs(config.cors.max_age));
-        tracing::info!("⏰ CORS: Max age = {}s", config.cors.max_age);
+        tracing::debug!("⏰ CORS: Max age = {}s", config.cors.max_age);
     }
 
     Some(cors)

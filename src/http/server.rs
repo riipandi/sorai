@@ -226,8 +226,6 @@ impl HttpServer {
             false
         };
 
-        tracing::info!("🌐 CORS: {}", if cors_enabled { "enabled" } else { "disabled" });
-
         // Add other middleware layers
         let middleware = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
@@ -266,28 +264,26 @@ impl HttpServer {
         app = app.layer(middleware);
 
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
+        let app_env = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
 
         tracing::info!("🚀 Starting Sorai HTTP Server");
         tracing::info!("📡 Listening on: http://{}", address);
-        tracing::info!(
-            "🔧 Environment: {}",
-            std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string())
-        );
-        tracing::info!("📊 Pool Size: {}", self.config.sorai.pool_size);
-        tracing::info!("📝 Log Level: {}", self.config.logging.level);
+        tracing::info!("🖥️  Environment: {}", app_env);
+        tracing::debug!("🎱 Pool Size: {}", self.config.sorai.pool_size);
+        tracing::debug!("📝 Log Level: {}", self.config.logging.level);
 
         let file_logging_enabled = self.parse_rotation().is_some();
-        tracing::info!(
+        tracing::debug!(
             "📄 Log to File: {}",
             if file_logging_enabled { "enabled" } else { "disabled" }
         );
 
         if file_logging_enabled {
-            tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
-            tracing::info!("🔄 Log Rotation: {}", self.config.logging.rotation);
+            tracing::debug!("📁 Log Directory: {}", self.config.logging.log_directory);
+            tracing::debug!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
 
-        tracing::info!("📊 Prometheus Metrics: enabled at /metrics");
+        tracing::debug!("🌐 CORS: {}", if cors_enabled { "enabled" } else { "disabled" });
         tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
