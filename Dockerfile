@@ -10,8 +10,16 @@ FROM --platform=${PLATFORM} busybox:1.37-glibc AS glibc
 # Base image for building the application
 # -----------------------------------------------------------------------------
 FROM --platform=${PLATFORM} rust:${RUST_VERSION}-slim-bookworm AS base
-RUN apt-get update && apt-get -yqq --no-install-recommends install tini
-RUN update-ca-certificates
+
+# Install build dependencies.
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean && apt-get update -y \
+    && apt-get -yqq --no-install-recommends install build-essential curl \
+       inotify-tools pkg-config libssl-dev git unzip ca-certificates tini \
+    && update-ca-certificates
+
 WORKDIR /usr/src
 
 # -----------------------------------------------------------------------------

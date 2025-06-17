@@ -391,7 +391,24 @@ impl HttpServer {
             tracing::debug!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
 
-        tracing::debug!("🌐 CORS: {}", if cors_enabled { "enabled" } else { "disabled" });
+        if cors_enabled {
+            match self.config.cors.allow_origins.as_slice() {
+                [origin] if origin == "*" => {
+                    tracing::info!("🌐 CORS enabled. Allow origins = * (any)");
+                }
+                origins if origins.is_empty() => {
+                    tracing::warn!("🌐 CORS enabled but no origins configured");
+                }
+                origins => {
+                    tracing::info!(
+                        "🌐 CORS enabled. Allow origins = {} (total: {})",
+                        origins.join(", "),
+                        origins.len()
+                    );
+                }
+            }
+        }
+
         tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
