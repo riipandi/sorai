@@ -1,0 +1,22 @@
+apiVersion: 1
+
+datasources:
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 3.4
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+      # exemplarTraceIdDestinations:
+      #   # This links exemplars to traces (if you have tracing setup)
+      #   - name: trace_id
+      #     url: http://localhost:16686/trace/${__value.raw}
+    secureJsonData: {}
