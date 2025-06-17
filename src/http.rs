@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::router::create_router;
-use crate::utils::time::{PreciseTimeFormat, format_timestamp_for_span, format_timestamp_readable};
-use axum::{extract::MatchedPath, http::Request, response::Response};
+use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
+use axum::{http::Request, response::Response};
 use std::time::Duration;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{Span, info_span};
@@ -18,6 +18,22 @@ impl HttpServer {
     /// Create new HTTP server instance
     pub fn new(config: Config) -> Self {
         Self { config }
+    }
+
+    /// Format duration with appropriate precision unit
+    fn format_duration(duration: Duration) -> String {
+        let nanos = duration.as_nanos();
+
+        if nanos >= 1_000_000 {
+            // >= 1ms, show in milliseconds
+            format!("{}ms", duration.as_millis())
+        } else if nanos >= 1_000 {
+            // >= 1μs, show in microseconds
+            format!("{}μs", duration.as_micros())
+        } else {
+            // < 1μs, show in nanoseconds
+            format!("{}ns", nanos)
+        }
     }
 
     /// Parse rotation string to tracing_appender Rotation enum
@@ -163,49 +179,28 @@ impl HttpServer {
             // Add TraceLayer for HTTP request/response logging
             .layer(
                 TraceLayer::new_for_http()
-                    .make_span_with(|request: &Request<_>| {
-                        // Log the matched route's path (with placeholders not filled in).
-                        // Use request.uri() or OriginalUri if you want the real path.
-                        let matched_path = request.extensions().get::<MatchedPath>().map(MatchedPath::as_str);
-
-                        info_span!(
-                            "request",
-                            method = %request.method(),
-                            uri = %request.uri(),
-                            path = matched_path,
-                            status = tracing::field::Empty,
-                            latency_ms = tracing::field::Empty,
-                            timestamp = format_timestamp_for_span(),
-                        )
+                    .make_span_with(|_request: &Request<_>| {
+                        // Create empty span to avoid field duplication
+                        info_span!("request")
                     })
                     .on_request(|request: &Request<_>, _span: &Span| {
-                        tracing::info!("→ {} {}", request.method(), request.uri().path());
+                        // Clean request log with [REQ] prefix
+                        tracing::info!("[REQ] {} {}", request.method(), request.uri().path());
                     })
-                    .on_response(|response: &Response, latency: Duration, span: &Span| {
-                        let latency_ms = latency.as_millis();
+                    .on_response(|response: &Response, latency: Duration, _span: &Span| {
                         let status = response.status();
+                        let duration_str = Self::format_duration(latency);
 
-                        span.record("status", status.as_u16());
-                        span.record("latency_ms", latency_ms);
-
-                        let status_emoji = match status.as_u16() {
-                            200..=299 => "✅",
-                            300..=399 => "↩️",
-                            400..=499 => "❌",
-                            500..=599 => "💥",
-                            _ => "❓",
-                        };
-
-                        tracing::info!(
-                            "← {} {} {}ms {}",
-                            status_emoji,
-                            status.as_u16(),
-                            latency_ms,
-                            if latency_ms > 1000 { "⚠️ SLOW" } else { "" }
-                        );
+                        // Clean response log with [RES] prefix and precise timing
+                        if latency.as_millis() > 1000 {
+                            tracing::info!("[RES] {} {} SLOW", status.as_u16(), duration_str);
+                        } else {
+                            tracing::info!("[RES] {} {}", status.as_u16(), duration_str);
+                        }
                     })
                     .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
-                        tracing::error!("💥 Request failed after {}ms: {:?}", latency.as_millis(), error);
+                        let duration_str = Self::format_duration(latency);
+                        tracing::error!("Request failed after {}: {:?}", duration_str, error);
                     }),
             );
 

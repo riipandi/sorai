@@ -24,12 +24,6 @@ impl FormatTime for HighPrecisionTimeFormat {
     }
 }
 
-/// Utility function to format timestamp consistently for span fields
-/// Returns 24-character timestamp with millisecond precision
-pub fn format_timestamp_for_span() -> String {
-    Utc::now().format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string()
-}
-
 /// Utility function to format timestamp for startup messages
 /// Returns human-readable format: "2025-06-17 15:23:58 UTC"
 pub fn format_timestamp_readable() -> String {
