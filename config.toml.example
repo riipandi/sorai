@@ -7,6 +7,12 @@ host = "127.0.0.1"
 port = 8000
 pool_size = 300
 
+[logging]
+# Show timestamp in logs (true/false)
+show_timestamp = true
+# Log level: trace, debug, info, warn, error
+level = "info"
+
 [openai]
 # OpenAI API Key - Get from https://platform.openai.com/api-keys
 api_key = ""

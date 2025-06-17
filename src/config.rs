@@ -7,6 +7,8 @@ use tokio::fs;
 pub struct Config {
     pub swift_relay: SwiftRelayConfig,
     #[serde(default)]
+    pub logging: LoggingConfig,
+    #[serde(default)]
     pub openai: OpenAIConfig,
     #[serde(default)]
     pub anthropic: AnthropicConfig,
@@ -26,6 +28,16 @@ pub struct SwiftRelayConfig {
     pub host: String,
     #[serde(default = "default_port")]
     pub port: u16,
+    #[serde(default = "default_pool_size")]
+    pub pool_size: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LoggingConfig {
+    #[serde(default = "default_show_timestamp")]
+    pub show_timestamp: bool,
+    #[serde(default = "default_log_level")]
+    pub level: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -89,11 +101,33 @@ fn default_port() -> u16 {
     8000
 }
 
+fn default_pool_size() -> u32 {
+    300
+}
+
+fn default_show_timestamp() -> bool {
+    true
+}
+
+fn default_log_level() -> String {
+    "info".to_string()
+}
+
 impl Default for SwiftRelayConfig {
     fn default() -> Self {
         Self {
             host: default_host(),
             port: default_port(),
+            pool_size: default_pool_size(),
+        }
+    }
+}
+
+impl Default for LoggingConfig {
+    fn default() -> Self {
+        Self {
+            show_timestamp: default_show_timestamp(),
+            level: default_log_level(),
         }
     }
 }
@@ -102,6 +136,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             swift_relay: SwiftRelayConfig::default(),
+            logging: LoggingConfig::default(),
             openai: OpenAIConfig::default(),
             anthropic: AnthropicConfig::default(),
             bedrock: BedrockConfig::default(),
@@ -174,6 +209,23 @@ impl Config {
             section: "SwiftRelay".to_string(),
             key: "Port".to_string(),
             value: self.swift_relay.port.to_string(),
+        });
+        config_items.push(ConfigItem {
+            section: "SwiftRelay".to_string(),
+            key: "Pool Size".to_string(),
+            value: self.swift_relay.pool_size.to_string(),
+        });
+
+        // Logging Configuration
+        config_items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Show Timestamp".to_string(),
+            value: self.logging.show_timestamp.to_string(),
+        });
+        config_items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Level".to_string(),
+            value: self.logging.level.clone(),
         });
 
         // OpenAI Configuration
