@@ -28,7 +28,7 @@ pub async fn index() -> impl IntoResponse {
 pub async fn health_check() -> impl IntoResponse {
     let data = HealthStatus {
         status: "OK".to_string(),
-        service: "SwiftRelay".to_string(),
+        service: "Sorai".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
     };
     success(data)
@@ -37,7 +37,7 @@ pub async fn health_check() -> impl IntoResponse {
 /// API status endpoint handler
 pub async fn status() -> impl IntoResponse {
     let data = MessageResponse {
-        message: "SwiftRelay Server is running".to_string(),
+        message: "Sorai Server is running".to_string(),
     };
     success(data)
 }

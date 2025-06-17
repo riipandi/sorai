@@ -1,7 +1,7 @@
-# SwiftRelay Server Configuration
+# Sorai Server Configuration
 # Copy this file to config.toml and fill in your API keys
 
-[swift_relay]
+[sorai]
 # Server host address (use 0.0.0.0 to bind to all interfaces, 127.0.0.1 for localhost only)
 host = "127.0.0.1"
 port = 8000

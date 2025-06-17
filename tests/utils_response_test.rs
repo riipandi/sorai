@@ -1,5 +1,5 @@
 use serde_json::json;
-use swift_relay::utils::response::*;
+use sorai::utils::response::*;
 
 #[test]
 fn test_success_response() {
@@ -34,66 +34,66 @@ fn test_api_response_success_with_message() {
 }
 
 #[test]
-fn test_swift_relay_error_bad_request() {
-    let error = SwiftRelayError::bad_request("Invalid input", Some(json!({"field": "name"})));
+fn test_sorai_error_bad_request() {
+    let error = SoraiError::bad_request("Invalid input", Some(json!({"field": "name"})));
     assert_eq!(error.status_code, 400);
     assert_eq!(error.error_type, "invalid_request_error");
     assert_eq!(error.error.code, "bad_request");
     assert_eq!(error.error.message, "Invalid input");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
     assert!(error.event_id.len() > 0);
     assert_eq!(error.error.event_id, error.event_id);
 }
 
 #[test]
-fn test_swift_relay_error_unauthorized() {
-    let error = SwiftRelayError::unauthorized("Invalid API key");
+fn test_sorai_error_unauthorized() {
+    let error = SoraiError::unauthorized("Invalid API key");
     assert_eq!(error.status_code, 401);
     assert_eq!(error.error_type, "authentication_error");
     assert_eq!(error.error.code, "unauthorized");
     assert_eq!(error.error.message, "Invalid API key");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
     assert!(error.error.param.is_none());
 }
 
 #[test]
-fn test_swift_relay_error_rate_limit() {
-    let error = SwiftRelayError::rate_limit_exceeded("Too many requests");
+fn test_sorai_error_rate_limit() {
+    let error = SoraiError::rate_limit_exceeded("Too many requests");
     assert_eq!(error.status_code, 429);
     assert_eq!(error.error_type, "rate_limit_error");
     assert_eq!(error.error.code, "rate_limit_exceeded");
     assert_eq!(error.error.message, "Too many requests");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
 }
 
 #[test]
-fn test_swift_relay_error_internal_server_error() {
-    let error = SwiftRelayError::internal_server_error("Something went wrong");
+fn test_sorai_error_internal_server_error() {
+    let error = SoraiError::internal_server_error("Something went wrong");
     assert_eq!(error.status_code, 500);
     assert_eq!(error.error_type, "internal_error");
     assert_eq!(error.error.code, "internal_server_error");
     assert_eq!(error.error.message, "Something went wrong");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
 }
 
 #[test]
-fn test_swift_relay_error_bad_gateway() {
-    let error = SwiftRelayError::bad_gateway("Provider service unavailable");
+fn test_sorai_error_bad_gateway() {
+    let error = SoraiError::bad_gateway("Provider service unavailable");
     assert_eq!(error.status_code, 502);
     assert_eq!(error.error_type, "provider_error");
     assert_eq!(error.error.code, "bad_gateway");
     assert_eq!(error.error.message, "Provider service unavailable");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
 }
 
 #[test]
-fn test_swift_relay_error_service_unavailable() {
-    let error = SwiftRelayError::service_unavailable("Service temporarily unavailable");
+fn test_sorai_error_service_unavailable() {
+    let error = SoraiError::service_unavailable("Service temporarily unavailable");
     assert_eq!(error.status_code, 503);
     assert_eq!(error.error_type, "service_error");
     assert_eq!(error.error.code, "service_unavailable");
     assert_eq!(error.error.message, "Service temporarily unavailable");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
 }
 
 #[test]
@@ -112,20 +112,20 @@ fn test_helper_error_function() {
     assert_eq!(error.error_type, "validation_error");
     assert_eq!(error.error.code, "invalid_field");
     assert_eq!(error.error.message, "Field validation failed");
-    assert!(error.is_swift_relay_error);
+    assert!(error.is_sorai_error);
     assert_eq!(error.error.param, Some(json!({"field": "email"})));
 }
 
 #[test]
 fn test_event_id_consistency() {
-    let error = SwiftRelayError::bad_request("Test error", None);
+    let error = SoraiError::bad_request("Test error", None);
     assert_eq!(error.event_id, error.error.event_id);
     assert!(error.event_id.len() > 0);
 }
 
 #[test]
 fn test_error_field_structure() {
-    let error = SwiftRelayError::unauthorized("Access denied");
+    let error = SoraiError::unauthorized("Access denied");
 
     assert_eq!(error.error.error_type, "authentication_error");
     assert_eq!(error.error.code, "unauthorized");

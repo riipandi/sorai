@@ -1,7 +1,7 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
 use serde_json::json;
-use swift_relay::create_router;
+use sorai::create_router;
 use tower::util::ServiceExt;
 
 #[tokio::test]
@@ -228,7 +228,7 @@ async fn test_error_handling_consistency() {
         assert_eq!(response_json["error_type"], "invalid_request_error");
         assert_eq!(response_json["error"]["code"], "bad_request");
         assert_eq!(response_json["error"]["message"], expected_message);
-        assert!(response_json["is_swift_relay_error"].as_bool().unwrap());
+        assert!(response_json["is_sorai_error"].as_bool().unwrap());
         assert!(response_json["event_id"].is_string());
         assert!(response_json["error"]["event_id"].is_string());
     }

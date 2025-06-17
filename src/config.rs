@@ -5,7 +5,7 @@ use tokio::fs;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
-    pub swift_relay: SwiftRelayConfig,
+    pub sorai: SoraiConfig,
     #[serde(default)]
     pub logging: LoggingConfig,
     #[serde(default)]
@@ -23,7 +23,7 @@ pub struct Config {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SwiftRelayConfig {
+pub struct SoraiConfig {
     #[serde(default = "default_host")]
     pub host: String,
     #[serde(default = "default_port")]
@@ -113,7 +113,7 @@ fn default_log_level() -> String {
     "info".to_string()
 }
 
-impl Default for SwiftRelayConfig {
+impl Default for SoraiConfig {
     fn default() -> Self {
         Self {
             host: default_host(),
@@ -135,7 +135,7 @@ impl Default for LoggingConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            swift_relay: SwiftRelayConfig::default(),
+            sorai: SoraiConfig::default(),
             logging: LoggingConfig::default(),
             openai: OpenAIConfig::default(),
             anthropic: AnthropicConfig::default(),
@@ -199,21 +199,21 @@ impl Config {
     pub fn display_debug_table(&self) {
         let mut config_items = Vec::new();
 
-        // SwiftRelay Configuration
+        // Sorai Configuration
         config_items.push(ConfigItem {
-            section: "SwiftRelay".to_string(),
+            section: "Sorai".to_string(),
             key: "Host".to_string(),
-            value: self.swift_relay.host.clone(),
+            value: self.sorai.host.clone(),
         });
         config_items.push(ConfigItem {
-            section: "SwiftRelay".to_string(),
+            section: "Sorai".to_string(),
             key: "Port".to_string(),
-            value: self.swift_relay.port.to_string(),
+            value: self.sorai.port.to_string(),
         });
         config_items.push(ConfigItem {
-            section: "SwiftRelay".to_string(),
+            section: "Sorai".to_string(),
             key: "Pool Size".to_string(),
-            value: self.swift_relay.pool_size.to_string(),
+            value: self.sorai.pool_size.to_string(),
         });
 
         // Logging Configuration

@@ -1,6 +1,6 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
-use swift_relay::create_router;
+use sorai::create_router;
 use tower::util::ServiceExt;
 
 #[tokio::test]
@@ -44,7 +44,7 @@ async fn test_health_check_route() {
 
     assert_eq!(response_json["success"], true);
     assert_eq!(response_json["data"]["status"], "OK");
-    assert_eq!(response_json["data"]["service"], "SwiftRelay");
+    assert_eq!(response_json["data"]["service"], "Sorai");
     assert!(response_json["data"]["version"].is_string());
     assert!(!response_json["data"]["version"].as_str().unwrap().is_empty());
 }
@@ -70,7 +70,7 @@ async fn test_status_route() {
     let response_json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
     assert_eq!(response_json["success"], true);
-    assert_eq!(response_json["data"]["message"], "SwiftRelay Server is running");
+    assert_eq!(response_json["data"]["message"], "Sorai Server is running");
     assert!(response_json["message"].is_null());
 }
 
@@ -235,7 +235,7 @@ async fn test_multiple_requests_consistency() {
             i
         );
         assert_eq!(
-            response_json["data"]["service"], "SwiftRelay",
+            response_json["data"]["service"], "Sorai",
             "Request {} should return correct service name",
             i
         );

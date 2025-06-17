@@ -6,13 +6,13 @@
 platform_arch := if arch() == "aarch64" { "linux/arm64" } else { "linux/amd64" }
 
 [private]
-app_identifier := "swift-relay"
+app_identifier := "sorai"
 
 [private]
 app_version := "0.0.0"
 
 [private]
-app_image := "ghcr.io/riipandi/swift-relay"
+app_image := "ghcr.io/riipandi/sorai"
 
 [private]
 default:
@@ -92,7 +92,7 @@ docker-run *args:
 [doc('Exec into the Docker image')]
 [no-exit-message]
 docker-exec *args:
-  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /srv/swift-relay {{app_image}}:{{app_version}} {{args}}
+  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /srv/sorai {{app_image}}:{{app_version}} {{args}}
 
 [doc('Debug the Docker image')]
 [no-exit-message]

@@ -21,15 +21,15 @@ FROM base AS builder
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/src/target cargo build \
-    --release --frozen && strip -s target/release/swift-relay \
-    && mv target/release/swift-relay . && chmod +x swift-relay
+    --release --frozen && strip -s target/release/sorai \
+    && mv target/release/sorai . && chmod +x sorai
 
 # -----------------------------------------------------------------------------
 # Use the slim image for a lean production container.
 # -----------------------------------------------------------------------------
 FROM --platform=${PLATFORM} gcr.io/distroless/cc-debian12:nonroot AS runner
-LABEL org.opencontainers.image.source="https://github.com/riipandi/swift-relay"
-LABEL org.opencontainers.image.documentation="https://github.com/riipandi/swift-relay"
+LABEL org.opencontainers.image.source="https://github.com/riipandi/sorai"
+LABEL org.opencontainers.image.documentation="https://github.com/riipandi/sorai"
 LABEL org.opencontainers.image.description="Fast LLM gateway written in Rust"
 LABEL org.opencontainers.image.authors="Aris Ripandi"
 LABEL org.opencontainers.image.vendor="Aris Ripandi"
@@ -41,7 +41,7 @@ ARG OPENAI_API_KEY ANTHROPIC_API_KEY BEDROCK_API_KEY BEDROCK_ACCESS_KEY \
     VERTEX_CREDENTIALS
 
 # Copy the build output files and necessary utilities from previous stage.
-COPY --from=builder --chown=nonroot:nonroot /usr/src/swift-relay /srv/swift-relay
+COPY --from=builder --chown=nonroot:nonroot /usr/src/sorai /srv/sorai
 COPY --from=builder --chmod=775 /usr/bin/tini /usr/bin/tini
 
 # Add some additional system utilities for debugging (~10MB).
@@ -57,7 +57,7 @@ COPY --from=builder --chmod=775 /usr/bin/tini /usr/bin/tini
 # COPY --from=glibc /bin/sh /bin/sh
 
 # Define the host and port to listen on.
-ARG RUST_LOG=swift-relay=debug HOST=0.0.0.0 PORT=8000
+ARG RUST_LOG=sorai=debug HOST=0.0.0.0 PORT=8000
 ENV RUST_LOG=$RUST_LOG HOST=$HOST PORT=$PORT
 ENV TINI_SUBREAPER=true PATH="/srv:$PATH"
 
@@ -66,4 +66,4 @@ USER nonroot:nonroot
 EXPOSE $PORT/tcp
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["swift-relay", "serve"]
+CMD ["sorai", "serve"]

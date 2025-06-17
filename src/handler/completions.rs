@@ -1,6 +1,6 @@
 #![allow(unused_variables, dead_code)]
 
-use crate::utils::response::{SwiftRelayError, success};
+use crate::utils::response::{SoraiError, success};
 use axum::{extract::Json, response::IntoResponse};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -13,7 +13,7 @@ pub struct ChatCompletionRequest {
     #[serde(default)]
     pub model: Option<String>,
     #[serde(default)]
-    pub messages: Vec<Value>, // Placeholder for SwiftRelayMessage
+    pub messages: Vec<Value>, // Placeholder for SoraiMessage
     #[serde(default)]
     pub params: Option<Value>, // Placeholder for ModelParameters
     #[serde(default)]
@@ -46,32 +46,30 @@ pub struct CompletionResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage: Option<Value>, // Placeholder for LLMUsage
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub extra_fields: Option<Value>, // Placeholder for SwiftRelayResponseExtraFields
+    pub extra_fields: Option<Value>, // Placeholder for SoraiResponseExtraFields
 }
 
 /// Placeholder completion choice
 #[derive(Debug, Serialize)]
 pub struct CompletionChoice {
     pub index: i32,
-    pub message: Value, // Placeholder for SwiftRelayMessage
+    pub message: Value, // Placeholder for SoraiMessage
     pub finish_reason: String,
 }
 
 /// Chat completions endpoint handler
 /// POST /v1/chat/completions
-pub async fn chat_completions(
-    Json(request): Json<ChatCompletionRequest>,
-) -> Result<impl IntoResponse, SwiftRelayError> {
+pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Result<impl IntoResponse, SoraiError> {
     // Validate required fields
     let provider = match &request.provider {
         None => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Provider is required",
                 Some(serde_json::json!({"field": "provider"})),
             ));
         }
         Some(provider) if provider.is_empty() => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Provider is required",
                 Some(serde_json::json!({"field": "provider"})),
             ));
@@ -81,13 +79,13 @@ pub async fn chat_completions(
 
     let model = match &request.model {
         None => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Model is required",
                 Some(serde_json::json!({"field": "model"})),
             ));
         }
         Some(model) if model.is_empty() => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Model is required",
                 Some(serde_json::json!({"field": "model"})),
             ));
@@ -96,7 +94,7 @@ pub async fn chat_completions(
     };
 
     if request.messages.is_empty() {
-        return Err(SwiftRelayError::bad_request(
+        return Err(SoraiError::bad_request(
             "Messages array cannot be empty",
             Some(serde_json::json!({"field": "messages"})),
         ));
@@ -111,7 +109,7 @@ pub async fn chat_completions(
             index: 0,
             message: serde_json::json!({
                 "role": "assistant",
-                "content": "This is a placeholder response from SwiftRelay chat completions endpoint."
+                "content": "This is a placeholder response from Sorai chat completions endpoint."
             }),
             finish_reason: "stop".to_string(),
         }],
@@ -133,19 +131,17 @@ pub async fn chat_completions(
 
 /// Text completions endpoint handler
 /// POST /v1/text/completions
-pub async fn text_completions(
-    Json(request): Json<TextCompletionRequest>,
-) -> Result<impl IntoResponse, SwiftRelayError> {
+pub async fn text_completions(Json(request): Json<TextCompletionRequest>) -> Result<impl IntoResponse, SoraiError> {
     // Validate required fields
     let provider = match &request.provider {
         None => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Provider is required",
                 Some(serde_json::json!({"field": "provider"})),
             ));
         }
         Some(provider) if provider.is_empty() => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Provider is required",
                 Some(serde_json::json!({"field": "provider"})),
             ));
@@ -155,13 +151,13 @@ pub async fn text_completions(
 
     let model = match &request.model {
         None => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Model is required",
                 Some(serde_json::json!({"field": "model"})),
             ));
         }
         Some(model) if model.is_empty() => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Model is required",
                 Some(serde_json::json!({"field": "model"})),
             ));
@@ -172,13 +168,13 @@ pub async fn text_completions(
     // Check if text field is missing or empty
     let text = match &request.text {
         None => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Text prompt is required",
                 Some(serde_json::json!({"field": "text"})),
             ));
         }
         Some(text) if text.is_empty() => {
-            return Err(SwiftRelayError::bad_request(
+            return Err(SoraiError::bad_request(
                 "Text prompt is required",
                 Some(serde_json::json!({"field": "text"})),
             ));

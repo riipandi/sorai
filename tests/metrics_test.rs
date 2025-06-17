@@ -1,6 +1,6 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode};
-use swift_relay::create_router;
+use sorai::create_router;
 use tower::util::ServiceExt;
 
 #[tokio::test]
@@ -28,39 +28,39 @@ async fn test_metrics_endpoint() {
     let body_str = String::from_utf8(body.to_vec()).unwrap();
 
     // Verify Prometheus format metrics are present
-    assert!(body_str.contains("# HELP swift_relay_requests_total"));
-    assert!(body_str.contains("# TYPE swift_relay_requests_total counter"));
-    assert!(body_str.contains("swift_relay_requests_total{"));
+    assert!(body_str.contains("# HELP sorai_requests_total"));
+    assert!(body_str.contains("# TYPE sorai_requests_total counter"));
+    assert!(body_str.contains("sorai_requests_total{"));
 
     // Verify request duration metrics
-    assert!(body_str.contains("# HELP swift_relay_request_duration_seconds"));
-    assert!(body_str.contains("# TYPE swift_relay_request_duration_seconds histogram"));
-    assert!(body_str.contains("swift_relay_request_duration_seconds_bucket{"));
+    assert!(body_str.contains("# HELP sorai_request_duration_seconds"));
+    assert!(body_str.contains("# TYPE sorai_request_duration_seconds histogram"));
+    assert!(body_str.contains("sorai_request_duration_seconds_bucket{"));
 
     // Verify token metrics
-    assert!(body_str.contains("# HELP swift_relay_tokens_total"));
-    assert!(body_str.contains("# TYPE swift_relay_tokens_total counter"));
-    assert!(body_str.contains("swift_relay_tokens_total{"));
+    assert!(body_str.contains("# HELP sorai_tokens_total"));
+    assert!(body_str.contains("# TYPE sorai_tokens_total counter"));
+    assert!(body_str.contains("sorai_tokens_total{"));
 
     // Verify error metrics
-    assert!(body_str.contains("# HELP swift_relay_errors_total"));
-    assert!(body_str.contains("# TYPE swift_relay_errors_total counter"));
-    assert!(body_str.contains("swift_relay_errors_total{"));
+    assert!(body_str.contains("# HELP sorai_errors_total"));
+    assert!(body_str.contains("# TYPE sorai_errors_total counter"));
+    assert!(body_str.contains("sorai_errors_total{"));
 
     // Verify connection pool metrics
-    assert!(body_str.contains("# HELP swift_relay_connection_pool_active"));
-    assert!(body_str.contains("# TYPE swift_relay_connection_pool_active gauge"));
-    assert!(body_str.contains("swift_relay_connection_pool_active{"));
+    assert!(body_str.contains("# HELP sorai_connection_pool_active"));
+    assert!(body_str.contains("# TYPE sorai_connection_pool_active gauge"));
+    assert!(body_str.contains("sorai_connection_pool_active{"));
 
     // Verify fallback metrics
-    assert!(body_str.contains("# HELP swift_relay_fallback_usage_total"));
-    assert!(body_str.contains("# TYPE swift_relay_fallback_usage_total counter"));
-    assert!(body_str.contains("swift_relay_fallback_usage_total{"));
+    assert!(body_str.contains("# HELP sorai_fallback_usage_total"));
+    assert!(body_str.contains("# TYPE sorai_fallback_usage_total counter"));
+    assert!(body_str.contains("sorai_fallback_usage_total{"));
 
     // Verify server info metrics
-    assert!(body_str.contains("# HELP swift_relay_server_info"));
-    assert!(body_str.contains("# TYPE swift_relay_server_info gauge"));
-    assert!(body_str.contains("swift_relay_server_info{"));
+    assert!(body_str.contains("# HELP sorai_server_info"));
+    assert!(body_str.contains("# TYPE sorai_server_info gauge"));
+    assert!(body_str.contains("sorai_server_info{"));
 }
 
 #[tokio::test]

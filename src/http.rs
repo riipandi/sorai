@@ -119,16 +119,16 @@ impl HttpServer {
                     }),
             );
 
-        let address = format!("{}:{}", self.config.swift_relay.host, self.config.swift_relay.port);
+        let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
         let startup_time: DateTime<Utc> = Utc::now();
 
-        tracing::info!("🚀 Starting SwiftRelay HTTP Server");
+        tracing::info!("🚀 Starting Sorai HTTP Server");
         tracing::info!("📡 Listening on: http://{}", address);
         tracing::info!(
             "🔧 Environment: {}",
             std::env::var("RUST_ENV").unwrap_or_else(|_| "development".to_string())
         );
-        tracing::info!("📊 Pool Size: {}", self.config.swift_relay.pool_size);
+        tracing::info!("📊 Pool Size: {}", self.config.sorai.pool_size);
         tracing::info!("📝 Log Level: {}", self.config.logging.level);
         tracing::info!(
             "⏰ Show Timestamp: {}",

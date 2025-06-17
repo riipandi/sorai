@@ -1,10 +1,10 @@
 [package]
-name = "swift-relay"
+name = "sorai"
 version = "0.0.0"
 description = "Fast LLM gateway written in Rust"
 authors = ["Aris Ripandi <aris@duck.com>"]
-repository = "https://github.com/riipandi/swift-relay"
-documentation = "https://github.com/riipandi/swift-relay"
+repository = "https://github.com/riipandi/sorai"
+documentation = "https://github.com/riipandi/sorai"
 keywords = ["axum", "api", "llm", "proxy", "gateway"]
 license = "MIT OR Apache-2.0"
 rust-version = "1.87"

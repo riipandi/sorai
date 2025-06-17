@@ -14,13 +14,13 @@ pub struct ApiResponse<T> {
     pub message: Option<String>,
 }
 
-/// Standard error response following SwiftRelay specification
+/// Standard error response following Sorai specification
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SwiftRelayError {
+pub struct SoraiError {
     pub event_id: String,
     #[serde(rename = "type")]
     pub error_type: String,
-    pub is_swift_relay_error: bool,
+    pub is_sorai_error: bool,
     pub status_code: u16,
     pub error: ErrorField,
 }
@@ -69,8 +69,8 @@ where
     }
 }
 
-impl SwiftRelayError {
-    /// Create a new SwiftRelay error
+impl SoraiError {
+    /// Create a new Sorai error
     pub fn new(
         status_code: StatusCode,
         error_type: &str,
@@ -83,7 +83,7 @@ impl SwiftRelayError {
         Self {
             event_id: event_id.clone(),
             error_type: error_type.to_string(),
-            is_swift_relay_error: true,
+            is_sorai_error: true,
             status_code: status_code.as_u16(),
             error: ErrorField {
                 error_type: error_type.to_string(),
@@ -156,7 +156,7 @@ impl SwiftRelayError {
     }
 }
 
-impl IntoResponse for SwiftRelayError {
+impl IntoResponse for SoraiError {
     fn into_response(self) -> Response {
         let status_code = StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
 
@@ -187,6 +187,6 @@ pub fn error(
     code: &str,
     message: &str,
     param: Option<serde_json::Value>,
-) -> SwiftRelayError {
-    SwiftRelayError::new(status_code, error_type, code, message, param)
+) -> SoraiError {
+    SoraiError::new(status_code, error_type, code, message, param)
 }

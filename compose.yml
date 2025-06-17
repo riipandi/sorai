@@ -3,23 +3,23 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: swiftrelay_prometheus
+    container_name: sorai_prometheus
     restart: always
     ports: ['9090:9090']
     volumes: ['./prometheus.yml:/etc/prometheus/prometheus.yml:ro']
-    networks: ['swiftrelay_network']
+    networks: ['sorai_network']
 
   grafana:
     image: grafana/grafana:latest
-    container_name: swiftrelay_grafana
+    container_name: sorai_grafana
     restart: always
     ports: ['3000:3000']
     environment:
       GF_SECURITY_ADMIN_PASSWORD: 'admin' # Default admin password for Grafana
-    networks: ['swiftrelay_network']
+    networks: ['sorai_network']
     depends_on:
       - prometheus
 
 networks:
-  swiftrelay_network:
+  sorai_network:
     driver: bridge

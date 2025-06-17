@@ -8,4 +8,4 @@ pub mod utils;
 pub use config::Config;
 pub use http::HttpServer;
 pub use router::create_router;
-pub use utils::response::{ApiResponse, SwiftRelayError, error, success, success_with_message};
+pub use utils::response::{ApiResponse, SoraiError, error, success, success_with_message};

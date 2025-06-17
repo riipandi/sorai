@@ -12,7 +12,7 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 use config::Config;
 use http::HttpServer;
 
-/// SwiftRelay Server
+/// Sorai Server
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -97,11 +97,11 @@ async fn main() {
             // Override config with command line arguments if provided
             if let Some(host) = host {
                 tracing::info!("🔧 Overriding host from CLI: {}", host);
-                config.swift_relay.host = host;
+                config.sorai.host = host;
             }
             if let Some(port) = port {
                 tracing::info!("🔧 Overriding port from CLI: {}", port);
-                config.swift_relay.port = port;
+                config.sorai.port = port;
             }
 
             // Create and start HTTP server
