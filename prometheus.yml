@@ -1,0 +1,16 @@
+# Prometheus configuration for tracking SwiftRelay service.
+# For development and testing purposes only, don't use in production without proper setup.
+
+global:
+  scrape_interval: 5s # Scrape every 5 seconds
+
+# Note: Target configuration depends on your deployment environment:
+# - For local development: Use "host.docker.internal:8000" to access the service running on your host machine
+# - For Docker deployment: Use "swiftrelay-api:8000" to access the service within the Docker network
+#   Make sure to replace "swiftrelay-api" and "8000" with your actual docker container name and port if different
+#   Also check that you have the swiftrelay container inside "swiftrelay_network".
+
+scrape_configs:
+  - job_name: 'swiftrelay-api'
+    static_configs:
+      - targets: ['host.docker.internal:8000'] # Scrape from the /metrics endpoint

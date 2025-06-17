@@ -97,3 +97,17 @@ docker-images:
 [doc('Push the Docker image')]
 docker-push:
   @docker push {{app_image}}:{{app_version}}
+
+#----- Docker Compose related tasks -------------------------------------------
+
+[doc('Start the development environment')]
+compose-up:
+  @docker compose -f compose.yml up --detach --remove-orphans
+
+[doc('Stop the development environment')]
+compose-down:
+  @docker compose -f compose.yml down --remove-orphans
+
+[doc('Cleanup the development environment')]
+compose-cleanup:
+  @docker compose -f compose.yml down --remove-orphans --volumes
