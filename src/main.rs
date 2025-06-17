@@ -2,6 +2,7 @@ mod config;
 mod handler;
 mod http;
 mod router;
+mod utils;
 
 use clap::{CommandFactory, Parser};
 use clap_derive::{Parser, Subcommand};

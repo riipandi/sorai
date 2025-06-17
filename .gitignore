@@ -9,8 +9,10 @@ pnpm-debug.log*
 .cache
 .pnpm-store
 node_modules
-dist/
 build/
+dist/
+temp/
+tmp/
 *.local
 
 # Editor directories and files

@@ -5,6 +5,7 @@
 # Server host address (use 0.0.0.0 to bind to all interfaces, 127.0.0.1 for localhost only)
 host = "127.0.0.1"
 port = 8000
+pool_size = 300
 
 [openai]
 # OpenAI API Key - Get from https://platform.openai.com/api-keys

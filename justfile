@@ -57,6 +57,10 @@ start-debug *args:
 test *args:
   @cargo test {{args}}
 
+[doc('Generate code coverage report')]
+coverage *args:
+  @cargo tarpaulin --frozen --release --out Stdout {{args}}
+
 [doc('Format the code')]
 format *args:
   @cargo fmt --all -- --check {{args}}
