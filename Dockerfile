@@ -21,7 +21,7 @@ FROM base AS builder
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/src/target cargo build \
-    --release --frozen && strip -s target/release/sorai \
+    --release && strip -s target/release/sorai \
     && mv target/release/sorai . && chmod +x sorai
 
 # -----------------------------------------------------------------------------

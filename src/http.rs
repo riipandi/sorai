@@ -4,9 +4,11 @@ use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::http::{HeaderName, HeaderValue, Method, Request};
 use axum::response::Response;
 use std::time::Duration;
+use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
+use tower_http::timeout::TimeoutLayer;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::Span;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
@@ -346,7 +348,7 @@ impl HttpServer {
             // Set request ID layer - generates UUID for each request
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
             // Add TraceLayer for HTTP request/response logging with request ID
-            .layer(
+            .layer((
                 TraceLayer::new_for_http()
                     .make_span_with(|_request: &Request<_>| {
                         // Create empty span to avoid field duplication in logs
@@ -372,7 +374,9 @@ impl HttpServer {
                         let duration_str = Self::format_duration(latency);
                         tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
                     }),
-            )
+                // Used for graceful shutdown
+                TimeoutLayer::new(Duration::from_secs(10)),
+            ))
             // Propagate request ID to response headers
             .layer(PropagateRequestIdLayer::new(x_request_id));
 
@@ -413,11 +417,40 @@ impl HttpServer {
 
         tracing::info!("🎯 Server ready to accept connections");
 
-        if let Err(e) = axum::serve(listener, app).await {
+        if let Err(e) = axum::serve(listener, app)
+            .with_graceful_shutdown(Self::shutdown_signal())
+            .await
+        {
             tracing::error!("💥 Server error: {}", e);
             std::process::exit(1);
         }
 
         Ok(())
+    }
+
+    async fn shutdown_signal() {
+        let ctrl_c = async {
+            signal::ctrl_c().await.expect("failed to install Ctrl+C handler");
+        };
+
+        #[cfg(unix)]
+        let terminate = async {
+            signal::unix::signal(signal::unix::SignalKind::terminate())
+                .expect("failed to install signal handler")
+                .recv()
+                .await;
+        };
+
+        #[cfg(not(unix))]
+        let terminate = std::future::pending::<()>();
+
+        tokio::select! {
+            _ = ctrl_c => {
+                tracing::info!("👋 Ctrl+C received, shutting down...");
+            }
+            _ = terminate => {
+                tracing::info!("🔄 Termination signal received, shutting down...");
+            }
+        }
     }
 }
