@@ -112,10 +112,11 @@ impl HttpServer {
         // Determine what logging outputs to enable
         let enable_file = self.parse_rotation().is_some();
         let show_timestamp = self.config.logging.show_timestamp;
+        let show_module = self.config.logging.show_module;
 
-        match (enable_file, show_timestamp) {
-            // File and console, with timestamp for console
-            (true, true) => {
+        match (enable_file, show_timestamp, show_module) {
+            // File and console, with timestamp and module for console
+            (true, true, true) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
                         "❌ Failed to create log directory '{}': {}",
@@ -125,7 +126,7 @@ impl HttpServer {
 
                     tracing_subscriber::registry()
                         .with(env_filter)
-                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(true))
                         .init();
                 } else {
                     let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
@@ -143,14 +144,15 @@ impl HttpServer {
                                 .with_writer(file_appender)
                                 .with_ansi(false)
                                 .compact()
-                                .with_timer(PreciseTimeFormat),
+                                .with_timer(PreciseTimeFormat)
+                                .with_target(true),
                         )
-                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(true))
                         .init();
                 }
             }
-            // File and console, without timestamp for console
-            (true, false) => {
+            // File and console, with timestamp but without module for console
+            (true, true, false) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
                         "❌ Failed to create log directory '{}': {}",
@@ -160,7 +162,7 @@ impl HttpServer {
 
                     tracing_subscriber::registry()
                         .with(env_filter)
-                        .with(fmt::layer().compact().without_time())
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(false))
                         .init();
                 } else {
                     let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
@@ -178,24 +180,111 @@ impl HttpServer {
                                 .with_writer(file_appender)
                                 .with_ansi(false)
                                 .compact()
-                                .with_timer(PreciseTimeFormat),
+                                .with_timer(PreciseTimeFormat)
+                                .with_target(true),
                         )
-                        .with(fmt::layer().compact().without_time())
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(false))
                         .init();
                 }
             }
-            // Console only, with timestamp
-            (false, true) => {
+            // File and console, without timestamp but with module for console
+            (true, false, true) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console-only logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().without_time().with_target(true))
+                        .init();
+                } else {
+                    let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(rotation)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .with_timer(PreciseTimeFormat)
+                                .with_target(true),
+                        )
+                        .with(fmt::layer().compact().without_time().with_target(true))
+                        .init();
+                }
+            }
+            // File and console, without timestamp and without module for console
+            (true, false, false) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console-only logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().without_time().with_target(false))
+                        .init();
+                } else {
+                    let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(rotation)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .with_timer(PreciseTimeFormat)
+                                .with_target(true),
+                        )
+                        .with(fmt::layer().compact().without_time().with_target(false))
+                        .init();
+                }
+            }
+            // Console only, with timestamp and module
+            (false, true, true) => {
                 tracing_subscriber::registry()
                     .with(env_filter)
-                    .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
+                    .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(true))
                     .init();
             }
-            // Console only, without timestamp
-            (false, false) => {
+            // Console only, with timestamp but without module
+            (false, true, false) => {
                 tracing_subscriber::registry()
                     .with(env_filter)
-                    .with(fmt::layer().compact().without_time())
+                    .with(fmt::layer().compact().with_timer(PreciseTimeFormat).with_target(false))
+                    .init();
+            }
+            // Console only, without timestamp but with module
+            (false, false, true) => {
+                tracing_subscriber::registry()
+                    .with(env_filter)
+                    .with(fmt::layer().compact().without_time().with_target(true))
+                    .init();
+            }
+            // Console only, without timestamp and without module
+            (false, false, false) => {
+                tracing_subscriber::registry()
+                    .with(env_filter)
+                    .with(fmt::layer().compact().without_time().with_target(false))
                     .init();
             }
         }

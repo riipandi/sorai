@@ -17,6 +17,8 @@ log_directory = "./logs"
 # Log rotation frequency: minutely, hourly, daily, never, none
 # Use "none" to disable file logging completely (console logging is always enabled)
 rotation = "daily"
+# Show module name in logs (true/false) - controls display of module paths like "sorai::http::server:"
+show_module = true
 
 [cors]
 # Enable or disable CORS (Cross-Origin Resource Sharing)

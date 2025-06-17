@@ -11,6 +11,8 @@ pub struct LoggingConfig {
     pub log_directory: String,
     #[serde(default = "default_log_rotation")]
     pub rotation: String,
+    #[serde(default = "default_show_module")]
+    pub show_module: bool,
 }
 
 impl Default for LoggingConfig {
@@ -20,6 +22,7 @@ impl Default for LoggingConfig {
             level: default_log_level(),
             log_directory: default_log_directory(),
             rotation: default_log_rotation(),
+            show_module: default_show_module(),
         }
     }
 }
@@ -46,6 +49,11 @@ impl LoggingConfig {
             key: "Rotation".to_string(),
             value: self.rotation.clone(),
         });
+        items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Show Module".to_string(),
+            value: self.show_module.to_string(),
+        });
     }
 }
 
@@ -63,4 +71,8 @@ fn default_log_directory() -> String {
 
 fn default_log_rotation() -> String {
     "daily".to_string()
+}
+
+fn default_show_module() -> bool {
+    true
 }
