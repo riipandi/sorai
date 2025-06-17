@@ -227,10 +227,9 @@ impl HttpServer {
             false
         };
 
-        // Add other middleware layers
+        // Add middleware layers in correct order
         let middleware = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
-            .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
             .layer(TimeoutLayer::new(Duration::from_secs(10)))
             .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))
@@ -276,7 +275,9 @@ impl HttpServer {
                         let duration_str = Self::format_duration(latency);
                         tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
                     }),
-            );
+            )
+            // PropagateRequestIdLayer must come AFTER TraceLayer to send headers from request to response
+            .layer(PropagateRequestIdLayer::new(x_request_id));
 
         // Apply middleware to the app
         app = app.layer(middleware);
