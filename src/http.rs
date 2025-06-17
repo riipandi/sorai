@@ -20,6 +20,25 @@ impl HttpServer {
         Self { config }
     }
 
+    /// Parse rotation string to tracing_appender Rotation enum
+    /// Returns None if file logging should be disabled
+    fn parse_rotation(&self) -> Option<tracing_appender::rolling::Rotation> {
+        match self.config.logging.rotation.to_lowercase().as_str() {
+            "minutely" => Some(tracing_appender::rolling::Rotation::MINUTELY),
+            "hourly" => Some(tracing_appender::rolling::Rotation::HOURLY),
+            "daily" => Some(tracing_appender::rolling::Rotation::DAILY),
+            "never" => Some(tracing_appender::rolling::Rotation::NEVER),
+            "none" | "off" | "disable" | "disabled" => None,
+            _ => {
+                eprintln!(
+                    "⚠️  Invalid rotation '{}', falling back to 'daily'",
+                    self.config.logging.rotation
+                );
+                Some(tracing_appender::rolling::Rotation::DAILY)
+            }
+        }
+    }
+
     /// Initialize tracing subscriber for logging with config options
     pub fn init_tracing(&self) {
         let log_level = match self.config.logging.level.to_lowercase().as_str() {
@@ -44,35 +63,27 @@ impl HttpServer {
         });
 
         // Determine what logging outputs to enable
-        let enable_file = self.config.logging.log_to_file;
-        let enable_console = self.config.logging.log_to_console;
+        let enable_file = self.parse_rotation().is_some();
         let show_timestamp = self.config.logging.show_timestamp;
 
-        // If no logging is enabled, fallback to console
-        let (enable_file, enable_console) = if !enable_file && !enable_console {
-            eprintln!("⚠️  No logging output configured, enabling console logging as fallback");
-            (false, true)
-        } else {
-            (enable_file, enable_console)
-        };
-
-        match (enable_file, enable_console, show_timestamp) {
-            // File only, with timestamp (file always has timestamp)
-            (true, false, _) => {
+        match (enable_file, show_timestamp) {
+            // File and console, with timestamp for console
+            (true, true) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
                         "❌ Failed to create log directory '{}': {}",
                         self.config.logging.log_directory, e
                     );
-                    eprintln!("📝 Falling back to console logging");
+                    eprintln!("📝 Falling back to console-only logging");
 
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
                         .init();
                 } else {
+                    let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
                     let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
-                        .rotation(tracing_appender::rolling::Rotation::DAILY)
+                        .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
                         .build(&self.config.logging.log_directory)
@@ -87,95 +98,54 @@ impl HttpServer {
                                 .compact()
                                 .with_timer(fmt::time::UtcTime::rfc_3339()),
                         )
+                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .init();
+                }
+            }
+            // File and console, without timestamp for console
+            (true, false) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console-only logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().without_time())
+                        .init();
+                } else {
+                    let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(rotation)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .with_timer(fmt::time::UtcTime::rfc_3339()),
+                        )
+                        .with(fmt::layer().compact().without_time())
                         .init();
                 }
             }
             // Console only, with timestamp
-            (false, true, true) => {
+            (false, true) => {
                 tracing_subscriber::registry()
                     .with(env_filter)
                     .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
                     .init();
             }
             // Console only, without timestamp
-            (false, true, false) => {
-                tracing_subscriber::registry()
-                    .with(env_filter)
-                    .with(fmt::layer().compact().without_time())
-                    .init();
-            }
-            // Both file and console, with timestamp for console
-            (true, true, true) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
-                    eprintln!("📝 Falling back to console-only logging");
-
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
-                        .init();
-                } else {
-                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
-                        .rotation(tracing_appender::rolling::Rotation::DAILY)
-                        .filename_prefix(LOG_NAME_PREFIX)
-                        .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
-                        .expect("failed to initialize rolling file appender");
-
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(
-                            fmt::layer()
-                                .with_writer(file_appender)
-                                .with_ansi(false)
-                                .compact()
-                                .with_timer(fmt::time::UtcTime::rfc_3339()),
-                        )
-                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
-                        .init();
-                }
-            }
-            // Both file and console, without timestamp for console
-            (true, true, false) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
-                    eprintln!("📝 Falling back to console-only logging");
-
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(fmt::layer().compact().without_time())
-                        .init();
-                } else {
-                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
-                        .rotation(tracing_appender::rolling::Rotation::DAILY)
-                        .filename_prefix(LOG_NAME_PREFIX)
-                        .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
-                        .expect("failed to initialize rolling file appender");
-
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(
-                            fmt::layer()
-                                .with_writer(file_appender)
-                                .with_ansi(false)
-                                .compact()
-                                .with_timer(fmt::time::UtcTime::rfc_3339()),
-                        )
-                        .with(fmt::layer().compact().without_time())
-                        .init();
-                }
-            }
-            // Handle case where both file and console logging are disabled
-            (false, false, _) => {
-                // This case should never happen due to the earlier fallback,
-                // but we need to handle it to satisfy the exhaustive match
+            (false, false) => {
                 tracing_subscriber::registry()
                     .with(env_filter)
                     .with(fmt::layer().compact().without_time())
@@ -250,24 +220,17 @@ impl HttpServer {
         );
         tracing::info!("📊 Pool Size: {}", self.config.sorai.pool_size);
         tracing::info!("📝 Log Level: {}", self.config.logging.level);
+
+        let file_logging_enabled = self.parse_rotation().is_some();
         tracing::info!(
             "📄 Log to File: {}",
-            if self.config.logging.log_to_file {
-                "enabled"
-            } else {
-                "disabled"
-            }
+            if file_logging_enabled { "enabled" } else { "disabled" }
         );
-        tracing::info!(
-            "🖥️  Log to Console: {}",
-            if self.config.logging.log_to_console {
-                "enabled"
-            } else {
-                "disabled"
-            }
-        );
-        if self.config.logging.log_to_file {
+        tracing::info!("🖥️  Log to Console: enabled");
+
+        if file_logging_enabled {
             tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
+            tracing::info!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
         tracing::info!("🕐 Server started at: {}", startup_time.format("%Y-%m-%d %H:%M:%S UTC"));
 

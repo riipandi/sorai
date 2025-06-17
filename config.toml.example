@@ -11,13 +11,12 @@ pool_size = 300
 # Show timestamp in logs (true/false)
 show_timestamp = true
 # Log level: trace, debug, info, warn, error
-level = "info"
-# Enable logging to file (true/false)
-log_to_file = true
+level = "debug"
 # Log directory path (relative to working directory or absolute path)
-log_directory = "./logs"
-# Enable logging to console/stdout (true/false)
-log_to_console = true
+log_directory = "./tmp/logs"
+# Log rotation frequency: minutely, hourly, daily, never, none
+# Use "none" to disable file logging completely (console logging is always enabled)
+rotation = "daily"
 
 [openai]
 # OpenAI API Key - Get from https://platform.openai.com/api-keys
