@@ -1,5 +1,3 @@
-#![allow(unused_variables, dead_code)]
-
 use axum::response::{IntoResponse, Response};
 use axum::{Json, http::StatusCode};
 use serde::{Deserialize, Serialize};

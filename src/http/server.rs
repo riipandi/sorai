@@ -1,13 +1,13 @@
-use super::middleware::create_cors_layer;
 use super::router::create_router;
 use crate::config::Config;
-use crate::metrics::{record_http_request, record_server_info, setup_metrics_recorder};
+use crate::http::middleware::{create_cors_layer, track_metrics};
+use crate::metrics::{record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
-use axum::extract::{MatchedPath, Request};
+use axum::extract::Request;
 use axum::http::HeaderName;
-use axum::middleware::{self, Next};
-use axum::response::{IntoResponse, Response};
-use std::time::{Duration, Instant};
+use axum::middleware;
+use axum::response::Response;
+use std::time::Duration;
 use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
@@ -200,29 +200,6 @@ impl HttpServer {
         }
     }
 
-    /// Middleware to track HTTP request metrics
-    async fn track_metrics(req: Request, next: Next) -> impl IntoResponse {
-        let start = Instant::now();
-
-        // Get the matched path for better metric grouping
-        let path = if let Some(matched_path) = req.extensions().get::<MatchedPath>() {
-            matched_path.as_str().to_owned()
-        } else {
-            req.uri().path().to_owned()
-        };
-
-        let method = req.method().clone();
-        let response = next.run(req).await;
-
-        let latency = start.elapsed().as_secs_f64();
-        let status = response.status().as_u16();
-
-        // Record metrics
-        record_http_request(method.as_str(), &path, status, latency);
-
-        response
-    }
-
     /// Start the HTTP server
     pub async fn start(self) -> Result<(), Box<dyn std::error::Error>> {
         // Initialize tracing with config
@@ -256,7 +233,7 @@ impl HttpServer {
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
             .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
             .layer(TimeoutLayer::new(Duration::from_secs(10)))
-            .layer(middleware::from_fn(Self::track_metrics))
+            .layer(middleware::from_fn(track_metrics))
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|_request: &Request<_>| {
@@ -359,16 +336,4 @@ impl HttpServer {
             }
         }
     }
-}
-
-/// Record HTTP error metrics with more context
-pub fn record_http_error(method: &str, path: &str, status: u16, error_type: &str) {
-    let labels = [
-        ("method", method.to_string()),
-        ("path", path.to_string()),
-        ("status", status.to_string()),
-        ("error_type", error_type.to_string()),
-    ];
-
-    metrics::counter!("sorai_http_errors_total", &labels).increment(1);
 }
