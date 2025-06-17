@@ -1,4 +1,4 @@
-use crate::handler::{completions, health, metrics, not_found};
+use super::handler::{completions, health, metrics, not_found};
 use axum::Router;
 use axum::routing::{get, post};
 

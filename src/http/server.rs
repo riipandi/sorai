@@ -1,5 +1,5 @@
+use super::router::create_router;
 use crate::config::Config;
-use crate::router::create_router;
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::http::{HeaderName, HeaderValue, Method, Request};
 use axum::response::Response;
