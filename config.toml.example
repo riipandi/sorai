@@ -12,6 +12,12 @@ pool_size = 300
 show_timestamp = true
 # Log level: trace, debug, info, warn, error
 level = "info"
+# Enable logging to file (true/false)
+log_to_file = true
+# Log directory path (relative to working directory or absolute path)
+log_directory = "./logs"
+# Enable logging to console/stdout (true/false)
+log_to_console = true
 
 [openai]
 # OpenAI API Key - Get from https://platform.openai.com/api-keys

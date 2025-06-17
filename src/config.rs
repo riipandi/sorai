@@ -38,6 +38,12 @@ pub struct LoggingConfig {
     pub show_timestamp: bool,
     #[serde(default = "default_log_level")]
     pub level: String,
+    #[serde(default = "default_log_to_file")]
+    pub log_to_file: bool,
+    #[serde(default = "default_log_directory")]
+    pub log_directory: String,
+    #[serde(default = "default_log_to_console")]
+    pub log_to_console: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -113,6 +119,18 @@ fn default_log_level() -> String {
     "info".to_string()
 }
 
+fn default_log_to_file() -> bool {
+    true
+}
+
+fn default_log_directory() -> String {
+    "./logs".to_string()
+}
+
+fn default_log_to_console() -> bool {
+    true
+}
+
 impl Default for SoraiConfig {
     fn default() -> Self {
         Self {
@@ -128,6 +146,9 @@ impl Default for LoggingConfig {
         Self {
             show_timestamp: default_show_timestamp(),
             level: default_log_level(),
+            log_to_file: default_log_to_file(),
+            log_directory: default_log_directory(),
+            log_to_console: default_log_to_console(),
         }
     }
 }
@@ -226,6 +247,21 @@ impl Config {
             section: "Logging".to_string(),
             key: "Level".to_string(),
             value: self.logging.level.clone(),
+        });
+        config_items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Log to File".to_string(),
+            value: self.logging.log_to_file.to_string(),
+        });
+        config_items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Log Directory".to_string(),
+            value: self.logging.log_directory.clone(),
+        });
+        config_items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Log to Console".to_string(),
+            value: self.logging.log_to_console.to_string(),
         });
 
         // OpenAI Configuration

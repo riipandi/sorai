@@ -5,8 +5,10 @@ use chrono::{DateTime, Utc};
 use std::time::Duration;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{Span, info_span};
-use tracing_subscriber::Layer;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
+
+const LOG_NAME_PREFIX: &str = env!("CARGO_PKG_NAME");
+const LOG_NAME_SUFFIX: &str = ".log";
 
 /// HTTP Server handler
 pub struct HttpServer {
@@ -30,38 +32,170 @@ impl HttpServer {
             _ => "info", // default fallback
         };
 
-        let fmt_layer = fmt::layer()
-            .with_target(true)
-            .with_thread_ids(false)
-            .with_thread_names(false)
-            .with_file(false)
-            .with_line_number(false)
-            .with_level(true)
-            .with_ansi(true)
-            .compact();
+        let env_filter = tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            // axum logs rejections from built-in extractors with the `axum::rejection`
+            // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
+            format!(
+                "{}={},tower_http={},axum::rejection=trace",
+                env!("CARGO_CRATE_NAME"),
+                log_level,
+                log_level
+            )
+            .into()
+        });
 
-        let fmt_layer = if self.config.logging.show_timestamp {
-            fmt_layer.with_timer(fmt::time::UtcTime::rfc_3339()).boxed()
+        // Determine what logging outputs to enable
+        let enable_file = self.config.logging.log_to_file;
+        let enable_console = self.config.logging.log_to_console;
+        let show_timestamp = self.config.logging.show_timestamp;
+
+        // If no logging is enabled, fallback to console
+        let (enable_file, enable_console) = if !enable_file && !enable_console {
+            eprintln!("⚠️  No logging output configured, enabling console logging as fallback");
+            (false, true)
         } else {
-            fmt_layer.without_time().boxed()
+            (enable_file, enable_console)
         };
 
-        tracing_subscriber::registry()
-            .with(
-                tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                    // axum logs rejections from built-in extractors with the `axum::rejection`
-                    // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
-                    format!(
-                        "{}={},tower_http={},axum::rejection=trace",
-                        env!("CARGO_CRATE_NAME"),
-                        log_level,
-                        log_level
-                    )
-                    .into()
-                }),
-            )
-            .with(fmt_layer)
-            .init();
+        match (enable_file, enable_console, show_timestamp) {
+            // File only, with timestamp
+            (true, false, true) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .init();
+                } else {
+                    let file_appender =
+                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .with_timer(fmt::time::UtcTime::rfc_3339()),
+                        )
+                        .init();
+                }
+            }
+            // File only, without timestamp
+            (true, false, false) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().without_time())
+                        .init();
+                } else {
+                    let file_appender =
+                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .without_time(),
+                        )
+                        .init();
+                }
+            }
+            // Console only, with timestamp
+            (false, true, true) => {
+                tracing_subscriber::registry()
+                    .with(env_filter)
+                    .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                    .init();
+            }
+            // Console only, without timestamp
+            (false, true, false) => {
+                tracing_subscriber::registry()
+                    .with(env_filter)
+                    .with(fmt::layer().compact().without_time())
+                    .init();
+            }
+            // Both file and console, with timestamp
+            (true, true, true) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console-only logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .init();
+                } else {
+                    let file_appender =
+                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .with_timer(fmt::time::UtcTime::rfc_3339()),
+                        )
+                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .init();
+                }
+            }
+            // Both file and console, without timestamp
+            (true, true, false) => {
+                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
+                    eprintln!(
+                        "❌ Failed to create log directory '{}': {}",
+                        self.config.logging.log_directory, e
+                    );
+                    eprintln!("📝 Falling back to console-only logging");
+
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(fmt::layer().compact().without_time())
+                        .init();
+                } else {
+                    let file_appender =
+                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    tracing_subscriber::registry()
+                        .with(env_filter)
+                        .with(
+                            fmt::layer()
+                                .with_writer(file_appender)
+                                .with_ansi(false)
+                                .compact()
+                                .without_time(),
+                        )
+                        .with(fmt::layer().compact().without_time())
+                        .init();
+                }
+            }
+            // Handle case where both file and console logging are disabled
+            (false, false, _) => {
+                // This case should never happen due to the earlier fallback,
+                // but we need to handle it to satisfy the exhaustive match
+                tracing_subscriber::registry()
+                    .with(env_filter)
+                    .with(fmt::layer().compact().without_time())
+                    .init();
+            }
+        }
     }
 
     /// Start the HTTP server
@@ -126,25 +260,33 @@ impl HttpServer {
         tracing::info!("📡 Listening on: http://{}", address);
         tracing::info!(
             "🔧 Environment: {}",
-            std::env::var("RUST_ENV").unwrap_or_else(|_| "development".to_string())
+            std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string())
         );
         tracing::info!("📊 Pool Size: {}", self.config.sorai.pool_size);
         tracing::info!("📝 Log Level: {}", self.config.logging.level);
         tracing::info!(
-            "⏰ Show Timestamp: {}",
-            if self.config.logging.show_timestamp {
+            "📄 Log to File: {}",
+            if self.config.logging.log_to_file {
                 "enabled"
             } else {
                 "disabled"
             }
         );
+        tracing::info!(
+            "🖥️  Log to Console: {}",
+            if self.config.logging.log_to_console {
+                "enabled"
+            } else {
+                "disabled"
+            }
+        );
+        if self.config.logging.log_to_file {
+            tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
+        }
         tracing::info!("🕐 Server started at: {}", startup_time.format("%Y-%m-%d %H:%M:%S UTC"));
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
-            Ok(listener) => {
-                tracing::info!("✅ Server bound successfully to {}", address);
-                listener
-            }
+            Ok(listener) => listener,
             Err(e) => {
                 tracing::error!("❌ Failed to bind to address {}: {}", address, e);
                 std::process::exit(1);
