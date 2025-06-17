@@ -1,12 +1,13 @@
 use super::router::create_router;
 use crate::config::Config;
-use crate::http::middleware::{create_cors_layer, track_metrics};
+use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
 use crate::metrics::{record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::extract::Request;
 use axum::http::HeaderName;
 use axum::middleware;
 use axum::response::Response;
+use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::signal;
 use tower::ServiceBuilder;
@@ -231,6 +232,7 @@ impl HttpServer {
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
             .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
             .layer(TimeoutLayer::new(Duration::from_secs(10)))
+            .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))
             .layer(
                 TraceLayer::new_for_http()
@@ -240,7 +242,23 @@ impl HttpServer {
                     })
                     .on_request(|request: &Request<_>, _span: &Span| {
                         let request_id = Self::extract_short_request_id(request);
-                        tracing::info!("[REQ:{}] {} {}", request_id, request.method(), request.uri().path());
+                        let conn_info = ConnectionInfo::from_request_or_default(request);
+
+                        // Use short user agent for cleaner logs
+                        let short_ua = conn_info.short_user_agent();
+
+                        // Add bot indicator if detected
+                        let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
+
+                        tracing::info!(
+                            "[REQ:{}] {} {} | IP: {} | UA: {}{}",
+                            request_id,
+                            request.method(),
+                            request.uri().path(),
+                            conn_info.client_ip,
+                            short_ua,
+                            bot_indicator
+                        );
                     })
                     .on_response(|response: &Response, latency: Duration, _span: &Span| {
                         let status = response.status();
@@ -296,7 +314,8 @@ impl HttpServer {
 
         tracing::info!("🎯 Server ready to accept connections");
 
-        if let Err(e) = axum::serve(listener, app)
+        // Use axum::serve with ConnectInfo to capture client socket addresses
+        if let Err(e) = axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>())
             .with_graceful_shutdown(Self::shutdown_signal())
             .await
         {
