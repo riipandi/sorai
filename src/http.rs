@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::router::create_router;
+use crate::utils::time::{PreciseTimeFormat, format_timestamp_for_span, format_timestamp_readable};
 use axum::{extract::MatchedPath, http::Request, response::Response};
-use chrono::{DateTime, Utc};
 use std::time::Duration;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{Span, info_span};
@@ -78,7 +78,7 @@ impl HttpServer {
 
                     tracing_subscriber::registry()
                         .with(env_filter)
-                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
                         .init();
                 } else {
                     let rotation = self.parse_rotation().unwrap(); // Safe because we checked enable_file
@@ -96,9 +96,9 @@ impl HttpServer {
                                 .with_writer(file_appender)
                                 .with_ansi(false)
                                 .compact()
-                                .with_timer(fmt::time::UtcTime::rfc_3339()),
+                                .with_timer(PreciseTimeFormat),
                         )
-                        .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                        .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
                         .init();
                 }
             }
@@ -131,7 +131,7 @@ impl HttpServer {
                                 .with_writer(file_appender)
                                 .with_ansi(false)
                                 .compact()
-                                .with_timer(fmt::time::UtcTime::rfc_3339()),
+                                .with_timer(PreciseTimeFormat),
                         )
                         .with(fmt::layer().compact().without_time())
                         .init();
@@ -141,7 +141,7 @@ impl HttpServer {
             (false, true) => {
                 tracing_subscriber::registry()
                     .with(env_filter)
-                    .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
+                    .with(fmt::layer().compact().with_timer(PreciseTimeFormat))
                     .init();
             }
             // Console only, without timestamp
@@ -175,7 +175,7 @@ impl HttpServer {
                             path = matched_path,
                             status = tracing::field::Empty,
                             latency_ms = tracing::field::Empty,
-                            timestamp = %Utc::now().format("%Y-%m-%d %H:%M:%S UTC"),
+                            timestamp = format_timestamp_for_span(),
                         )
                     })
                     .on_request(|request: &Request<_>, _span: &Span| {
@@ -210,7 +210,6 @@ impl HttpServer {
             );
 
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
-        let startup_time: DateTime<Utc> = Utc::now();
 
         tracing::info!("🚀 Starting Sorai HTTP Server");
         tracing::info!("📡 Listening on: http://{}", address);
@@ -232,7 +231,7 @@ impl HttpServer {
             tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
             tracing::info!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
-        tracing::info!("🕐 Server started at: {}", startup_time.format("%Y-%m-%d %H:%M:%S UTC"));
+        tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
             Ok(listener) => listener,

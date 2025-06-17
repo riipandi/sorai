@@ -13,7 +13,7 @@ show_timestamp = true
 # Log level: trace, debug, info, warn, error
 level = "debug"
 # Log directory path (relative to working directory or absolute path)
-log_directory = "./tmp/logs"
+log_directory = "./logs"
 # Log rotation frequency: minutely, hourly, daily, never, none
 # Use "none" to disable file logging completely (console logging is always enabled)
 rotation = "daily"
