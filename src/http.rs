@@ -1,10 +1,11 @@
 use crate::config::Config;
 use crate::router::create_router;
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
-use axum::http::{HeaderName, Request};
+use axum::http::{HeaderName, HeaderValue, Method, Request};
 use axum::response::Response;
 use std::time::Duration;
 use tower::ServiceBuilder;
+use tower_http::cors::CorsLayer;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::Span;
@@ -77,6 +78,132 @@ impl HttpServer {
                 Some(tracing_appender::rolling::Rotation::DAILY)
             }
         }
+    }
+
+    /// Create CORS layer from configuration
+    fn create_cors_layer(&self) -> Option<CorsLayer> {
+        if !self.config.cors.enabled {
+            tracing::info!("🚫 CORS is disabled");
+            return None;
+        }
+
+        let mut cors = CorsLayer::new();
+
+        // Configure allowed origins
+        if self.config.cors.allow_origins.len() == 1 && self.config.cors.allow_origins[0] == "*" {
+            cors = cors.allow_origin(tower_http::cors::Any);
+            tracing::info!("🌐 CORS: Allow origins = * (any)");
+        } else {
+            let origins: Result<Vec<HeaderValue>, _> = self
+                .config
+                .cors
+                .allow_origins
+                .iter()
+                .map(|origin| origin.parse::<HeaderValue>())
+                .collect();
+
+            match origins {
+                Ok(origin_values) => {
+                    cors = cors.allow_origin(origin_values);
+                    tracing::info!("🌐 CORS: Allow origins = {}", self.config.cors.allow_origins.join(", "));
+                }
+                Err(e) => {
+                    tracing::error!("❌ Invalid CORS origin configuration: {}", e);
+                    tracing::info!("🔄 Falling back to allow any origin");
+                    cors = cors.allow_origin(tower_http::cors::Any);
+                }
+            }
+        }
+
+        // Configure allowed methods
+        let methods: Result<Vec<Method>, _> = self
+            .config
+            .cors
+            .allow_methods
+            .iter()
+            .map(|method| method.parse::<Method>())
+            .collect();
+
+        match methods {
+            Ok(method_values) => {
+                cors = cors.allow_methods(method_values);
+                tracing::info!("🔧 CORS: Allow methods = {}", self.config.cors.allow_methods.join(", "));
+            }
+            Err(e) => {
+                tracing::error!("❌ Invalid CORS method configuration: {}", e);
+                tracing::info!("🔄 Falling back to default methods");
+                cors = cors.allow_methods([
+                    Method::GET,
+                    Method::POST,
+                    Method::PUT,
+                    Method::DELETE,
+                    Method::HEAD,
+                    Method::OPTIONS,
+                    Method::PATCH,
+                ]);
+            }
+        }
+
+        // Configure allowed headers
+        if !self.config.cors.allow_headers.is_empty() {
+            let headers: Result<Vec<HeaderName>, _> = self
+                .config
+                .cors
+                .allow_headers
+                .iter()
+                .map(|header| header.parse::<HeaderName>())
+                .collect();
+
+            match headers {
+                Ok(header_values) => {
+                    cors = cors.allow_headers(header_values);
+                    tracing::info!("📋 CORS: Allow headers = {}", self.config.cors.allow_headers.join(", "));
+                }
+                Err(e) => {
+                    tracing::error!("❌ Invalid CORS header configuration: {}", e);
+                    tracing::info!("🔄 Falling back to any headers");
+                    cors = cors.allow_headers(tower_http::cors::Any);
+                }
+            }
+        }
+
+        // Configure exposed headers
+        if !self.config.cors.expose_headers.is_empty() {
+            let expose_headers: Result<Vec<HeaderName>, _> = self
+                .config
+                .cors
+                .expose_headers
+                .iter()
+                .map(|header| header.parse::<HeaderName>())
+                .collect();
+
+            match expose_headers {
+                Ok(header_values) => {
+                    cors = cors.expose_headers(header_values);
+                    tracing::info!(
+                        "📤 CORS: Expose headers = {}",
+                        self.config.cors.expose_headers.join(", ")
+                    );
+                }
+                Err(e) => {
+                    tracing::error!("❌ Invalid CORS expose headers configuration: {}", e);
+                }
+            }
+        }
+
+        // Configure credentials
+        if self.config.cors.allow_credentials {
+            cors = cors.allow_credentials(true);
+            tracing::info!("🔐 CORS: Allow credentials = true");
+        }
+
+        // Configure max age
+        if self.config.cors.max_age > 0 {
+            cors = cors.max_age(Duration::from_secs(self.config.cors.max_age));
+            tracing::info!("⏰ CORS: Max age = {}s", self.config.cors.max_age);
+        }
+
+        Some(cors)
     }
 
     /// Initialize tracing subscriber for logging with config options
@@ -201,6 +328,20 @@ impl HttpServer {
 
         let x_request_id = HeaderName::from_static(REQUEST_ID_HEADER);
 
+        // Create base router
+        let mut app = create_router();
+
+        // Add CORS layer if enabled
+        let cors_enabled = if let Some(cors_layer) = self.create_cors_layer() {
+            app = app.layer(cors_layer);
+            true
+        } else {
+            false
+        };
+
+        tracing::info!("🌐 CORS: {}", if cors_enabled { "enabled" } else { "disabled" });
+
+        // Add other middleware layers
         let middleware = ServiceBuilder::new()
             // Set request ID layer - generates UUID for each request
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
@@ -235,7 +376,8 @@ impl HttpServer {
             // Propagate request ID to response headers
             .layer(PropagateRequestIdLayer::new(x_request_id));
 
-        let app = create_router().layer(middleware);
+        // Apply middleware to the app
+        app = app.layer(middleware);
 
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
 
@@ -258,6 +400,7 @@ impl HttpServer {
             tracing::info!("📁 Log Directory: {}", self.config.logging.log_directory);
             tracing::info!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
+
         tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {

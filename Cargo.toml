@@ -11,7 +11,7 @@ rust-version = "1.87"
 edition = "2024"
 
 [dependencies]
-axum = "0.8"
+axum = { version = "0.8", features = ["macros"] }
 chrono = { version = "0.4", features = ["serde"] }
 clap = "4.5"
 clap_derive = "4.5"
@@ -21,7 +21,7 @@ tabled = "0.20"
 tokio = { version = "1.45", features = ["full"] }
 toml = "0.8"
 tower = { version = "0.5", features = ["full"] }
-tower-http = { version = "0.6", features = ["request-id", "trace"] }
+tower-http = { version = "0.6", features = ["cors", "request-id", "trace"] }
 tracing = "0.1.41"
 tracing-appender = "0.2"
 tracing-subscriber = { version = "0.3", features = ["chrono", "env-filter", "time"] }
