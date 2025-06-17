@@ -10,7 +10,7 @@
         "**/target": true
     },
     "[dockerfile]": {
-        "editor.defaultFormatter": "docker.docker"
+        "editor.defaultFormatter": "ms-azuretools.vscode-containers"
     },
     "[markdown]": {
         "editor.defaultFormatter": "darkriszty.markdown-table-prettify"

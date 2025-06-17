@@ -21,7 +21,7 @@ FROM base AS builder
 COPY . .
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/src/target cargo build \
-    --release && strip -s target/release/swift-relay \
+    --release --frozen && strip -s target/release/swift-relay \
     && mv target/release/swift-relay . && chmod +x swift-relay
 
 # -----------------------------------------------------------------------------
@@ -46,15 +46,15 @@ COPY --from=builder --chmod=775 /usr/bin/tini /usr/bin/tini
 
 # Add some additional system utilities for debugging (~10MB).
 # To enhance security, consider avoiding the copying of sysutils.
-COPY --from=glibc /bin/hostname /bin/hostname
-COPY --from=glibc /bin/whoami /bin/whoami
-COPY --from=glibc /bin/clear /bin/clear
-COPY --from=glibc /bin/mkdir /bin/mkdir
-COPY --from=glibc /bin/which /bin/which
-COPY --from=glibc /bin/head /bin/head
-COPY --from=glibc /bin/cat /bin/cat
-COPY --from=glibc /bin/ls /bin/ls
-COPY --from=glibc /bin/sh /bin/sh
+# COPY --from=glibc /bin/hostname /bin/hostname
+# COPY --from=glibc /bin/whoami /bin/whoami
+# COPY --from=glibc /bin/clear /bin/clear
+# COPY --from=glibc /bin/mkdir /bin/mkdir
+# COPY --from=glibc /bin/which /bin/which
+# COPY --from=glibc /bin/head /bin/head
+# COPY --from=glibc /bin/cat /bin/cat
+# COPY --from=glibc /bin/ls /bin/ls
+# COPY --from=glibc /bin/sh /bin/sh
 
 # Define the host and port to listen on.
 ARG RUST_LOG=swift-relay=debug HOST=0.0.0.0 PORT=8000

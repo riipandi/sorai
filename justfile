@@ -2,6 +2,9 @@
 # ^ A shebang isn't required, but allows a justfile to be executed
 #   like a script, with `./justfile test`, for example.
 
+# Set additional Docker build args for the image platform
+platform_arch := if arch() == "aarch64" { "linux/arm64" } else { "linux/amd64" }
+
 [private]
 app_identifier := "swift-relay"
 
@@ -31,14 +34,14 @@ run *args:
 [no-exit-message]
 build *args:
   @echo "Building {{app_identifier}} v{{app_version}} in release mode..."
-  @cargo build --release {{args}}
+  @cargo build --release --frozen {{args}}
   @ls -lh target/release/{{app_identifier}}
 
 [doc('Build the application (debug)')]
 [no-exit-message]
 build-debug *args:
   @echo "Building {{app_identifier}} v{{app_version}} in debug mode..."
-  @cargo build {{args}}
+  @cargo build --frozen {{args}}
   @ls -lh target/debug/{{app_identifier}}
 
 [doc('Start the application from build (release)')]
@@ -78,14 +81,20 @@ cleanup:
 
 [doc('Build the Docker image')]
 docker-build *args:
-  @docker build -f Dockerfile . -t {{app_image}}:{{app_version}} {{args}}
+  @echo "Building {{app_image}}:{{app_version}} for platform {{platform_arch}}"
+  @docker build -f Dockerfile . -t {{app_image}}:{{app_version}} --build-arg PLATFORM={{platform_arch}} {{args}}
   @docker image list --filter reference={{app_image}}:*
 
 [doc('Run the Docker image')]
 docker-run *args:
   @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro {{app_image}}:{{app_version}} {{args}}
 
-[doc('Run the Docker image')]
+[doc('Exec into the Docker image')]
+[no-exit-message]
+docker-exec *args:
+  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /srv/swift-relay {{app_image}}:{{app_version}} {{args}}
+
+[doc('Debug the Docker image')]
 [no-exit-message]
 docker-shell:
   @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /bin/sh {{app_image}}:{{app_version}}
