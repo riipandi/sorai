@@ -5,7 +5,7 @@ use tower::util::ServiceExt;
 
 #[tokio::test]
 async fn test_index_route() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(Request::builder().method("GET").uri("/").body(Body::empty()).unwrap())
@@ -24,7 +24,7 @@ async fn test_index_route() {
 
 #[tokio::test]
 async fn test_health_check_route() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -51,7 +51,7 @@ async fn test_health_check_route() {
 
 #[tokio::test]
 async fn test_status_route() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -76,7 +76,7 @@ async fn test_status_route() {
 
 #[tokio::test]
 async fn test_health_endpoints_content_type() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let endpoints = vec!["/", "/healthz", "/status"];
 
@@ -113,7 +113,7 @@ async fn test_health_endpoints_content_type() {
 
 #[tokio::test]
 async fn test_health_endpoints_response_structure() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let endpoints = vec!["/", "/healthz", "/status"];
 
@@ -161,7 +161,7 @@ async fn test_health_endpoints_response_structure() {
 
 #[tokio::test]
 async fn test_health_endpoints_method_not_allowed() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let endpoints = vec!["/", "/healthz", "/status"];
 
@@ -189,7 +189,7 @@ async fn test_health_endpoints_method_not_allowed() {
 
 #[tokio::test]
 async fn test_not_found_route() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -207,7 +207,7 @@ async fn test_not_found_route() {
 
 #[tokio::test]
 async fn test_multiple_requests_consistency() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Test multiple requests to ensure handlers work consistently
     for i in 0..5 {
@@ -244,7 +244,7 @@ async fn test_multiple_requests_consistency() {
 
 #[tokio::test]
 async fn test_health_check_version_format() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(

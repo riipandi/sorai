@@ -1,15 +1,15 @@
+use super::middleware::create_cors_layer;
 use super::router::create_router;
 use crate::config::Config;
 use crate::metrics::{record_http_request, record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::extract::{MatchedPath, Request};
-use axum::http::{HeaderName, HeaderValue, Method};
+use axum::http::HeaderName;
 use axum::middleware::{self, Next};
 use axum::response::{IntoResponse, Response};
 use std::time::{Duration, Instant};
 use tokio::signal;
 use tower::ServiceBuilder;
-use tower_http::cors::CorsLayer;
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
@@ -83,132 +83,6 @@ impl HttpServer {
                 Some(tracing_appender::rolling::Rotation::DAILY)
             }
         }
-    }
-
-    /// Create CORS layer from configuration
-    fn create_cors_layer(&self) -> Option<CorsLayer> {
-        if !self.config.cors.enabled {
-            tracing::info!("🚫 CORS is disabled");
-            return None;
-        }
-
-        let mut cors = CorsLayer::new();
-
-        // Configure allowed origins
-        if self.config.cors.allow_origins.len() == 1 && self.config.cors.allow_origins[0] == "*" {
-            cors = cors.allow_origin(tower_http::cors::Any);
-            tracing::info!("🌐 CORS: Allow origins = * (any)");
-        } else {
-            let origins: Result<Vec<HeaderValue>, _> = self
-                .config
-                .cors
-                .allow_origins
-                .iter()
-                .map(|origin| origin.parse::<HeaderValue>())
-                .collect();
-
-            match origins {
-                Ok(origin_values) => {
-                    cors = cors.allow_origin(origin_values);
-                    tracing::info!("🌐 CORS: Allow origins = {}", self.config.cors.allow_origins.join(", "));
-                }
-                Err(e) => {
-                    tracing::error!("❌ Invalid CORS origin configuration: {}", e);
-                    tracing::info!("🔄 Falling back to allow any origin");
-                    cors = cors.allow_origin(tower_http::cors::Any);
-                }
-            }
-        }
-
-        // Configure allowed methods
-        let methods: Result<Vec<Method>, _> = self
-            .config
-            .cors
-            .allow_methods
-            .iter()
-            .map(|method| method.parse::<Method>())
-            .collect();
-
-        match methods {
-            Ok(method_values) => {
-                cors = cors.allow_methods(method_values);
-                tracing::info!("🔧 CORS: Allow methods = {}", self.config.cors.allow_methods.join(", "));
-            }
-            Err(e) => {
-                tracing::error!("❌ Invalid CORS method configuration: {}", e);
-                tracing::info!("🔄 Falling back to default methods");
-                cors = cors.allow_methods([
-                    Method::GET,
-                    Method::POST,
-                    Method::PUT,
-                    Method::DELETE,
-                    Method::HEAD,
-                    Method::OPTIONS,
-                    Method::PATCH,
-                ]);
-            }
-        }
-
-        // Configure allowed headers
-        if !self.config.cors.allow_headers.is_empty() {
-            let headers: Result<Vec<HeaderName>, _> = self
-                .config
-                .cors
-                .allow_headers
-                .iter()
-                .map(|header| header.parse::<HeaderName>())
-                .collect();
-
-            match headers {
-                Ok(header_values) => {
-                    cors = cors.allow_headers(header_values);
-                    tracing::info!("📋 CORS: Allow headers = {}", self.config.cors.allow_headers.join(", "));
-                }
-                Err(e) => {
-                    tracing::error!("❌ Invalid CORS header configuration: {}", e);
-                    tracing::info!("🔄 Falling back to any headers");
-                    cors = cors.allow_headers(tower_http::cors::Any);
-                }
-            }
-        }
-
-        // Configure exposed headers
-        if !self.config.cors.expose_headers.is_empty() {
-            let expose_headers: Result<Vec<HeaderName>, _> = self
-                .config
-                .cors
-                .expose_headers
-                .iter()
-                .map(|header| header.parse::<HeaderName>())
-                .collect();
-
-            match expose_headers {
-                Ok(header_values) => {
-                    cors = cors.expose_headers(header_values);
-                    tracing::info!(
-                        "📤 CORS: Expose headers = {}",
-                        self.config.cors.expose_headers.join(", ")
-                    );
-                }
-                Err(e) => {
-                    tracing::error!("❌ Invalid CORS expose headers configuration: {}", e);
-                }
-            }
-        }
-
-        // Configure credentials
-        if self.config.cors.allow_credentials {
-            cors = cors.allow_credentials(true);
-            tracing::info!("🔐 CORS: Allow credentials = true");
-        }
-
-        // Configure max age
-        if self.config.cors.max_age > 0 {
-            cors = cors.max_age(Duration::from_secs(self.config.cors.max_age));
-            tracing::info!("⏰ CORS: Max age = {}s", self.config.cors.max_age);
-        }
-
-        Some(cors)
     }
 
     /// Initialize tracing subscriber for logging with config options
@@ -368,7 +242,7 @@ impl HttpServer {
         let mut app = create_router(prometheus_handle);
 
         // Add CORS layer if enabled
-        let cors_enabled = if let Some(cors_layer) = self.create_cors_layer() {
+        let cors_enabled = if let Some(cors_layer) = create_cors_layer(&self.config) {
             app = app.layer(cors_layer);
             true
         } else {

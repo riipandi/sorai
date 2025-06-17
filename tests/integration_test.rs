@@ -6,7 +6,7 @@ use tower::util::ServiceExt;
 
 #[tokio::test]
 async fn test_full_application_routes() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Test all major routes are accessible
     let routes = vec![
@@ -37,7 +37,7 @@ async fn test_full_application_routes() {
 
 #[tokio::test]
 async fn test_api_endpoints_require_post() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let api_endpoints = vec!["/v1/chat/completions", "/v1/text/completions"];
 
@@ -66,7 +66,7 @@ async fn test_api_endpoints_require_post() {
 
 #[tokio::test]
 async fn test_chat_completions_full_workflow() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Test successful request
     let request_body = json!({
@@ -125,7 +125,7 @@ async fn test_chat_completions_full_workflow() {
 
 #[tokio::test]
 async fn test_text_completions_full_workflow() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -168,7 +168,7 @@ async fn test_text_completions_full_workflow() {
 
 #[tokio::test]
 async fn test_error_handling_consistency() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Test various error scenarios
     let error_cases = vec![
@@ -236,7 +236,7 @@ async fn test_error_handling_consistency() {
 
 #[tokio::test]
 async fn test_content_type_validation() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Test missing content-type header
     let response = app
@@ -274,7 +274,7 @@ async fn test_content_type_validation() {
 
 #[tokio::test]
 async fn test_large_request_handling() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     // Create a large messages array
     let mut messages = Vec::new();
@@ -313,7 +313,7 @@ async fn test_large_request_handling() {
 
 #[tokio::test]
 async fn test_concurrent_requests() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",

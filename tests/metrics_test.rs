@@ -5,7 +5,7 @@ use tower::util::ServiceExt;
 
 #[tokio::test]
 async fn test_metrics_endpoint() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -65,7 +65,7 @@ async fn test_metrics_endpoint() {
 
 #[tokio::test]
 async fn test_metrics_contains_provider_labels() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -104,7 +104,7 @@ async fn test_metrics_contains_provider_labels() {
 
 #[tokio::test]
 async fn test_metrics_contains_numeric_values() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -140,7 +140,7 @@ async fn test_metrics_contains_numeric_values() {
 
 #[tokio::test]
 async fn test_metrics_prometheus_format_validity() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
@@ -178,7 +178,7 @@ async fn test_metrics_prometheus_format_validity() {
 
 #[tokio::test]
 async fn test_metrics_method_not_allowed() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(

@@ -6,7 +6,7 @@ use tower::util::ServiceExt;
 
 #[tokio::test]
 async fn test_chat_completions_success() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -44,7 +44,7 @@ async fn test_chat_completions_success() {
 
 #[tokio::test]
 async fn test_chat_completions_missing_provider() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "model": "gpt-4o",
@@ -80,7 +80,7 @@ async fn test_chat_completions_missing_provider() {
 
 #[tokio::test]
 async fn test_chat_completions_empty_messages() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -110,7 +110,7 @@ async fn test_chat_completions_empty_messages() {
 
 #[tokio::test]
 async fn test_text_completions_success() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -143,7 +143,7 @@ async fn test_text_completions_success() {
 
 #[tokio::test]
 async fn test_text_completions_missing_text() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -172,7 +172,7 @@ async fn test_text_completions_missing_text() {
 
 #[tokio::test]
 async fn test_text_completions_empty_text() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
         "provider": "openai",
@@ -202,7 +202,7 @@ async fn test_text_completions_empty_text() {
 
 #[tokio::test]
 async fn test_invalid_json_request() {
-    let app = create_router();
+    let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let response = app
         .oneshot(
