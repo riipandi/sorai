@@ -1,9 +1,12 @@
 use super::router::create_router;
 use crate::config::Config;
+use crate::metrics::{record_http_request, record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
-use axum::http::{HeaderName, HeaderValue, Method, Request};
-use axum::response::Response;
-use std::time::Duration;
+use axum::extract::{MatchedPath, Request};
+use axum::http::{HeaderName, HeaderValue, Method};
+use axum::middleware::{self, Next};
+use axum::response::{IntoResponse, Response};
+use std::time::{Duration, Instant};
 use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
@@ -323,15 +326,46 @@ impl HttpServer {
         }
     }
 
+    /// Middleware to track HTTP request metrics
+    async fn track_metrics(req: Request, next: Next) -> impl IntoResponse {
+        let start = Instant::now();
+
+        // Get the matched path for better metric grouping
+        let path = if let Some(matched_path) = req.extensions().get::<MatchedPath>() {
+            matched_path.as_str().to_owned()
+        } else {
+            req.uri().path().to_owned()
+        };
+
+        let method = req.method().clone();
+        let response = next.run(req).await;
+
+        let latency = start.elapsed().as_secs_f64();
+        let status = response.status().as_u16();
+
+        // Record metrics
+        record_http_request(method.as_str(), &path, status, latency);
+
+        response
+    }
+
     /// Start the HTTP server
     pub async fn start(self) -> Result<(), Box<dyn std::error::Error>> {
         // Initialize tracing with config
         self.init_tracing();
 
+        // Setup Prometheus metrics recorder
+        let prometheus_handle = setup_metrics_recorder();
+
+        // Record server info metrics
+        let version = env!("CARGO_PKG_VERSION");
+        let build = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
+        record_server_info(version, &build);
+
         let x_request_id = HeaderName::from_static(REQUEST_ID_HEADER);
 
-        // Create base router
-        let mut app = create_router();
+        // Create base router with Prometheus handle
+        let mut app = create_router(prometheus_handle);
 
         // Add CORS layer if enabled
         let cors_enabled = if let Some(cors_layer) = self.create_cors_layer() {
@@ -345,10 +379,11 @@ impl HttpServer {
 
         // Add other middleware layers
         let middleware = ServiceBuilder::new()
-            // Set request ID layer - generates UUID for each request
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
-            // Add TraceLayer for HTTP request/response logging with request ID
-            .layer((
+            .layer(PropagateRequestIdLayer::new(x_request_id.clone()))
+            .layer(TimeoutLayer::new(Duration::from_secs(10)))
+            .layer(middleware::from_fn(Self::track_metrics))
+            .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|_request: &Request<_>| {
                         // Create empty span to avoid field duplication in logs
@@ -374,11 +409,7 @@ impl HttpServer {
                         let duration_str = Self::format_duration(latency);
                         tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
                     }),
-                // Used for graceful shutdown
-                TimeoutLayer::new(Duration::from_secs(10)),
-            ))
-            // Propagate request ID to response headers
-            .layer(PropagateRequestIdLayer::new(x_request_id));
+            );
 
         // Apply middleware to the app
         app = app.layer(middleware);
@@ -405,6 +436,7 @@ impl HttpServer {
             tracing::info!("🔄 Log Rotation: {}", self.config.logging.rotation);
         }
 
+        tracing::info!("📊 Prometheus Metrics: enabled at /metrics");
         tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
@@ -453,4 +485,16 @@ impl HttpServer {
             }
         }
     }
+}
+
+/// Record HTTP error metrics with more context
+pub fn record_http_error(method: &str, path: &str, status: u16, error_type: &str) {
+    let labels = [
+        ("method", method.to_string()),
+        ("path", path.to_string()),
+        ("status", status.to_string()),
+        ("error_type", error_type.to_string()),
+    ];
+
+    metrics::counter!("sorai_http_errors_total", &labels).increment(1);
 }

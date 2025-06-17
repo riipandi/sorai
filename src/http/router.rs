@@ -1,9 +1,10 @@
 use super::handler::{completions, health, metrics, not_found};
 use axum::Router;
 use axum::routing::{get, post};
+use metrics_exporter_prometheus::PrometheusHandle;
 
 /// Create application router with all routes
-pub fn create_router() -> Router {
+pub fn create_router(prometheus_handle: PrometheusHandle) -> Router {
     Router::new()
         // Health check routes
         .route("/", get(health::index))
@@ -17,4 +18,6 @@ pub fn create_router() -> Router {
         .route("/metrics", get(metrics::metrics))
         // Fallback handler for 404 routes
         .fallback(not_found::not_found_handler)
+        // Add Prometheus handle as shared state
+        .with_state(prometheus_handle)
 }
