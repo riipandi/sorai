@@ -4,7 +4,7 @@ use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::{http::Request, response::Response};
 use std::time::Duration;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
-use tracing::{Span, info_span};
+use tracing::Span;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 const LOG_NAME_PREFIX: &str = env!("CARGO_PKG_NAME");
@@ -180,8 +180,8 @@ impl HttpServer {
             .layer(
                 TraceLayer::new_for_http()
                     .make_span_with(|_request: &Request<_>| {
-                        // Create empty span to avoid field duplication
-                        info_span!("request")
+                        // Create empty span without name to avoid field duplication
+                        tracing::Span::none()
                     })
                     .on_request(|request: &Request<_>, _span: &Span| {
                         // Clean request log with [REQ] prefix
