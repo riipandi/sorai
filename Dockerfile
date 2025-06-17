@@ -25,6 +25,19 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     && mv target/release/sorai . && chmod +x sorai
 
 # -----------------------------------------------------------------------------
+# Cleanup the builder stage and create data directory.
+# -----------------------------------------------------------------------------
+FROM base AS pruner
+
+# Copy output and config files from the builder stage.
+COPY --from=builder /usr/src/config.toml.example /srv/config.toml
+COPY --from=builder /usr/src/sorai /srv/sorai
+
+# Create the logs directory and set permissions. We need to allow "others" access
+# to app folder, because Docker container can be started with arbitrary uid.
+RUN mkdir -p /srv/logs && chmod ugo+rw -R /srv/logs
+
+# -----------------------------------------------------------------------------
 # Use the slim image for a lean production container.
 # -----------------------------------------------------------------------------
 FROM --platform=${PLATFORM} gcr.io/distroless/cc-debian12:nonroot AS runner
@@ -41,25 +54,28 @@ ARG OPENAI_API_KEY ANTHROPIC_API_KEY BEDROCK_API_KEY BEDROCK_ACCESS_KEY \
     VERTEX_CREDENTIALS
 
 # Copy the build output files and necessary utilities from previous stage.
-COPY --from=builder --chown=nonroot:nonroot /usr/src/sorai /srv/sorai
-COPY --from=builder --chmod=775 /usr/bin/tini /usr/bin/tini
+COPY --from=pruner --chmod=775 /usr/bin/tini /usr/bin/tini
+COPY --from=pruner --chown=nonroot:nonroot /srv /srv
 
 # Add some additional system utilities for debugging (~10MB).
 # To enhance security, consider avoiding the copying of sysutils.
-# COPY --from=glibc /bin/hostname /bin/hostname
-# COPY --from=glibc /bin/whoami /bin/whoami
-# COPY --from=glibc /bin/clear /bin/clear
-# COPY --from=glibc /bin/mkdir /bin/mkdir
-# COPY --from=glibc /bin/which /bin/which
-# COPY --from=glibc /bin/head /bin/head
-# COPY --from=glibc /bin/cat /bin/cat
-# COPY --from=glibc /bin/ls /bin/ls
-# COPY --from=glibc /bin/sh /bin/sh
+COPY --from=glibc /bin/hostname /bin/hostname
+COPY --from=glibc /bin/whoami /bin/whoami
+COPY --from=glibc /bin/clear /bin/clear
+COPY --from=glibc /bin/mkdir /bin/mkdir
+COPY --from=glibc /bin/which /bin/which
+COPY --from=glibc /bin/head /bin/head
+COPY --from=glibc /bin/cat /bin/cat
+COPY --from=glibc /bin/ls /bin/ls
+COPY --from=glibc /bin/sh /bin/sh
 
 # Define the host and port to listen on.
 ARG RUST_LOG=sorai=debug HOST=0.0.0.0 PORT=8000
 ENV RUST_LOG=$RUST_LOG HOST=$HOST PORT=$PORT
 ENV TINI_SUBREAPER=true PATH="/srv:$PATH"
+
+# Define volumes for persistent storage.
+VOLUME /srv/logs /srv/config.toml
 
 WORKDIR /srv
 USER nonroot:nonroot

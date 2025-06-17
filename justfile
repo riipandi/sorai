@@ -87,17 +87,23 @@ docker-build *args:
 
 [doc('Run the Docker image')]
 docker-run *args:
-  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro {{app_image}}:{{app_version}} {{args}}
+  @docker run --network=host --rm -it \
+    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
+    {{app_image}}:{{app_version}} {{args}}
 
 [doc('Exec into the Docker image')]
 [no-exit-message]
 docker-exec *args:
-  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /srv/sorai {{app_image}}:{{app_version}} {{args}}
+  @docker run --network=host --rm -it \
+    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
+    --entrypoint /srv/sorai {{app_image}}:{{app_version}} {{args}}
 
 [doc('Debug the Docker image')]
 [no-exit-message]
 docker-shell:
-  @docker run --network=host --rm -it -v ./config.toml:/srv/config.toml:ro --entrypoint /bin/sh {{app_image}}:{{app_version}}
+  @docker run --network=host --rm -it \
+    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
+    --entrypoint /bin/sh {{app_image}}:{{app_version}}
 
 [doc('Get Docker image list')]
 docker-images:
