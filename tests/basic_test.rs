@@ -3,7 +3,7 @@ use axum::{Router, body::Body, routing::get};
 use tower::util::ServiceExt;
 
 async fn index() -> &'static str {
-    "Hello, World!!!"
+    "All is well"
 }
 
 fn create_app() -> Router {
@@ -22,7 +22,7 @@ async fn test_index_route() {
     assert_eq!(response.status(), StatusCode::OK);
 
     let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
-    assert_eq!(&body[..], b"Hello, World!!!");
+    assert_eq!(&body[..], b"All is well");
 }
 
 #[tokio::test]
@@ -52,6 +52,6 @@ async fn test_multiple_requests() {
         assert_eq!(response.status(), StatusCode::OK);
 
         let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
-        assert_eq!(&body[..], b"Hello, World!!!");
+        assert_eq!(&body[..], b"All is well");
     }
 }

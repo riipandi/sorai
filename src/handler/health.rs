@@ -18,10 +18,9 @@ pub struct MessageResponse {
 
 /// Root endpoint handler
 pub async fn index() -> impl IntoResponse {
-    let data = MessageResponse {
-        message: "Hello, World!!!".to_string(),
-    };
-    success(data)
+    success(MessageResponse {
+        message: "All is well".to_string(),
+    })
 }
 
 /// Health check endpoint handler

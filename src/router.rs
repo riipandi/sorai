@@ -1,4 +1,4 @@
-use crate::handler::{completions, health, metrics};
+use crate::handler::{completions, health, metrics, not_found};
 use axum::Router;
 use axum::routing::{get, post};
 
@@ -15,4 +15,6 @@ pub fn create_router() -> Router {
         .route("/v1/text/completions", post(completions::text_completions))
         // Metrics endpoint for Prometheus monitoring
         .route("/metrics", get(metrics::metrics))
+        // Fallback handler for 404 routes
+        .fallback(not_found::not_found_handler)
 }

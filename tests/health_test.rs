@@ -18,7 +18,7 @@ async fn test_index_route() {
     let response_json: serde_json::Value = serde_json::from_slice(&body).unwrap();
 
     assert_eq!(response_json["success"], true);
-    assert_eq!(response_json["data"]["message"], "Hello, World!!!");
+    assert_eq!(response_json["data"]["message"], "All is well");
     assert!(response_json["message"].is_null());
 }
 
