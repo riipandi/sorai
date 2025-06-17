@@ -316,55 +316,58 @@ impl HttpServer {
             false
         };
 
+        let trace_layer_for_http = TraceLayer::new_for_http()
+            .make_span_with(|_request: &Request<_>| {
+                // Create empty span to avoid field duplication in logs
+                tracing::Span::none()
+            })
+            .on_request(|request: &Request<_>, _span: &Span| {
+                let request_id = Self::extract_short_request_id(request);
+                let conn_info = ConnectionInfo::from_request_or_default(request);
+
+                // Use short user agent for cleaner logs
+                let short_ua = conn_info.short_user_agent();
+
+                // Add bot indicator if detected
+                let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
+
+                tracing::info!(
+                    "[REQ:{}] {} {} | IP: {} | UA: {}{}",
+                    request_id,
+                    request.method(),
+                    request.uri().path(),
+                    conn_info.client_ip,
+                    short_ua,
+                    bot_indicator
+                );
+            })
+            .on_response(|response: &Response, latency: Duration, _span: &Span| {
+                let status = response.status();
+                let duration_str = Self::format_duration(latency);
+                let request_id = Self::extract_short_request_id_from_response(response);
+
+                // Clean response log with [RES] prefix and precise timing
+                if latency.as_millis() > 1000 {
+                    tracing::info!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
+                } else {
+                    tracing::info!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
+                }
+            })
+            .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
+                let duration_str = Self::format_duration(latency);
+                tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
+            });
+
+        // Get timeout request from config
+        let timeout_requests = self.config.sorai.timeout_request;
+
         // Add middleware layers in correct order
         let middleware = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
-            .layer(TimeoutLayer::new(Duration::from_secs(10)))
+            .layer(TimeoutLayer::new(Duration::from_secs(timeout_requests)))
             .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))
-            .layer(
-                TraceLayer::new_for_http()
-                    .make_span_with(|_request: &Request<_>| {
-                        // Create empty span to avoid field duplication in logs
-                        tracing::Span::none()
-                    })
-                    .on_request(|request: &Request<_>, _span: &Span| {
-                        let request_id = Self::extract_short_request_id(request);
-                        let conn_info = ConnectionInfo::from_request_or_default(request);
-
-                        // Use short user agent for cleaner logs
-                        let short_ua = conn_info.short_user_agent();
-
-                        // Add bot indicator if detected
-                        let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
-
-                        tracing::info!(
-                            "[REQ:{}] {} {} | IP: {} | UA: {}{}",
-                            request_id,
-                            request.method(),
-                            request.uri().path(),
-                            conn_info.client_ip,
-                            short_ua,
-                            bot_indicator
-                        );
-                    })
-                    .on_response(|response: &Response, latency: Duration, _span: &Span| {
-                        let status = response.status();
-                        let duration_str = Self::format_duration(latency);
-                        let request_id = Self::extract_short_request_id_from_response(response);
-
-                        // Clean response log with [RES] prefix and precise timing
-                        if latency.as_millis() > 1000 {
-                            tracing::info!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
-                        } else {
-                            tracing::info!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
-                        }
-                    })
-                    .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
-                        let duration_str = Self::format_duration(latency);
-                        tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
-                    }),
-            )
+            .layer(trace_layer_for_http)
             // PropagateRequestIdLayer must come AFTER TraceLayer to send headers from request to response
             .layer(PropagateRequestIdLayer::new(x_request_id));
 
@@ -378,6 +381,7 @@ impl HttpServer {
         tracing::info!("📡 Listening on: http://{}", address);
         tracing::info!("🖥️  Environment: {}", app_env);
         tracing::debug!("🎱 Pool Size: {}", self.config.sorai.pool_size);
+        tracing::debug!("⏱️  Timeout Request: {}s", self.config.sorai.timeout_request);
         tracing::debug!("📝 Log Level: {}", self.config.logging.level);
 
         let file_logging_enabled = self.parse_rotation().is_some();
