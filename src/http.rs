@@ -8,7 +8,6 @@ use tracing::{Span, info_span};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 const LOG_NAME_PREFIX: &str = env!("CARGO_PKG_NAME");
-const LOG_NAME_SUFFIX: &str = ".log";
 
 /// HTTP Server handler
 pub struct HttpServer {
@@ -58,8 +57,8 @@ impl HttpServer {
         };
 
         match (enable_file, enable_console, show_timestamp) {
-            // File only, with timestamp
-            (true, false, true) => {
+            // File only, with timestamp (file always has timestamp)
+            (true, false, _) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
                         "❌ Failed to create log directory '{}': {}",
@@ -72,8 +71,13 @@ impl HttpServer {
                         .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
                         .init();
                 } else {
-                    let file_appender =
-                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(tracing_appender::rolling::Rotation::DAILY)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
@@ -82,34 +86,6 @@ impl HttpServer {
                                 .with_ansi(false)
                                 .compact()
                                 .with_timer(fmt::time::UtcTime::rfc_3339()),
-                        )
-                        .init();
-                }
-            }
-            // File only, without timestamp
-            (true, false, false) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
-                    eprintln!("📝 Falling back to console logging");
-
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(fmt::layer().compact().without_time())
-                        .init();
-                } else {
-                    let file_appender =
-                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
-                    tracing_subscriber::registry()
-                        .with(env_filter)
-                        .with(
-                            fmt::layer()
-                                .with_writer(file_appender)
-                                .with_ansi(false)
-                                .compact()
-                                .without_time(),
                         )
                         .init();
                 }
@@ -128,7 +104,7 @@ impl HttpServer {
                     .with(fmt::layer().compact().without_time())
                     .init();
             }
-            // Both file and console, with timestamp
+            // Both file and console, with timestamp for console
             (true, true, true) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
@@ -142,8 +118,13 @@ impl HttpServer {
                         .with(fmt::layer().compact().with_timer(fmt::time::UtcTime::rfc_3339()))
                         .init();
                 } else {
-                    let file_appender =
-                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(tracing_appender::rolling::Rotation::DAILY)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
@@ -157,7 +138,7 @@ impl HttpServer {
                         .init();
                 }
             }
-            // Both file and console, without timestamp
+            // Both file and console, without timestamp for console
             (true, true, false) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
@@ -171,8 +152,13 @@ impl HttpServer {
                         .with(fmt::layer().compact().without_time())
                         .init();
                 } else {
-                    let file_appender =
-                        tracing_appender::rolling::daily(&self.config.logging.log_directory, LOG_NAME_PREFIX);
+                    let file_appender = tracing_appender::rolling::RollingFileAppender::builder()
+                        .rotation(tracing_appender::rolling::Rotation::DAILY)
+                        .filename_prefix(LOG_NAME_PREFIX)
+                        .filename_suffix("log")
+                        .build(&self.config.logging.log_directory)
+                        .expect("failed to initialize rolling file appender");
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
@@ -180,7 +166,7 @@ impl HttpServer {
                                 .with_writer(file_appender)
                                 .with_ansi(false)
                                 .compact()
-                                .without_time(),
+                                .with_timer(fmt::time::UtcTime::rfc_3339()),
                         )
                         .with(fmt::layer().compact().without_time())
                         .init();
