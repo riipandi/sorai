@@ -35,6 +35,7 @@ welcoming environment for all contributors.
 - **Nextest**: Better test runner - `cargo install cargo-nextest`
 - **Tarpaulin**: Code coverage - `cargo install cargo-tarpaulin`
 - **Docker**: For containerized development (optional)
+- **jq**: JSON processor for parsing metadata - Install from [jq website](https://jqlang.org) or via package manager
 
 ### Initial Setup
 
