@@ -1,6 +1,7 @@
 use super::router::create_router;
 use crate::config::Config;
 use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
+use crate::http::request_id::MakeTypeSafeRequestId;
 use crate::metrics::{record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::extract::Request;
@@ -11,7 +12,7 @@ use std::net::SocketAddr;
 use std::time::Duration;
 use tokio::signal;
 use tower::ServiceBuilder;
-use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
+use tower_http::request_id::{PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::Span;
@@ -47,23 +48,23 @@ impl HttpServer {
         }
     }
 
-    /// Extract short request ID (first 8 characters)
-    fn extract_short_request_id(request: &Request<axum::body::Body>) -> String {
+    /// Extract request ID from headers
+    fn extract_request_id(request: &Request<axum::body::Body>) -> String {
         request
             .headers()
             .get(REQUEST_ID_HEADER)
             .and_then(|v| v.to_str().ok())
-            .map(|id| id.chars().take(8).collect())
+            .map(|id| id.to_string())
             .unwrap_or_else(|| "unknown".to_string())
     }
 
-    /// Extract short request ID from response headers
-    fn extract_short_request_id_from_response(response: &Response) -> String {
+    /// Extract request ID from response headers
+    fn extract_request_id_from_response(response: &Response) -> String {
         response
             .headers()
             .get(REQUEST_ID_HEADER)
             .and_then(|v| v.to_str().ok())
-            .map(|id| id.chars().take(8).collect())
+            .map(|id| id.to_string())
             .unwrap_or_else(|| "unknown".to_string())
     }
 
@@ -322,7 +323,7 @@ impl HttpServer {
                 tracing::Span::none()
             })
             .on_request(|request: &Request<_>, _span: &Span| {
-                let request_id = Self::extract_short_request_id(request);
+                let request_id = Self::extract_request_id(request);
                 let conn_info = ConnectionInfo::from_request_or_default(request);
 
                 // Use short user agent for cleaner logs
@@ -344,7 +345,7 @@ impl HttpServer {
             .on_response(|response: &Response, latency: Duration, _span: &Span| {
                 let status = response.status();
                 let duration_str = Self::format_duration(latency);
-                let request_id = Self::extract_short_request_id_from_response(response);
+                let request_id = Self::extract_request_id_from_response(response);
 
                 // Clean response log with [RES] prefix and precise timing
                 if latency.as_millis() > 1000 {
@@ -363,7 +364,7 @@ impl HttpServer {
 
         // Add middleware layers in correct order
         let middleware = ServiceBuilder::new()
-            .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeRequestUuid))
+            .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeTypeSafeRequestId))
             .layer(TimeoutLayer::new(Duration::from_secs(timeout_requests)))
             .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))

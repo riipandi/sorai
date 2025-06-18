@@ -1,5 +1,6 @@
 mod handler;
 mod middleware;
+mod request_id;
 mod router;
 mod server;
 
