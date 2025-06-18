@@ -49,12 +49,12 @@ full observability, Sorai transforms client-to-LLM interactions into a seamless,
 ### Installation
 
 1. Clone the repository:
-```bash
+```sh
 git clone https://github.com/riipandi/sorai.git && cd sorai
 ```
 
 2. Build the project:
-```bash
+```sh
 # Using cargo directly
 cargo build --release
 
@@ -63,7 +63,7 @@ just build
 ```
 
 3. Set up configuration:
-```bash
+```sh
 # Copy example configuration
 cp config.toml.example config.toml
 
@@ -77,7 +77,7 @@ Create your `config.toml` file based on the [`config.toml.example`](./config.tom
 
 ### Running the Server
 
-```bash
+```sh
 # Using cargo
 cargo run -- serve
 
@@ -105,6 +105,84 @@ Sorai provides OpenAI-compatible API endpoints:
 http://localhost:8000
 ```
 
+## Performance Benchmarks
+
+Here are example benchmarks using [oha](https://github.com/hatoo/oha) HTTP load generator:
+
+### Health Check Endpoint Performance
+
+**Test Configuration:**
+- **Concurrent Users**: 100
+- **Total Requests**: 2,500
+- **Target**: `GET /healthz`
+- **Environment**: local development server
+
+```sh
+oha -n 2500 -c 100 --latency-correction http://localhost:8000/healthz
+```
+
+**Example Results:**
+```
+Summary:
+  Success rate: 100.00%
+  Total:        0.0886 secs
+  Slowest:      0.0078 secs
+  Fastest:      0.0001 secs
+  Average:      0.0034 secs
+  Requests/sec: 28203.6793
+
+  Total data:   183.11 KiB
+  Size/request: 75 B
+  Size/sec:     2.02 MiB
+
+Response time histogram:
+  0.000 [1]   |
+  0.001 [103] |■■■■■■
+  0.002 [225] |■■■■■■■■■■■■■
+  0.002 [308] |■■■■■■■■■■■■■■■■■■
+  0.003 [453] |■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.004 [539] |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.005 [442] |■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.005 [244] |■■■■■■■■■■■■■■
+  0.006 [130] |■■■■■■■
+  0.007 [45]  |■■
+  0.008 [10]  |
+```
+
+### Load Testing Different Scenarios
+
+```sh
+# Light load - 50 concurrent users, 1000 requests
+oha -n 1000 -c 50 http://localhost:8000/healthz
+
+# Medium load - 100 concurrent users, 2500 requests with 10s duration
+oha -z 10s -n 2500 -c 100 http://localhost:8000/healthz
+
+# Heavy load - 500 concurrent users, 10000 requests
+oha -z 10s -n 10000 -c 500 http://localhost:8000/healthz
+
+# Sustained load test - 30 seconds duration
+oha -c 100 -z 30s http://localhost:8000/healthz
+```
+
+### API Endpoint Benchmarks
+
+For testing actual LLM proxy endpoints:
+
+```sh
+# Test chat completions endpoint (requires valid API key)
+oha -n 100 -c 10 -m POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{"model":"gpt-4o-mini","messages":[{"role":"user","content":"Hello"}]}' \
+  http://localhost:8000/v1/chat/completions
+```
+
+**Performance Notes:**
+- Actual LLM endpoints performance depends on upstream provider latency
+- Connection pooling and keep-alive significantly improve throughput
+- Memory usage remains stable under high concurrent load
+
 ## Documentation
 
 For detailed documentation, see:
@@ -125,7 +203,7 @@ Sorai provides comprehensive monitoring through Prometheus metrics at `/metrics`
 
 Sorai includes full Docker support with multi-platform builds:
 
-```bash
+```sh
 # Build Docker image
 just docker-build
 
