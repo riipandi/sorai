@@ -1,4 +1,4 @@
-# Sorai
+# Sorai LLM Proxy Gateway
 
 [![GitHub Release](https://img.shields.io/github/v/release/riipandi/sorai?logo=docker)](https://github.com/riipandi/sorai/releases)
 [![MSRV](https://img.shields.io/badge/rust-v1.87+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
