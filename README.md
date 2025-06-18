@@ -14,17 +14,17 @@ full observability, Sorai transforms client-to-LLM interactions into a seamless,
 
 ## Key Features
 
-- **🚀 High Performance**: Leverages Rust's speed and memory safety for low-latency, high-throughput proxying
-- **🔌 Multi-Provider Support**: Seamlessly connects to OpenAI, Anthropic, Azure OpenAI, AWS Bedrock, Cohere, and Google Vertex AI
-- **⚡ Flexible Integration**: Minimal configuration required for various LLM backends
-- **📊 Built-in Monitoring**: Prometheus metrics and comprehensive observability
-- **🛠️ Developer-Friendly**: Simple setup, clear documentation, and extensible design
-- **🔄 Fallback Support**: Automatic failover between providers for reliability
-- **🌐 CORS Support**: Configurable Cross-Origin Resource Sharing
-- **📝 Structured Logging**: Configurable logging with rotation and timestamps
-- **🐳 Docker Ready**: Container support with multi-platform builds
-- **📈 Scalable Architecture**: Connection pooling and request timeout handling
-- **📝 OpenSource**: Dual-licensed under MIT and Apache 2.0 for maximum flexibility
+- **🚀 High Performance**: Leverages Rust's speed and memory safety for low-latency, high-throughput proxying.
+- **🔌 Multi-Provider Support**: Seamlessly connects to OpenAI, Anthropic, AWS Bedrock, Cohere, etc.
+- **⚡ Flexible Integration**: Minimal configuration required for various LLM backends.
+- **📊 Built-in Monitoring**: Prometheus metrics and comprehensive observability.
+- **🛠️ Developer-Friendly**: Simple setup, clear documentation, and extensible design.
+- **🔄 Fallback Support**: Automatic failover between providers for reliability.
+- **🌐 CORS Support**: Configurable Cross-Origin Resource Sharing.
+- **📝 Structured Logging**: Configurable logging with rotation and timestamps.
+- **🐳 Docker Ready**: Container support with multi-platform builds.
+- **📈 Scalable Architecture**: Connection pooling and request timeout handling.
+- **📝 Open Source**: Dual-licensed under MIT and Apache 2.0 for maximum flexibility.
 
 ## Supported Providers
 
@@ -145,7 +145,7 @@ We welcome contributions to make Sorai even better!
 - Submit a pull request with a clear title and description
 - Join the discussion on [GitHub Issues](https://github.com/riipandi/sorai/issues)
 
-Join the flow. Amplify your AI product with Sorai! 🚀
+Join the flow. Amplify your AI stack with Sorai! 🚀
 
 ## Why "Sorai"?
 
