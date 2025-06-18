@@ -71,7 +71,7 @@ async fn test_chat_completions_full_workflow() {
     // Test successful request
     let request_body = json!({
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": [
             {
                 "role": "system",
@@ -110,7 +110,7 @@ async fn test_chat_completions_full_workflow() {
     assert_eq!(response_json["success"], true);
     assert!(response_json["data"]["id"].is_string());
     assert_eq!(response_json["data"]["object"], "chat.completion");
-    assert_eq!(response_json["data"]["model"], "gpt-4o");
+    assert_eq!(response_json["data"]["model"], "gpt-4o-mini");
     assert!(response_json["data"]["choices"].is_array());
     assert!(response_json["data"]["usage"].is_object());
     assert!(response_json["data"]["extra_fields"].is_object());
@@ -174,7 +174,7 @@ async fn test_error_handling_consistency() {
     let error_cases = vec![
         (
             "/v1/chat/completions",
-            json!({"model": "gpt-4o", "messages": []}),
+            json!({"model": "gpt-4o-mini", "messages": []}),
             "Provider is required",
         ),
         (
@@ -184,7 +184,7 @@ async fn test_error_handling_consistency() {
         ),
         (
             "/v1/chat/completions",
-            json!({"provider": "openai", "model": "gpt-4o", "messages": []}),
+            json!({"provider": "openai", "model": "gpt-4o-mini", "messages": []}),
             "Messages array cannot be empty",
         ),
         (
@@ -245,7 +245,9 @@ async fn test_content_type_validation() {
             Request::builder()
                 .method("POST")
                 .uri("/v1/chat/completions")
-                .body(Body::from(r#"{"provider":"openai","model":"gpt-4o","messages":[]}"#))
+                .body(Body::from(
+                    r#"{"provider":"openai","model":"gpt-4o-mini","messages":[]}"#,
+                ))
                 .unwrap(),
         )
         .await
@@ -262,7 +264,9 @@ async fn test_content_type_validation() {
                 .method("POST")
                 .uri("/v1/chat/completions")
                 .header("content-type", "text/plain")
-                .body(Body::from(r#"{"provider":"openai","model":"gpt-4o","messages":[]}"#))
+                .body(Body::from(
+                    r#"{"provider":"openai","model":"gpt-4o-mini","messages":[]}"#,
+                ))
                 .unwrap(),
         )
         .await
@@ -287,7 +291,7 @@ async fn test_large_request_handling() {
 
     let request_body = json!({
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": messages
     });
 
@@ -317,7 +321,7 @@ async fn test_concurrent_requests() {
 
     let request_body = json!({
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": [
             {
                 "role": "user",

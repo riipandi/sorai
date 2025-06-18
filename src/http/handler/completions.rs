@@ -4,6 +4,27 @@ use crate::utils::response::{SoraiError, success};
 use axum::{extract::Json, response::IntoResponse};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use type_safe_id::{StaticType, TypeSafeId};
+
+/// Chat completion type for TypeID
+#[derive(Default)]
+struct ChatCompletion;
+
+impl StaticType for ChatCompletion {
+    const TYPE: &'static str = "chatcmpl";
+}
+
+/// Text completion type for TypeID
+#[derive(Default)]
+struct TextCompletion;
+
+impl StaticType for TextCompletion {
+    const TYPE: &'static str = "cmpl";
+}
+
+/// Type aliases for completion IDs
+type ChatCompletionId = TypeSafeId<ChatCompletion>;
+type TextCompletionId = TypeSafeId<TextCompletion>;
 
 /// Chat completion request payload
 #[derive(Debug, Deserialize)]
@@ -102,8 +123,9 @@ pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Res
 
     // TODO: Implement actual chat completion logic
     // For now, return a placeholder response
+    let completion_id = ChatCompletionId::new();
     let response = CompletionResponse {
-        id: format!("chatcmpl-{}", uuid::Uuid::now_v7()),
+        id: completion_id.to_string(),
         object: "chat.completion".to_string(),
         choices: vec![CompletionChoice {
             index: 0,
@@ -184,8 +206,9 @@ pub async fn text_completions(Json(request): Json<TextCompletionRequest>) -> Res
 
     // TODO: Implement actual text completion logic
     // For now, return a placeholder response
+    let completion_id = TextCompletionId::new();
     let response = CompletionResponse {
-        id: format!("cmpl-{}", uuid::Uuid::now_v7()),
+        id: completion_id.to_string(),
         object: "text.completion".to_string(),
         choices: vec![CompletionChoice {
             index: 0,

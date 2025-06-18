@@ -427,7 +427,7 @@ curl -X POST http://localhost:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "provider": "openai",
-    "model": "gpt-4o",
+    "model": "gpt-4o-mini",
     "messages": [
       {"role": "user", "content": "Hello, Sorai!"}
     ]
@@ -443,7 +443,7 @@ All responses include Sorai-specific extra fields:
   "id": "chatcmpl-123",
   "object": "chat.completion",
   "choices": [...],
-  "model": "gpt-4o",
+  "model": "gpt-4o-mini",
   "created": 1677652288,
   "usage": {...},
   "extra_fields": {

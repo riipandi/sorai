@@ -10,7 +10,7 @@ async fn test_chat_completions_success() {
 
     let request_body = json!({
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": [
             {
                 "role": "user",
@@ -39,7 +39,7 @@ async fn test_chat_completions_success() {
     assert_eq!(response_json["success"], true);
     assert!(response_json["data"]["id"].as_str().unwrap().starts_with("chatcmpl-"));
     assert_eq!(response_json["data"]["object"], "chat.completion");
-    assert_eq!(response_json["data"]["model"], "gpt-4o");
+    assert_eq!(response_json["data"]["model"], "gpt-4o-mini");
 }
 
 #[tokio::test]
@@ -47,7 +47,7 @@ async fn test_chat_completions_missing_provider() {
     let app = create_router(/* metrics_exporter_prometheus::recorder::PrometheusHandle */);
 
     let request_body = json!({
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": [
             {
                 "role": "user",
@@ -84,7 +84,7 @@ async fn test_chat_completions_empty_messages() {
 
     let request_body = json!({
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-4o-mini",
         "messages": []
     });
 

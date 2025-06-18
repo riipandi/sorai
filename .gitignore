@@ -7,6 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 *.profraw
 
+*_creds*
+**/venv/
+**/__pycache__/
+**/__pycache__/**
+
 .cache
 .pnpm-store
 node_modules

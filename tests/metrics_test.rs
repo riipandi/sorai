@@ -89,7 +89,7 @@ async fn test_metrics_contains_provider_labels() {
     assert!(body_str.contains("provider=\"bedrock\""));
 
     // Verify model labels
-    assert!(body_str.contains("model=\"gpt-4o\""));
+    assert!(body_str.contains("model=\"gpt-4o-mini\""));
     assert!(body_str.contains("model=\"claude-3-sonnet\""));
 
     // Verify status labels

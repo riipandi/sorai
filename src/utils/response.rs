@@ -1,7 +1,18 @@
 use axum::response::{IntoResponse, Response};
 use axum::{Json, http::StatusCode};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use type_safe_id::{StaticType, TypeSafeId};
+
+/// Error event type for TypeID
+#[derive(Default)]
+struct ErrorEvent;
+
+impl StaticType for ErrorEvent {
+    const TYPE: &'static str = "err";
+}
+
+/// Type alias for error event ID
+type ErrorEventId = TypeSafeId<ErrorEvent>;
 
 /// Standard API response wrapper for success cases
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,10 +87,11 @@ impl SoraiError {
         message: &str,
         param: Option<serde_json::Value>,
     ) -> Self {
-        let event_id = Uuid::now_v7().to_string();
+        let event_id = ErrorEventId::new();
+        let event_id_str = event_id.to_string();
 
         Self {
-            event_id: event_id.clone(),
+            event_id: event_id_str.clone(),
             error_type: error_type.to_string(),
             is_sorai_error: true,
             status_code: status_code.as_u16(),
@@ -88,7 +100,7 @@ impl SoraiError {
                 code: code.to_string(),
                 message: message.to_string(),
                 param,
-                event_id,
+                event_id: event_id_str,
             },
         }
     }
