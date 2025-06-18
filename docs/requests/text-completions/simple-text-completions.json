@@ -1,0 +1,9 @@
+{
+	"provider": "openai",
+	"model": "gpt-3.5-turbo-instruct",
+	"text": "The future of artificial intelligence is",
+	"params": {
+		"max_tokens": 100,
+		"temperature": 0.7
+	}
+}

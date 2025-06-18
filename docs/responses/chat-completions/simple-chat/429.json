@@ -1,0 +1,8 @@
+{
+	"is_sorai_error": false,
+	"status_code": 429,
+	"error": {
+		"type": "rate_limit_error",
+		"message": "Rate limit exceeded. Please try again later."
+	}
+}

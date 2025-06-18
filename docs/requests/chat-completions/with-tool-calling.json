@@ -1,0 +1,37 @@
+{
+	"provider": "openai",
+	"model": "gpt-4o",
+	"messages": [
+		{
+			"role": "user",
+			"content": "What's the weather in San Francisco?"
+		}
+	],
+	"params": {
+		"tools": [
+			{
+				"type": "function",
+				"function": {
+					"name": "get_weather",
+					"description": "Get current weather for a location",
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"location": {
+								"type": "string",
+								"description": "The city and state, e.g. San Francisco, CA"
+							}
+						},
+						"required": ["location"]
+					}
+				}
+			}
+		],
+		"tool_choice": {
+			"type": "function",
+			"function": {
+				"name": "get_weather"
+			}
+		}
+	}
+}

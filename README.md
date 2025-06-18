@@ -7,10 +7,10 @@
 [![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/sorai/graphs/contributors)
 <!-- ![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/sorai/ci.yml?branch=main) -->
 
-Sorai is a lightweight, high-performance, and open-source LLM proxy gateway built in Rust for performance,
-safety, and reliability. It serves as the dynamic hub of your AI ecosystem, managing requests and responses
-with exceptional efficiency. By seamlessly coordinating communication between clients and large language
-models, Sorai ensures a robust, reliable, and harmonious data flow.
+Sorai provides a unified HTTP API for tapping into multiple AI model providers. Built in Rust as a lightweight,
+high-performance open-source LLM proxy gateway. Acting as the central orchestrator, Sorai handles every request
+and response with precision. With uniform endpoints for text and chat completions, smart fallback logic, and
+full observability, Sorai transforms client-to-LLM interactions into a seamless, elegantly managed experience.
 
 ## Key Features
 
