@@ -153,12 +153,6 @@ Inspired from Indonesian term for *"joyous uproar"*, Sorai captures the essence 
 connection. More than just a proxy, it's a seamless bridge that elevates your AI workflows
 with speed and reliability.
 
-## Community
-
-- **GitHub**: [riipandi/sorai](https://github.com/riipandi/sorai)
-- **Issues**: [Report bugs or suggest features](https://github.com/riipandi/sorai/issues)
-- **Discussions**: [Join the conversation](https://github.com/riipandi/sorai/discussions)
-
 ## License
 
 Sorai is licensed under either of [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0)
