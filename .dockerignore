@@ -23,6 +23,7 @@ npm-debug.log
 compose.env*
 README.md
 DEPLOY.md
+*.profraw
 *.log
 .env*
 docker-compose*.yaml
