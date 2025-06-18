@@ -1,9 +1,11 @@
 # Sorai
 
+[![GitHub Release](https://img.shields.io/github/v/release/riipandi/sorai?logo=docker)](https://github.com/riipandi/sorai/releases)
+[![MSRV](https://img.shields.io/badge/rust-v1.87+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
+[![Dependencies](https://deps.rs/repo/github/riipandi/sorai/status.svg)](https://deps.rs/repo/github/riipandi/sorai)
 ![License: MIT/Apache-2.0](https://img.shields.io/badge/License-MIT%20or%20Apache%202.0-blue.svg)
-![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/sorai/ci.yml?branch=main)
-![Rust Version](https://img.shields.io/badge/rust-1.70%2B-orange.svg)
-![Contributing](https://img.shields.io/badge/Contribute-GitHub-brightgreen)
+[![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/sorai/graphs/contributors)
+<!-- ![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/sorai/ci.yml?branch=main) -->
 
 Sorai is a lightweight, high-performance, and open-source LLM proxy gateway built in Rust for performance,
 safety, and reliability. It serves as the dynamic hub of your AI ecosystem, managing requests and responses
