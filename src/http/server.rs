@@ -68,6 +68,27 @@ impl HttpServer {
             .unwrap_or_else(|| "unknown".to_string())
     }
 
+    /// Extract API key from Authorization header for logging
+    fn extract_api_key_for_logging(request: &Request<axum::body::Body>) -> Option<String> {
+        request
+            .headers()
+            .get("authorization")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|auth| {
+                if auth.starts_with("Bearer ") {
+                    let key = &auth[7..]; // Remove "Bearer " prefix
+                    // Only show first 8 characters for security
+                    if key.len() > 8 {
+                        Some(format!("{}***", &key[..8]))
+                    } else {
+                        Some("***".to_string())
+                    }
+                } else {
+                    None
+                }
+            })
+    }
+
     /// Parse rotation string to tracing_appender Rotation enum
     /// Returns None if file logging should be disabled
     fn parse_rotation(&self) -> Option<tracing_appender::rolling::Rotation> {
@@ -332,14 +353,20 @@ impl HttpServer {
                 // Add bot indicator if detected
                 let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
 
+                // Extract API key for logging (masked for security)
+                let api_key_info = Self::extract_api_key_for_logging(request)
+                    .map(|key| format!(" | Key: {}", key))
+                    .unwrap_or_default();
+
                 tracing::info!(
-                    "[REQ:{}] {} {} | IP: {} | UA: {}{}",
+                    "[REQ:{}] {} {} | IP: {} | UA: {}{}{}",
                     request_id,
                     request.method(),
                     request.uri().path(),
                     conn_info.client_ip,
                     short_ua,
-                    bot_indicator
+                    bot_indicator,
+                    api_key_info
                 );
             })
             .on_response(|response: &Response, latency: Duration, _span: &Span| {
@@ -464,3 +491,15 @@ impl HttpServer {
         }
     }
 }
+
+// TODO: Add additional server features:
+// - Health check with dependency validation (database, external APIs)
+// - Graceful shutdown with connection draining
+// - Server metrics collection (request count, response times, error rates)
+// - Rate limiting middleware integration
+// - Request/response size limits
+// - Security headers middleware
+// - API versioning support
+// - WebSocket support for streaming responses
+// - Server-sent events for real-time updates
+// - Background task scheduling and management

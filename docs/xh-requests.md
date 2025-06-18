@@ -1,21 +1,31 @@
 # Example Requests
 
+Example request with invalid API key:
+
+```sh
+xh POST localhost:8000/v1/chat/completions \
+   Authorization:"Bearer sk-0000" \
+   provider=openai \
+   model=gpt-4o-mini \
+   messages:='[]'
+```
+
 ## Chat Completions
 
 Create chat completions using conversational messages.
 
 ```sh
 # Simple Chat
-xh post localhost:8000/v1/chat/completions < docs/requests/chat-completions/simple-chat.json
+xh POST localhost:8000/v1/chat/completions Authorization:"Bearer sk-1234" < docs/requests/chat-completions/simple-chat.json
 
 # With Fallback Providers
-xh post localhost:8000/v1/chat/completions < docs/requests/chat-completions/with-fallback-providers.json
+xh POST localhost:8000/v1/chat/completions Authorization:"Bearer sk-1234" < docs/requests/chat-completions/with-fallback-providers.json
 
 # With Tool Calling
-xh post localhost:8000/v1/chat/completions < docs/requests/chat-completions/with-tool-calling.json
+xh POST localhost:8000/v1/chat/completions Authorization:"Bearer sk-1234" < docs/requests/chat-completions/with-tool-calling.json
 
 # With Structured Content (text and image)
-xh post localhost:8000/v1/chat/completions < docs/requests/chat-completions/with-structured-content.json
+xh POST localhost:8000/v1/chat/completions Authorization:"Bearer sk-1234" < docs/requests/chat-completions/with-structured-content.json
 ```
 
 ## Text Completions
@@ -24,10 +34,10 @@ Creates a text completion from a prompt. Useful for text generation, summarizati
 
 ```sh
 # Simple Text Completion
-xh post localhost:8000/v1/text/completions < docs/requests/text-completions/simple-text-completions.json
+xh POST localhost:8000/v1/text/completions Authorization:"Bearer sk-1234" < docs/requests/text-completions/simple-text-completions.json
 
 # With Stop Sequences
-xh post localhost:8000/v1/text/completions < docs/requests/text-completions/with-stop-sequences.json
+xh POST localhost:8000/v1/text/completions Authorization:"Bearer sk-1234" < docs/requests/text-completions/with-stop-sequences.json
 ```
 
 ## Monitoring

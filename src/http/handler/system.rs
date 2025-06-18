@@ -21,6 +21,7 @@ pub struct MessageResponse {
 }
 
 /// Root endpoint handler
+/// Public endpoint - no authentication required
 pub async fn index() -> impl IntoResponse {
     success(MessageResponse {
         message: "All is well".to_string(),
@@ -28,6 +29,7 @@ pub async fn index() -> impl IntoResponse {
 }
 
 /// Health check endpoint handler
+/// Public endpoint - no authentication required
 pub async fn health_check() -> impl IntoResponse {
     let data = HealthStatus {
         status: "OK".to_string(),
@@ -38,6 +40,7 @@ pub async fn health_check() -> impl IntoResponse {
 }
 
 /// API status endpoint handler
+/// Public endpoint - no authentication required
 pub async fn status() -> impl IntoResponse {
     let data = MessageResponse {
         message: "Sorai Server is running".to_string(),
@@ -48,6 +51,8 @@ pub async fn status() -> impl IntoResponse {
 /// Metrics endpoint handler
 /// GET /metrics
 /// Returns Prometheus-compatible metrics for monitoring
+/// Public endpoint - no authentication required (typically accessed by monitoring systems)
+/// TODO: Consider adding optional authentication for metrics endpoint in production
 pub async fn metrics(State(prometheus_handle): State<PrometheusHandle>) -> impl IntoResponse {
     let metrics_data = prometheus_handle.render();
 
@@ -59,6 +64,7 @@ pub async fn metrics(State(prometheus_handle): State<PrometheusHandle>) -> impl 
 }
 
 /// Handler for 404 Not Found routes
+/// Public endpoint - no authentication required
 pub async fn not_found_handler() -> impl IntoResponse {
     SoraiError::new(
         axum::http::StatusCode::NOT_FOUND,
@@ -68,3 +74,10 @@ pub async fn not_found_handler() -> impl IntoResponse {
         None,
     )
 }
+
+// TODO: Add protected system endpoints that require authentication:
+// - Admin dashboard endpoints
+// - API key management endpoints
+// - System configuration endpoints
+// - User management endpoints
+// - Audit log endpoints

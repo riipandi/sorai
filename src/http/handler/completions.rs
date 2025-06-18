@@ -1,5 +1,6 @@
 #![allow(unused_variables, dead_code)]
 
+use crate::http::auth::ApiKey;
 use crate::utils::response::{SoraiError, success};
 use axum::{extract::Json, response::IntoResponse};
 use serde::{Deserialize, Serialize};
@@ -80,7 +81,17 @@ pub struct CompletionChoice {
 
 /// Chat completions endpoint handler
 /// POST /v1/chat/completions
-pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Result<impl IntoResponse, SoraiError> {
+/// Requires Bearer token authentication
+pub async fn chat_completions(
+    api_key: ApiKey,
+    Json(request): Json<ChatCompletionRequest>,
+) -> Result<impl IntoResponse, SoraiError> {
+    // Log API key usage for monitoring
+    tracing::debug!("Chat completion request from API key: {}", api_key.key());
+
+    // TODO: Implement API key usage tracking and rate limiting
+    // TODO: Check API key permissions for chat completions endpoint
+
     // Validate required fields
     let provider = match &request.provider {
         None => {
@@ -122,6 +133,10 @@ pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Res
     }
 
     // TODO: Implement actual chat completion logic
+    // TODO: Add provider-specific implementations
+    // TODO: Implement fallback mechanism
+    // TODO: Add request/response validation
+    // TODO: Implement streaming responses
     // For now, return a placeholder response
     let completion_id = ChatCompletionId::new();
     let response = CompletionResponse {
@@ -144,7 +159,8 @@ pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Res
         })),
         extra_fields: Some(serde_json::json!({
             "provider": provider,
-            "latency": 0.5
+            "latency": 0.5,
+            "api_key_used": api_key.key()
         })),
     };
 
@@ -153,7 +169,17 @@ pub async fn chat_completions(Json(request): Json<ChatCompletionRequest>) -> Res
 
 /// Text completions endpoint handler
 /// POST /v1/text/completions
-pub async fn text_completions(Json(request): Json<TextCompletionRequest>) -> Result<impl IntoResponse, SoraiError> {
+/// Requires Bearer token authentication
+pub async fn text_completions(
+    api_key: ApiKey,
+    Json(request): Json<TextCompletionRequest>,
+) -> Result<impl IntoResponse, SoraiError> {
+    // Log API key usage for monitoring
+    tracing::debug!("Text completion request from API key: {}", api_key.key());
+
+    // TODO: Implement API key usage tracking and rate limiting
+    // TODO: Check API key permissions for text completions endpoint
+
     // Validate required fields
     let provider = match &request.provider {
         None => {
@@ -205,6 +231,10 @@ pub async fn text_completions(Json(request): Json<TextCompletionRequest>) -> Res
     };
 
     // TODO: Implement actual text completion logic
+    // TODO: Add provider-specific implementations
+    // TODO: Implement fallback mechanism
+    // TODO: Add request/response validation
+    // TODO: Implement streaming responses
     // For now, return a placeholder response
     let completion_id = TextCompletionId::new();
     let response = CompletionResponse {
@@ -227,7 +257,8 @@ pub async fn text_completions(Json(request): Json<TextCompletionRequest>) -> Res
         })),
         extra_fields: Some(serde_json::json!({
             "provider": provider,
-            "latency": 0.3
+            "latency": 0.3,
+            "api_key_used": api_key.key()
         })),
     };
 

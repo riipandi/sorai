@@ -117,6 +117,7 @@ impl SoraiError {
     }
 
     /// Create an unauthorized error (401)
+    /// Used for authentication failures (missing or invalid API key)
     pub fn unauthorized(message: &str) -> Self {
         Self::new(
             StatusCode::UNAUTHORIZED,
@@ -125,6 +126,13 @@ impl SoraiError {
             message,
             None,
         )
+    }
+
+    /// Create a forbidden error (403)
+    /// Used for authorization failures (valid API key but insufficient permissions)
+    /// TODO: Implement when role-based access control is added
+    pub fn forbidden(message: &str) -> Self {
+        Self::new(StatusCode::FORBIDDEN, "authorization_error", "forbidden", message, None)
     }
 
     /// Create a rate limit error (429)
@@ -164,6 +172,32 @@ impl SoraiError {
             None,
         )
     }
+
+    /// Create an API key related error (401)
+    /// Specific error for API key authentication issues
+    pub fn invalid_api_key(message: &str) -> Self {
+        Self::new(
+            StatusCode::UNAUTHORIZED,
+            "authentication_error",
+            "invalid_api_key",
+            message,
+            Some(serde_json::json!({
+                "hint": "Please check your Bearer token format: 'Authorization: Bearer sk-xxxx'"
+            })),
+        )
+    }
+
+    /// Create an API key quota exceeded error (429)
+    /// TODO: Implement when usage tracking is added
+    pub fn quota_exceeded(message: &str, quota_info: Option<serde_json::Value>) -> Self {
+        Self::new(
+            StatusCode::TOO_MANY_REQUESTS,
+            "quota_error",
+            "quota_exceeded",
+            message,
+            quota_info,
+        )
+    }
 }
 
 impl IntoResponse for SoraiError {
@@ -200,3 +234,15 @@ pub fn error(
 ) -> SoraiError {
     SoraiError::new(status_code, error_type, code, message, param)
 }
+
+// TODO: Add additional response utilities:
+// - Pagination response wrapper
+// - Streaming response helpers
+// - File upload/download response helpers
+// - Webhook response formatters
+// - API versioning response headers
+// - Response caching utilities
+// - Response compression helpers
+// - Custom error types for specific business logic
+// - Response validation utilities
+// - Response transformation middleware

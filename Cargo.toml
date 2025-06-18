@@ -12,6 +12,7 @@ edition = "2024"
 
 [dependencies]
 axum = { version = "0.8", features = ["macros"] }
+axum-extra = { version = "0.10.1", features = ["json-lines", "typed-header"] }
 chrono = { version = "0.4", features = ["serde"] }
 clap = "4.5"
 clap_derive = "4.5"
