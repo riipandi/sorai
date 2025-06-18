@@ -1,7 +1,15 @@
 # Contributing to Sorai
 
-Thank you for your interest in contributing to Sorai! This document provides guidelines
-and information for developers who want to contribute to the project.
+Thank you for your interest in contributing to Sorai! We welcome contributions
+from everyone and are grateful for every contribution, no matter how small.
+This document provides guidelines and information for developers who want to
+contribute to the project.
+
+## Code of Conduct
+
+By participating in this project, you are expected to uphold our Code of Conduct.
+Please be respectful and constructive in all interactions. We aim to create a
+welcoming environment for all contributors.
 
 ## Table of Contents
 
@@ -505,10 +513,6 @@ show_module = true
 - **GitHub Discussions**: [Join the conversation](https://github.com/riipandi/sorai/discussions)
 - **Code Review**: Request reviews on your pull requests
 
-## Code of Conduct
-
-Please be respectful and constructive in all interactions. We aim to create a welcoming environment for all contributors.
-
 ---
 
-Thank you for contributing to Sorai! Your efforts help make AI more accessible and reliable for everyone. 🚀
+Thank you for contributing to Sorai! 🚀
