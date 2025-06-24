@@ -2,6 +2,7 @@
 /build
 /dist
 /docs
+/logs
 /temp
 /tmp
 .data

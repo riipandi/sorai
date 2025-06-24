@@ -1,0 +1,4 @@
+# Define a base URL for all requests
+@base: http://localhost:8000
+
+get /healthz
