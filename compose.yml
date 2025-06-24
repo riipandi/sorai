@@ -5,19 +5,30 @@ services:
     image: prom/prometheus:latest
     container_name: sorai_prometheus
     restart: always
-    ports: ['3390:9090']
+    ports: ['3390:3390']
     volumes: ['./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro']
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.listen-address=:3390'
     networks: ['sorai_network']
 
   grafana:
     image: grafana/grafana:latest
     container_name: sorai_grafana
     restart: always
-    ports: ['3300:3000']
+    ports: ['3300:3300']
     environment:
+      GF_SERVER_HTTP_PORT: '3300'
+      GF_SERVER_HTTP_ADDR: '0.0.0.0'
       GF_PATHS_PROVISIONING: '/etc/grafana/provisioning'
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/sorai-dashboard.json'
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: 'false' # Disable initial admin creation
+      GF_SECURITY_ADMIN_EMAIL: 'admin@example.com' # Default admin email for Grafana
       GF_SECURITY_ADMIN_PASSWORD: 'admin' # Default admin password for Grafana
+      GF_SECURITY_ADMIN_USER: 'admin' # Default admin user for Grafana
+      GF_FEEDBACK_LINKS_ENABLED: 'false' # Disable feedback links
+      GF_USERS_ALLOW_SIGN_UP: 'false' # Disable user sign up
+      GF_USERS_ALLOW_ORG_CREATE: 'false' # Disable organization creation
     volumes:
       - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
       - './docker/grafana/dashboards:/var/lib/grafana/dashboards:ro'
