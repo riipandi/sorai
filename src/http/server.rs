@@ -1,7 +1,7 @@
 use super::router::create_router;
 use crate::config::Config;
+use crate::http::middleware::MakeTypeSafeRequestId;
 use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
-use crate::http::request_id::MakeTypeSafeRequestId;
 use crate::metrics::{record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::extract::Request;

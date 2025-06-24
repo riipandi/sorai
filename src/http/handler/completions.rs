@@ -1,11 +1,12 @@
 #![allow(unused_variables, dead_code)]
 
-use crate::http::auth::ApiKey;
-use crate::utils::response::SoraiError;
+use crate::http::middleware::ApiKey;
 use axum::{extract::Json, response::IntoResponse};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use type_safe_id::{StaticType, TypeSafeId};
+
+use crate::http::response::SoraiError;
 
 /// Chat completion type for TypeID
 #[derive(Default)]

@@ -1,9 +1,10 @@
-use crate::utils::response::SoraiError;
 use axum::RequestPartsExt;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum_extra::TypedHeader;
 use axum_extra::headers::{Authorization, authorization::Bearer};
+
+use crate::http::response::SoraiError;
 
 /// Valid API keys for authentication
 /// TODO: Move this to configuration file or database

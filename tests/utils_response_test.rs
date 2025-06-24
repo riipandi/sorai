@@ -1,5 +1,5 @@
+use crate::http::response::*;
 use serde_json::json;
-use sorai::utils::response::*;
 
 #[test]
 fn test_success_response() {

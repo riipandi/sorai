@@ -1,10 +1,11 @@
-use crate::utils::response::SoraiError;
 use axum::Json;
 use axum::extract::State;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use metrics_exporter_prometheus::PrometheusHandle;
 use serde::{Deserialize, Serialize};
+
+use crate::http::response::SoraiError;
 
 /// Health check response data
 #[derive(Debug, Serialize, Deserialize)]
