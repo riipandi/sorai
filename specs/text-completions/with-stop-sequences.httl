@@ -4,8 +4,8 @@
 Authorization: Bearer sk-1234
 
 post /v1/text/completions {
-	provider: "cohere",
-	model: "command",
+	provider: "openai",
+	model: "Menlo:Jan-nano-gguf:jan-nano-4b-iQ4_XS.gguf",
 	text: "Write a short story about a robot:",
 	params: {
 		max_tokens: 200,

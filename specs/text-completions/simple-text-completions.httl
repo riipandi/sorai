@@ -5,7 +5,7 @@ Authorization: Bearer sk-1234
 
 post /v1/text/completions {
 	provider: "openai",
-	model: "gpt-3.5-turbo-instruct",
+	model: "Menlo:Jan-nano-gguf:jan-nano-4b-iQ4_XS.gguf",
 	text: "The future of artificial intelligence is",
 	params: {
 		max_tokens: 100,
