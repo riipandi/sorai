@@ -234,14 +234,13 @@ with speed and reliability.
 ## License
 
 Sorai is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0).
+See the [LICENSE](./LICENSE) file for more information.
 
 > Unless you explicitly state otherwise, any contribution intentionally submitted
 > for inclusion in this project by you shall be licensed under the Apache License 2.0,
 > without any additional terms or conditions.
 
 Copyrights in this project are retained by their contributors.
-
-See the [LICENSE](./LICENSE) file for more information.
 
 ---
 
