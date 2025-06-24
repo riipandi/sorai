@@ -1,8 +1,0 @@
-{
-	"is_sorai_error": true,
-	"status_code": 401,
-	"error": {
-		"type": "authentication_error",
-		"message": "Invalid API key provided"
-	}
-}

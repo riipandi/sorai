@@ -1,8 +1,0 @@
-{
-	"is_sorai_error": true,
-	"status_code": 500,
-	"error": {
-		"type": "api_error",
-		"message": "Internal server error occurred"
-	}
-}

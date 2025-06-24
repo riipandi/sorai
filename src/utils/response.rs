@@ -26,9 +26,8 @@ pub struct ApiResponse<T> {
 /// Standard error response following Sorai specification
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SoraiError {
-    pub event_id: String,
-    #[serde(rename = "type")]
-    pub error_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_id: Option<String>,
     pub is_sorai_error: bool,
     pub status_code: u16,
     pub error: ErrorField,
@@ -39,11 +38,13 @@ pub struct SoraiError {
 pub struct ErrorField {
     #[serde(rename = "type")]
     pub error_type: String,
-    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub param: Option<serde_json::Value>,
-    pub event_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_id: Option<String>,
 }
 
 impl<T> ApiResponse<T>
@@ -83,24 +84,28 @@ impl SoraiError {
     pub fn new(
         status_code: StatusCode,
         error_type: &str,
-        code: &str,
+        code: Option<&str>,
         message: &str,
         param: Option<serde_json::Value>,
+        is_sorai_error: bool,
     ) -> Self {
-        let event_id = ErrorEventId::new();
-        let event_id_str = event_id.to_string();
+        let event_id = if is_sorai_error {
+            let id = ErrorEventId::new();
+            Some(id.to_string())
+        } else {
+            None
+        };
 
         Self {
-            event_id: event_id_str.clone(),
-            error_type: error_type.to_string(),
-            is_sorai_error: true,
+            event_id: event_id.clone(),
+            is_sorai_error,
             status_code: status_code.as_u16(),
             error: ErrorField {
                 error_type: error_type.to_string(),
-                code: code.to_string(),
+                code: code.map(|c| c.to_string()),
                 message: message.to_string(),
                 param,
-                event_id: event_id_str,
+                event_id,
             },
         }
     }
@@ -110,9 +115,10 @@ impl SoraiError {
         Self::new(
             StatusCode::BAD_REQUEST,
             "invalid_request_error",
-            "bad_request",
+            Some("missing_required_parameter"),
             message,
             param,
+            true,
         )
     }
 
@@ -122,9 +128,10 @@ impl SoraiError {
         Self::new(
             StatusCode::UNAUTHORIZED,
             "authentication_error",
-            "unauthorized",
+            None,
             message,
             None,
+            true,
         )
     }
 
@@ -132,7 +139,14 @@ impl SoraiError {
     /// Used for authorization failures (valid API key but insufficient permissions)
     /// TODO: Implement when role-based access control is added
     pub fn forbidden(message: &str) -> Self {
-        Self::new(StatusCode::FORBIDDEN, "authorization_error", "forbidden", message, None)
+        Self::new(
+            StatusCode::FORBIDDEN,
+            "authorization_error",
+            Some("forbidden"),
+            message,
+            None,
+            true,
+        )
     }
 
     /// Create a rate limit error (429)
@@ -140,9 +154,10 @@ impl SoraiError {
         Self::new(
             StatusCode::TOO_MANY_REQUESTS,
             "rate_limit_error",
-            "rate_limit_exceeded",
+            None,
             message,
             None,
+            false,
         )
     }
 
@@ -150,16 +165,24 @@ impl SoraiError {
     pub fn internal_server_error(message: &str) -> Self {
         Self::new(
             StatusCode::INTERNAL_SERVER_ERROR,
-            "internal_error",
-            "internal_server_error",
+            "api_error",
+            None,
             message,
             None,
+            true,
         )
     }
 
     /// Create a bad gateway error (502)
     pub fn bad_gateway(message: &str) -> Self {
-        Self::new(StatusCode::BAD_GATEWAY, "provider_error", "bad_gateway", message, None)
+        Self::new(
+            StatusCode::BAD_GATEWAY,
+            "provider_error",
+            Some("bad_gateway"),
+            message,
+            None,
+            true,
+        )
     }
 
     /// Create a service unavailable error (503)
@@ -167,9 +190,10 @@ impl SoraiError {
         Self::new(
             StatusCode::SERVICE_UNAVAILABLE,
             "service_error",
-            "service_unavailable",
+            Some("service_unavailable"),
             message,
             None,
+            true,
         )
     }
 
@@ -179,11 +203,12 @@ impl SoraiError {
         Self::new(
             StatusCode::UNAUTHORIZED,
             "authentication_error",
-            "invalid_api_key",
+            None,
             message,
             Some(serde_json::json!({
                 "hint": "Please check your Bearer token format: 'Authorization: Bearer sk-xxxx'"
             })),
+            true,
         )
     }
 
@@ -193,9 +218,10 @@ impl SoraiError {
         Self::new(
             StatusCode::TOO_MANY_REQUESTS,
             "quota_error",
-            "quota_exceeded",
+            Some("quota_exceeded"),
             message,
             quota_info,
+            true,
         )
     }
 }
@@ -228,11 +254,12 @@ where
 pub fn error(
     status_code: StatusCode,
     error_type: &str,
-    code: &str,
+    code: Option<&str>,
     message: &str,
     param: Option<serde_json::Value>,
+    is_sorai_error: bool,
 ) -> SoraiError {
-    SoraiError::new(status_code, error_type, code, message, param)
+    SoraiError::new(status_code, error_type, code, message, param, is_sorai_error)
 }
 
 // TODO: Add additional response utilities:

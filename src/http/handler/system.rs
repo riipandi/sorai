@@ -1,5 +1,5 @@
 use crate::utils::response::SoraiError;
-use crate::utils::response::success;
+use axum::Json;
 use axum::extract::State;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
@@ -23,7 +23,7 @@ pub struct MessageResponse {
 /// Root endpoint handler
 /// Public endpoint - no authentication required
 pub async fn index() -> impl IntoResponse {
-    success(MessageResponse {
+    Json(MessageResponse {
         message: "All is well".to_string(),
     })
 }
@@ -36,7 +36,7 @@ pub async fn health_check() -> impl IntoResponse {
         service: "Sorai".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
     };
-    success(data)
+    Json(data)
 }
 
 /// API status endpoint handler
@@ -45,7 +45,7 @@ pub async fn status() -> impl IntoResponse {
     let data = MessageResponse {
         message: "Sorai Server is running".to_string(),
     };
-    success(data)
+    Json(data)
 }
 
 /// Metrics endpoint handler
@@ -68,10 +68,11 @@ pub async fn metrics(State(prometheus_handle): State<PrometheusHandle>) -> impl 
 pub async fn not_found_handler() -> impl IntoResponse {
     SoraiError::new(
         axum::http::StatusCode::NOT_FOUND,
-        "not_found_error",
-        "route_not_found",
+        "invalid_request_error",
+        Some("route_not_found"),
         "The requested route was not found on this server",
         None,
+        true,
     )
 }
 
