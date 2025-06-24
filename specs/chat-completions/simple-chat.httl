@@ -1,0 +1,15 @@
+# Define a base URL for all requests
+@base: http://localhost:8000
+
+Authorization: Bearer sk-1234
+
+post /v1/chat/completions {
+	provider: "openai",
+	model: "gpt-4o-mini",
+	messages: [
+		{
+			role: "user",
+			content: "Hello, how are you?"
+		}
+	]
+}

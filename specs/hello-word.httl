@@ -1,0 +1,19 @@
+# Define a base URL for all requests
+@base: http://localhost:8000
+
+Authorization: Bearer sk-1234
+
+get /
+
+assert {
+  status: 200,
+  headers: {
+    "access-control-allow-origin": "*",
+  },
+  body: {
+    success: true,
+    data: {
+      message: "All is well"
+    }
+  }
+}

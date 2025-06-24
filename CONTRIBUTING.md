@@ -28,7 +28,7 @@ welcoming environment for all contributors.
 
 ### Prerequisites
 
-- **Rust**: Version 1.70 or later. Install via [rustup](https://rustup.rs/)
+- **Rust**: Version 1.87 or later. Install via [rustup](https://rustup.rs/)
 - **Git**: For version control
 - **Just**: Task runner (optional but recommended) - `cargo install just`
 - **Watchexec**: For auto-reload during development - `cargo install watchexec-cli`
@@ -36,6 +36,8 @@ welcoming environment for all contributors.
 - **Tarpaulin**: Code coverage - `cargo install cargo-tarpaulin`
 - **Docker**: For containerized development (optional)
 - **jq**: JSON processor for parsing metadata - Install from [jq website](https://jqlang.org) or via package manager
+
+This project uses Just for comprehensive development tooling and Watchexec for hot reload support.
 
 ### Initial Setup
 
