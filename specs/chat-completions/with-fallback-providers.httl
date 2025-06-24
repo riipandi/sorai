@@ -1,7 +1,6 @@
 # Define a base URL for all requests
 @base: http://localhost:8000
 
-
 Authorization: Bearer sk-1234
 
 # Create chat completions using conversational messages.
@@ -15,7 +14,17 @@ post /v1/chat/completions {
 		},
 		{
 			role: "user",
-			content: "Hello, who are you? Say hello in a creative way!"
+			content: "Explain quantum computing"
+		}
+	],
+	fallbacks: [
+		{
+			provider: "anthropic",
+			model: "claude-3-sonnet-20240229"
+		},
+		{
+			provider: "cohere",
+			model: "command"
 		}
 	]
 }

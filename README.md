@@ -188,7 +188,7 @@ oha -n 100 -c 10 -m POST \
 For detailed documentation, see:
 - **[HTTP Transport Documentation](./docs/http-transport.md)** - Complete API reference
 - **[OpenAPI Specification](./docs/openapi.json)** - Machine-readable API spec
-- **[Example Requests](./docs/xh-requests.md)** - Sample requests using [xh](https://github.com/ducaale/xh)
+- **[Example Requests](./specs)** - Sample requests using [httl](https://httl.dev)
 
 ## Monitoring
 
@@ -223,7 +223,7 @@ We welcome contributions to make Sorai even better!
 - Submit a pull request with a clear title and description
 - Join the discussion on [GitHub Issues](https://github.com/riipandi/sorai/issues)
 
-Join the flow. Amplify your AI stack with Sorai! 🚀
+Join the flow. Amplify your your AI-powered applications with Sorai! 🚀
 
 ## Why "Sorai"?
 

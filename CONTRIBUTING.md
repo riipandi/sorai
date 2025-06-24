@@ -244,7 +244,7 @@ When making API changes:
 
 1. Update the OpenAPI specification in `docs/openapi.json`
 2. Update `docs/http-transport.md`
-3. Add examples to `docs/xh-requests.md`
+3. Add examples to `specs` directory
 
 ## Submitting Changes
 
@@ -419,7 +419,7 @@ just compose-cleanup
 
 ### Testing API Endpoints
 
-Use the provided examples in `docs/xh-requests.md`:
+Use the provided examples in `specs`:
 
 ```bash
 # Test chat completions

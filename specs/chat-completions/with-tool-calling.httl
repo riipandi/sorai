@@ -1,0 +1,47 @@
+# Define a base URL for all requests
+@base: http://localhost:8000
+
+Authorization: Bearer sk-1234
+
+# Create chat completions using conversational messages.
+post /v1/chat/completions {
+	provider: "openai",
+	model: "Menlo:Jan-nano-gguf:jan-nano-4b-iQ4_XS.gguf",
+	messages: [
+		{
+			role: "assistant",
+			content: "You are Sorai, a helpful assistant."
+		},
+		{
+			role: "user",
+			content: "What's the weather in Jakarta?"
+		}
+	],
+	params: {
+		tools: [
+			{
+				type: "function",
+				function: {
+					name: "get_weather",
+					description: "Get current weather for a location",
+					parameters: {
+						type: "object",
+						properties: {
+							location: {
+								type: "string",
+								description: "The city and state, e.g. San Francisco, CA"
+							}
+						},
+						required: ["location"]
+					}
+				}
+			}
+		],
+		tool_choice: {
+			type: "function",
+			function: {
+				name: "get_weather"
+			}
+		}
+	}
+}
