@@ -99,14 +99,6 @@ docker-run *args:
     {{app_image}}:{{app_version}} {{args}}
 
 [group('Docker Tasks')]
-[doc('Exec into the Docker image')]
-[no-exit-message]
-docker-exec *args:
-  @docker run --network=host --rm -it \
-    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
-    --entrypoint /srv/sorai {{app_image}}:{{app_version}} {{args}}
-
-[group('Docker Tasks')]
 [doc('Debug the Docker image')]
 [no-exit-message]
 docker-shell:

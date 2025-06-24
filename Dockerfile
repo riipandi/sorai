@@ -38,6 +38,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 FROM base AS pruner
 
 # Copy output and config files from the builder stage.
+COPY --from=builder /usr/src/docker/entrypoint.sh /srv/entrypoint.sh
 COPY --from=builder /usr/src/config.toml.example /srv/config.toml
 COPY --from=builder /usr/src/sorai /srv/sorai
 
@@ -89,5 +90,5 @@ WORKDIR /srv
 USER nonroot:nonroot
 EXPOSE $PORT/tcp
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sorai", "serve"]
+ENTRYPOINT ["/srv/entrypoint.sh"]
+CMD ["serve"]
