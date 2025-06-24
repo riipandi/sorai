@@ -54,7 +54,7 @@ LABEL org.opencontainers.image.documentation="https://github.com/riipandi/sorai"
 LABEL org.opencontainers.image.description="Fast LLM gateway written in Rust"
 LABEL org.opencontainers.image.authors="Aris Ripandi"
 LABEL org.opencontainers.image.vendor="Aris Ripandi"
-LABEL org.opencontainers.image.licenses="Apache-2.0 or MIT"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 # Required application environment variables
 ARG OPENAI_API_KEY ANTHROPIC_API_KEY BEDROCK_API_KEY BEDROCK_ACCESS_KEY \

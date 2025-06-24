@@ -3,7 +3,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/riipandi/sorai?logo=docker)](https://github.com/riipandi/sorai/releases)
 [![MSRV](https://img.shields.io/badge/rust-v1.87+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
 [![Dependencies](https://deps.rs/repo/github/riipandi/sorai/status.svg)](https://deps.rs/repo/github/riipandi/sorai)
-![License: MIT/Apache-2.0](https://img.shields.io/badge/License-MIT%20or%20Apache%202.0-blue.svg)
+![License Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/sorai/graphs/contributors)
 <!-- ![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/sorai/ci.yml?branch=main) -->
 
@@ -24,7 +24,7 @@ full observability, Sorai transforms client-to-LLM interactions into a seamless,
 - **📝 Structured Logging**: Configurable logging with rotation and timestamps.
 - **🐳 Docker Ready**: Container support with multi-platform builds.
 - **📈 Scalable Architecture**: Connection pooling and request timeout handling.
-- **📝 Open Source**: Dual-licensed under MIT and Apache 2.0 for maximum flexibility.
+- **📝 Open Source**: Licensed under Apache 2.0.
 
 ## Supported Providers
 
@@ -233,22 +233,18 @@ with speed and reliability.
 
 ## License
 
-Sorai is licensed under either of [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0)
-or [MIT license](https://choosealicense.com/licenses/mit).
-
-You may choose either license for your use case.
+Sorai is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0).
 
 > Unless you explicitly state otherwise, any contribution intentionally submitted
-> for inclusion in this project by you, as defined in the Apache-2.0 license, shall
-> be dual licensed as above, without any additional terms or conditions.
+> for inclusion in this project by you shall be licensed under the Apache License 2.0,
+> without any additional terms or conditions.
 
 Copyrights in this project are retained by their contributors.
 
-See the [LICENSE-APACHE](./LICENSE-APACHE) and [LICENSE-MIT](./LICENSE-MIT) files
-for more information.
+See the [LICENSE](./LICENSE) file for more information.
 
 ---
 
 <sub>🤫 Psst! If you like my work you can support me via [GitHub sponsors](https://github.com/sponsors/riipandi).</sub>
 
-[![Made by](https://badgen.net/badge/icon/Made%20by%20Aris%20Ripandi?icon=cocoapods&label&color=black&labelColor=black)](https://twitter.com/intent/follow?screen_name=riipandi)
+[![Made by](https://badgen.net/badge/icon/Made%20by%20Aris%20Ripandi?icon=cocoapods&label&color=black&labelColor=black)](https://x.com/intent/follow?screen_name=riipandi)
