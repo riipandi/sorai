@@ -80,20 +80,7 @@ LABEL org.opencontainers.image.authors="Aris Ripandi"
 LABEL org.opencontainers.image.vendor="Aris Ripandi"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
-# Read application environment variables
-ARG APP_BASE_URL=http://localhot:5080
-ARG APP_LOG_LEVEL=info
-ARG APP_LOG_WRITER=console
-
-ARG ANTHROPIC_API_KEY
-ARG AZURE_API_KEY
-ARG AZURE_ENDPOINT
-ARG BEDROCK_ACCESS_KEY
-ARG BEDROCK_API_KEY
-ARG COHERE_API_KEY
-ARG OPENAI_API_KEY
-ARG VERTEX_CREDENTIALS
-ARG VERTEX_PROJECT_ID
+# Optional: read application environment variables
 
 # Copy the build output files and necessary utilities from previous stage.
 # To enhance security, consider avoiding the copying of sysutils.
