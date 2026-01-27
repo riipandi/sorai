@@ -1,5 +1,6 @@
 mod handler;
 mod router;
+mod schemas;
 mod server;
 
 pub mod middleware;

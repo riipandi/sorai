@@ -30,7 +30,7 @@ type TextCompletionId = TypeSafeId<TextCompletion>;
 
 /// Chat completion request payload
 #[derive(Debug, Deserialize)]
-pub struct ChatCompletionRequest {
+pub struct ChatCompletionReq {
     #[serde(default)]
     pub provider: Option<String>,
     #[serde(default)]
@@ -45,7 +45,7 @@ pub struct ChatCompletionRequest {
 
 /// Text completion request payload
 #[derive(Debug, Deserialize)]
-pub struct TextCompletionRequest {
+pub struct TextCompletionReq {
     #[serde(default)]
     pub provider: Option<String>,
     #[serde(default)]
@@ -133,7 +133,7 @@ pub struct ExtraFields {
 /// Requires Bearer token authentication
 pub async fn chat_completions(
     api_key: ApiKey,
-    Json(request): Json<ChatCompletionRequest>,
+    Json(request): Json<ChatCompletionReq>,
 ) -> Result<impl IntoResponse, SoraiError> {
     // Log API key usage for monitoring
     tracing::debug!("Chat completion request from API key: {}", api_key.key());
@@ -222,7 +222,7 @@ pub async fn chat_completions(
 /// Requires Bearer token authentication
 pub async fn text_completions(
     api_key: ApiKey,
-    Json(request): Json<TextCompletionRequest>,
+    Json(request): Json<TextCompletionReq>,
 ) -> Result<impl IntoResponse, SoraiError> {
     // Log API key usage for monitoring
     tracing::debug!("Text completion request from API key: {}", api_key.key());
