@@ -28,7 +28,7 @@ welcoming environment for all contributors.
 
 ### Prerequisites
 
-- **Rust**: Version 1.87 or later. Install via [rustup](https://rustup.rs/)
+- **Rust**: Version 1.93 or later. Install via [rustup](https://rustup.rs/)
 - **Git**: For version control
 - **Just**: Task runner (optional but recommended) - `cargo install just`
 - **Watchexec**: For auto-reload during development - `cargo install watchexec-cli`

@@ -1,7 +1,7 @@
 # Sorai LLM Proxy Gateway
 
 [![GitHub Release](https://img.shields.io/github/v/release/riipandi/sorai?logo=docker)](https://github.com/riipandi/sorai/releases)
-[![MSRV](https://img.shields.io/badge/rust-v1.87+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
+[![MSRV](https://img.shields.io/badge/rust-v1.93+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
 [![Dependencies](https://deps.rs/repo/github/riipandi/sorai/status.svg)](https://deps.rs/repo/github/riipandi/sorai)
 ![License Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 [![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/sorai/graphs/contributors)
@@ -41,7 +41,7 @@ full observability, Sorai transforms client-to-LLM interactions into a seamless,
 
 ### Prerequisites
 
-- **Rust**: Ensure you have Rust installed (version 1.87 or later). Install via [rustup](https://rustup.rs/)
+- **Rust**: Ensure you have Rust installed (version 1.93 or later). Install via [rustup](https://rustup.rs/)
 - **Git**: Required to clone the repository
 - **API Keys**: Valid API keys for your chosen LLM providers
 - **Optional**: Docker for containerized deployment

@@ -88,14 +88,18 @@ cleanup:
 [doc('Build the Docker image')]
 docker-build *args:
   @echo "Building {{app_image}}:{{app_version}} for platform {{platform_arch}}"
-  @docker build -f Dockerfile . -t {{app_image}}:{{app_version}} --build-arg PLATFORM={{platform_arch}} {{args}}
+  @docker build -f Dockerfile --build-arg DISTROLESS_TAG=nonroot . \
+    -t {{app_image}}:{{app_version}} --build-arg PLATFORM={{platform_arch}} {{args}}
+  @docker build -f Dockerfile --build-arg DISTROLESS_TAG=debug-nonroot . \
+    -t {{app_image}}:{{app_version}}-debug --build-arg PLATFORM={{platform_arch}} {{args}}
   @docker image list --filter reference={{app_image}}:*
 
 [group('Docker Tasks')]
 [doc('Run the Docker image')]
 docker-run *args:
   @docker run --network=host --rm -it \
-    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
+    -v ./config.toml:/etc/sorai.toml:ro \
+    -v ./.data/logs:/data/logs:rw \
     {{app_image}}:{{app_version}} {{args}}
 
 [group('Docker Tasks')]
@@ -103,8 +107,8 @@ docker-run *args:
 [no-exit-message]
 docker-shell:
   @docker run --network=host --rm -it \
-    -v ./config.toml:/srv/config.toml:ro -v ./logs:/srv/logs:rw \
-    --entrypoint /bin/sh {{app_image}}:{{app_version}}
+    -v ./config.toml:/etc/sorai.toml:ro -v ./logs:/data/logs:rw \
+    --entrypoint sh {{app_image}}:{{app_version}}-debug
 
 [group('Docker Tasks')]
 [doc('Get Docker image list')]

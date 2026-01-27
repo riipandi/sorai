@@ -1,52 +1,96 @@
-# Logs
-logs
-*.log
+/.idea
+/.pnp
+/.husky
+.pnp.js
+.DS_Store
+.DS_Store?
+/coverage
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+node_modules/
+*tsbuildinfo
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-*.profraw
-
-*_creds*
-**/venv/
-**/__pycache__/
-**/__pycache__/**
-
-.cache
-.pnpm-store
-node_modules
-build/
-dist/
-temp/
-tmp/
-*.local
-
-# Editor directories and files
+.unikraft
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 !.vscode/launch.json
+!.vscode/mcp.json
 !.vscode/tasks.json
-.idea
-.DS_Store
-.DS_Store?
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.bak
 
-# envars
-.env*
+# SQLite
+*.sqlite*
+*.sqlite3*
+*.db
+
+# Output directory
+_data/
+build/
+dist/
+target/
+tmp/
+temp/
+.data
+.cache
+.wireit
+.temp
+.tmp
+
+# Vite & Vitest config
+vite.config.*
+!vite.config.ts
+vitest.config.*
+!vitest.config.ts
+vitest.workspace.*
+!vitest.workspace.ts
+
+# Envars
+.env.*
 !.env.example
+compose.env*
+!compose.env.example
+.*.vars
 
-# Config files
+# Disable this line in your real app
+/playwright/.cache/
+/playwright-report/
+/tests-results/
+/blob-report/
+.playwright/
+
+# Sentry Config File
+.sentryclirc
+
+# Storybook
+*storybook.log
+storybook-static/
+
+# Application data
+/logs/
+/storage/
 config.toml*
 !config.toml.example
 
-# Rust
-target/
+# Miscellaneous
+pnpm-exec-summary.json
+slim.report.json
+RELEASE.md
+audit.json
 
-# fly.toml
+# TanStack
+.tanstack/
+routes.gen.ts
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate*
+terraform.tfvars*
+!terraform.tfvars.example
+
+# fly.io
 fly*.toml*
 !fly*.example.toml

@@ -3,7 +3,7 @@
 
 [sorai]
 # Server host address (use 0.0.0.0 to bind to all interfaces, 127.0.0.1 for localhost only)
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = 8000
 pool_size = 300
 # Request timeout in seconds (default: 30)
@@ -15,7 +15,7 @@ show_timestamp = true
 # Log level: trace, debug, info, warn, error (default: info)
 level = "info"
 # Log directory path (relative to working directory or absolute path)
-log_directory = "./logs"
+log_directory = "/data/logs"
 # Log rotation frequency: minutely, hourly, daily, never, none
 # Use "none" to disable file logging completely (console logging is always enabled)
 rotation = "daily"
