@@ -1,11 +1,11 @@
 use super::router::create_router;
 use crate::config::Config;
 use crate::http::middleware::MakeTypeSafeRequestId;
-use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
+use crate::http::middleware::{connection_info_middleware, create_cors_layer, track_metrics, ConnectionInfo};
 use crate::metrics::{record_server_info, setup_metrics_recorder};
-use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
+use crate::utils::time::{format_timestamp_readable, PreciseTimeFormat};
 use axum::extract::Request;
-use axum::http::HeaderName;
+use axum::http::{HeaderName, StatusCode};
 use axum::middleware;
 use axum::response::Response;
 use std::net::SocketAddr;
@@ -77,7 +77,7 @@ impl HttpServer {
             .and_then(|auth| {
                 if auth.starts_with("Bearer ") {
                     let key = &auth[7..]; // Remove "Bearer " prefix
-                    // Only show first 8 characters for security
+                                          // Only show first 8 characters for security
                     if key.len() > 8 {
                         Some(format!("{}***", &key[..8]))
                     } else {
@@ -392,7 +392,10 @@ impl HttpServer {
         // Add middleware layers in correct order
         let middleware = ServiceBuilder::new()
             .layer(SetRequestIdLayer::new(x_request_id.clone(), MakeTypeSafeRequestId))
-            .layer(TimeoutLayer::new(Duration::from_secs(timeout_requests)))
+            .layer(TimeoutLayer::with_status_code(
+                StatusCode::REQUEST_TIMEOUT,
+                Duration::from_secs(timeout_requests),
+            ))
             .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))
             .layer(trace_layer_for_http)
