@@ -30,6 +30,7 @@ tower-http = { version = "0.6.8", features = ["cors", "request-id", "timeout", "
 tracing = "0.1.44"
 tracing-appender = "0.2.4"
 tracing-subscriber = { version = "0.3.22", features = ["chrono", "env-filter", "time"] }
+turso = "0.4.3"
 type-safe-id = { version = "0.3.3", features = ["serde"] }
 
 # Optimized for bundle size. If you want faster builds comment out/delete this section.
