@@ -1,6 +1,26 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
 
+name: sorai
+
 services:
+  mailpit:
+    image: axllent/mailpit:${MAILPIT_VERSION:-latest}
+    restart: unless-stopped
+    hostname: mailpit
+    volumes: ['mailpit_data:/data:rw']
+    ports: ['1025:1025', '8025:8025']
+    environment:
+      TZ: Asia/Jakarta
+      MP_TAGS_USERNAME: true
+      MP_DISABLE_VERSION_CHECK: true
+      MP_ALLOW_UNTRUSTED_TLS: true
+      MP_UI_BIND_ADDR: 0.0.0.0:8025
+      MP_SMTP_BIND_ADDR: 0.0.0.0:1025
+      MP_SMTP_AUTH_ALLOW_INSECURE: true
+      MP_SMTP_AUTH: 'maileruser1:mailerpass1 maileruser2:mailerpass2'
+    extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['sorai_network']
+
   prometheus:
     image: prom/prometheus:latest
     container_name: sorai_prometheus
@@ -10,6 +30,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.listen-address=:3390'
+    extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
 
   grafana:
@@ -32,9 +53,14 @@ services:
     volumes:
       - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
       - './docker/grafana/dashboards:/var/lib/grafana/dashboards:ro'
+    extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
     depends_on:
       - prometheus
+
+volumes:
+  mailpit_data:
+    driver: local
 
 networks:
   sorai_network:

@@ -1,25 +1,96 @@
 {
-    "files.associations": {
-        "*.toml.example": "toml",
-        "*.yml.example": "yaml"
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "always"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.vars": "dotenv",
+    "*.toml.example": "toml",
+    "*.yml.example": "yaml",
+    "wrangler.json": "jsonc"
+  },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true,
+    "**/routes.gen.ts": true
+  },
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true,
+    "**/routes.gen.ts": true
+  },
+  "search.exclude": {
+    "**/.husky": true,
+    "**/.output": true,
+    "**/build": true,
+    "**/dist": true,
+    "**/target": true,
+    "**/routeTree.gen.ts": true,
+    "**/routes.gen.ts": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    // @ref: https://www.tailwind-variants.org/docs/getting-started
+    // @ref: https://github.com/paolotiu/tailwind-intellisense-regex-list
+    ["(?:cn|cx|cva|clx|tv)\\(([^;]*)[\\);]", "[`'\"`]([^'\"`;]*)[`'\"`]"],
+    ["classList={{([^;]*)}}", "\\s*?[\"'`]([^\"'`]*).*?:"]
+  ],
+  "tailwindCSS.files.exclude": ["*.{json,md,js,ts,yml,yaml}"],
+  "[css]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports.biome": "explicit"
     },
-    "search.exclude": {
-        "**/build": true,
-        "**/dist": true,
-        "**/target": true
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports.biome": "explicit"
     },
-    "[dockerfile]": {
-        "editor.defaultFormatter": "ms-azuretools.vscode-containers"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "darkriszty.markdown-table-prettify"
+  },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  },
+  "[tailwindcss]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "Shellomo.enhanced-toml",
+    "editor.formatOnSave": false
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports.biome": "explicit"
     },
-    "[markdown]": {
-        "editor.defaultFormatter": "darkriszty.markdown-table-prettify"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports.biome": "explicit"
     },
-    "[rust]": {
-        "editor.defaultFormatter": "rust-lang.rust-analyzer",
-        "editor.formatOnSave": true,
-    },
-    "[toml]": {
-        "editor.defaultFormatter": "tamasfe.even-better-toml",
-        "editor.formatOnSave": false
-    }
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true
+  }
 }

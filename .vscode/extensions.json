@@ -1,13 +1,15 @@
 {
-    "recommendations": [
-        "darkriszty.markdown-table-prettify",
-        "EditorConfig.EditorConfig",
-        "fill-labs.dependi",
-        "foxundermoon.shell-format",
-        "HTTL.httl-vscode",
-        "rust-lang.rust-analyzer",
-        "tamasfe.even-better-toml",
-        "vadimcn.vscode-lldb"
-    ],
-    "unwantedRecommendations": []
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "darkriszty.markdown-table-prettify",
+    "EditorConfig.EditorConfig",
+    "fill-labs.dependi",
+    "foxundermoon.shell-format",
+    "ms-playwright.playwright",
+    "oxc.oxc-vscode",
+    "rust-lang.rust-analyzer",
+    "Shellomo.enhanced-toml",
+    "vadimcn.vscode-lldb"
+  ],
+  "unwantedRecommendations": []
 }

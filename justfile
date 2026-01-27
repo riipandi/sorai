@@ -80,7 +80,8 @@ check *args:
 [doc('Clean up artifacts')]
 [confirm("Are you sure you want to cleanup the artifacts?")]
 cleanup:
-  @npx --yes rimraf build dist tmp target
+  @pnpm dlx del-cli build dist tmp target pnpm-lock.yaml \
+    .{output,tanstack} node_modules storybook-static
 
 #----- Docker related tasks ---------------------------------------------------
 

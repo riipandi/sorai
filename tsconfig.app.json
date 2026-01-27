@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "exactOptionalPropertyTypes": false,
+    "erasableSyntaxOnly": false,
+    "inlineSourceMap": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "tsBuildInfoFile": "./node_modules/tsconfig_app.tsbuildinfo",
+    "types": ["vite/client"],
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "~/package.json": ["./package.json"],
+      "#/*": ["./app/*"]
+    }
+  },
+  "include": ["app", "stories"],
+  "exclude": [".output", "storage", "target", "temp", "vite.config.ts"]
+}

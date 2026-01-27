@@ -1,0 +1,101 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { Button } from '#/components/selia/button'
+import {
+  Menu,
+  MenuItem,
+  MenuPopup,
+  MenuSeparator,
+  MenuSubmenu,
+  MenuSubmenuTrigger,
+  MenuSubmenuPopup,
+  MenuTrigger
+} from '#/components/selia/menu'
+import { Menubar } from '#/components/selia/menubar'
+
+const meta = {
+  title: 'Components/Menubar',
+  component: Menubar,
+  parameters: { layout: 'centered' },
+  argTypes: {},
+  tags: [], // ['autodocs']
+  args: {},
+  decorators: [
+    (Story) => (
+      <div className='flex w-full min-w-md items-center justify-center'>
+        <Story />
+      </div>
+    )
+  ]
+} satisfies Meta<typeof Menubar>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Example: Story = {
+  args: {},
+  render: () => (
+    <Menubar>
+      <Menu>
+        <MenuTrigger
+          render={
+            <Button size='xs' variant='plain'>
+              File
+            </Button>
+          }
+        />
+        <MenuPopup size='compact'>
+          <MenuItem>New File</MenuItem>
+          <MenuItem>Open</MenuItem>
+          <MenuItem>Save</MenuItem>
+          <MenuSubmenu>
+            <MenuSubmenuTrigger>Export</MenuSubmenuTrigger>
+            <MenuSubmenuPopup size='compact'>
+              <MenuItem>PNG</MenuItem>
+              <MenuItem>JPG</MenuItem>
+              <MenuItem>PDF</MenuItem>
+            </MenuSubmenuPopup>
+          </MenuSubmenu>
+          <MenuSeparator />
+          <MenuItem>Exit App</MenuItem>
+        </MenuPopup>
+      </Menu>
+      <Menu>
+        <MenuTrigger
+          render={
+            <Button size='xs' variant='plain'>
+              Edit
+            </Button>
+          }
+        />
+        <MenuPopup size='compact'>
+          <MenuItem>Cut</MenuItem>
+          <MenuItem>Copy</MenuItem>
+          <MenuItem>Paste</MenuItem>
+        </MenuPopup>
+      </Menu>
+      <Menu>
+        <MenuTrigger
+          render={
+            <Button size='xs' variant='plain'>
+              View
+            </Button>
+          }
+        />
+        <MenuPopup size='compact'>
+          <MenuItem>Zoom In</MenuItem>
+          <MenuItem>Zoom Out</MenuItem>
+          <MenuSubmenu>
+            <MenuSubmenuTrigger>Layout</MenuSubmenuTrigger>
+            <MenuSubmenuPopup size='compact'>
+              <MenuItem>Single Page</MenuItem>
+              <MenuItem>Two Pages</MenuItem>
+              <MenuItem>Continous</MenuItem>
+            </MenuSubmenuPopup>
+          </MenuSubmenu>
+          <MenuSeparator />
+          <MenuItem>Full Screen</MenuItem>
+        </MenuPopup>
+      </Menu>
+    </Menubar>
+  )
+}

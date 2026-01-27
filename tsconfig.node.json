@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "composite": true,
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "exactOptionalPropertyTypes": false,
+    "erasableSyntaxOnly": false,
+    "inlineSourceMap": true,
+    "isolatedModules": true,
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictPropertyInitialization": true,
+    "target": "ES2023",
+    "tsBuildInfoFile": "./node_modules/tsconfig_node.tsbuildinfo",
+    "types": ["node"],
+    "verbatimModuleSyntax": true
+  },
+  "include": ["vite.config.ts", ".storybook"],
+  "exclude": [".output", "storage", "target", "temp"]
+}

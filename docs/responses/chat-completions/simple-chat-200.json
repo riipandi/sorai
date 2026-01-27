@@ -1,27 +1,27 @@
 {
-	"id": "chatcmpl-123",
-	"object": "chat.completion",
-	"choices": [
-		{
-			"index": 0,
-			"message": {
-				"role": "assistant",
-				"content": "Hello! I'm doing well, thank you for asking. How can I help you today?"
-			},
-			"finish_reason": "stop"
-		}
-	],
-	"model": "gpt-4o-mini",
-	"created": 1677652288,
-	"usage": {
-		"prompt_tokens": 12,
-		"completion_tokens": 19,
-		"total_tokens": 31
-	},
-	"extra_fields": {
-		"provider": "openai",
-		"model_params": {},
-		"latency": 1.234,
-		"raw_response": {}
-	}
+  "id": "chatcmpl-123",
+  "object": "chat.completion",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Hello! I'm doing well, thank you for asking. How can I help you today?"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "model": "gpt-4o-mini",
+  "created": 1677652288,
+  "usage": {
+    "prompt_tokens": 12,
+    "completion_tokens": 19,
+    "total_tokens": 31
+  },
+  "extra_fields": {
+    "provider": "openai",
+    "model_params": {},
+    "latency": 1.234,
+    "raw_response": {}
+  }
 }

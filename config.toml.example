@@ -30,7 +30,14 @@ allow_origins = ["*"]
 # Allowed HTTP methods
 allow_methods = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"]
 # Allowed request headers
-allow_headers = ["accept", "accept-language", "authorization", "content-type", "user-agent", "x-requested-id"]
+allow_headers = [
+  "accept",
+  "accept-language",
+  "authorization",
+  "content-type",
+  "user-agent",
+  "x-requested-id"
+]
 # Headers to expose to the browser
 expose_headers = []
 # Allow credentials (cookies, authorization headers, etc.)
