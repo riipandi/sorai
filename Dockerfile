@@ -19,10 +19,10 @@ WORKDIR /usr/src
 # Copy the source files
 COPY --chown=node:node . .
 
-# # Install dependencies and build the application.
-# RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install \
-#     --ignore-scripts --frozen-lockfile --stream \
-#     && NODE_ENV=production pnpm run build
+# Install dependencies and build the application.
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install \
+    --ignore-scripts --frozen-lockfile --stream \
+    && NODE_ENV=production pnpm run build
 
 # -----------------------------------------------------------------------------
 # Base image for building the Rust application
