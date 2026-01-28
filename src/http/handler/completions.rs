@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use type_safe_id::{StaticType, TypeSafeId};
 
-use crate::http::response::SoraiError;
+use crate::http::response::{ApiResponse, ErrorCode, ErrorTypeKind, RequestId, create_error};
 
 /// Chat completion type for TypeID
 #[derive(Default)]
@@ -36,11 +36,11 @@ pub struct ChatCompletionReq {
     #[serde(default)]
     pub model: Option<String>,
     #[serde(default)]
-    pub messages: Vec<Value>, // Placeholder for SoraiMessage
+    pub messages: Vec<Value>,
     #[serde(default)]
-    pub params: Option<Value>, // Placeholder for ModelParameters
+    pub params: Option<Value>,
     #[serde(default)]
-    pub fallbacks: Option<Vec<Value>>, // Placeholder for Fallback
+    pub fallbacks: Option<Vec<Value>>,
 }
 
 /// Text completion request payload
@@ -53,9 +53,9 @@ pub struct TextCompletionReq {
     #[serde(default)]
     pub text: Option<String>,
     #[serde(default)]
-    pub params: Option<Value>, // Placeholder for ModelParameters
+    pub params: Option<Value>,
     #[serde(default)]
-    pub fallbacks: Option<Vec<Value>>, // Placeholder for Fallback
+    pub fallbacks: Option<Vec<Value>>,
 }
 
 /// Chat completion response following OpenAI format
@@ -133,60 +133,75 @@ pub struct ExtraFields {
 /// Requires Bearer token authentication
 pub async fn chat_completions(
     api_key: ApiKey,
+    RequestId(request_id): RequestId,
     Json(request): Json<ChatCompletionReq>,
-) -> Result<impl IntoResponse, SoraiError> {
-    // Log API key usage for monitoring
+) -> impl IntoResponse {
     tracing::debug!("Chat completion request from API key: {}", api_key.key());
 
-    // TODO: Implement API key usage tracking and rate limiting
-    // TODO: Check API key permissions for chat completions endpoint
-
-    // Validate required fields
     let provider = match &request.provider {
         None => {
-            return Err(SoraiError::bad_request(
-                "Provider is required",
-                Some(serde_json::json!("provider")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Provider is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(provider) if provider.is_empty() => {
-            return Err(SoraiError::bad_request(
-                "Provider is required",
-                Some(serde_json::json!("provider")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Provider is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(provider) => provider,
     };
 
     let model = match &request.model {
         None => {
-            return Err(SoraiError::bad_request(
-                "Model is required",
-                Some(serde_json::json!("model")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Model is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(model) if model.is_empty() => {
-            return Err(SoraiError::bad_request(
-                "Model is required",
-                Some(serde_json::json!("model")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Model is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(model) => model,
     };
 
     if request.messages.is_empty() {
-        return Err(SoraiError::bad_request(
-            "Messages array cannot be empty",
-            Some(serde_json::json!("messages")),
-        ));
+        return ApiResponse::<()>::error(
+            create_error(
+                ErrorCode::MissingRequiredParameter,
+                ErrorTypeKind::Internal,
+                "Messages array cannot be empty",
+            ),
+            request_id.clone(),
+        )
+        .into_response();
     }
 
-    // TODO: Implement actual chat completion logic
-    // TODO: Add provider-specific implementations
-    // TODO: Implement fallback mechanism
-    // TODO: Add request/response validation
-    // TODO: Implement streaming responses
-    // For now, return a placeholder response
     let completion_id = ChatCompletionId::new();
     let response = ChatCompletionResponse {
         id: completion_id.to_string(),
@@ -214,7 +229,7 @@ pub async fn chat_completions(
         }),
     };
 
-    Ok(axum::Json(response))
+    ApiResponse::success(response, request_id).into_response()
 }
 
 /// Text completions endpoint handler
@@ -222,70 +237,89 @@ pub async fn chat_completions(
 /// Requires Bearer token authentication
 pub async fn text_completions(
     api_key: ApiKey,
+    RequestId(request_id): RequestId,
     Json(request): Json<TextCompletionReq>,
-) -> Result<impl IntoResponse, SoraiError> {
-    // Log API key usage for monitoring
+) -> impl IntoResponse {
     tracing::debug!("Text completion request from API key: {}", api_key.key());
 
-    // TODO: Implement API key usage tracking and rate limiting
-    // TODO: Check API key permissions for text completions endpoint
-
-    // Validate required fields
     let provider = match &request.provider {
         None => {
-            return Err(SoraiError::bad_request(
-                "Provider is required",
-                Some(serde_json::json!("provider")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Provider is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(provider) if provider.is_empty() => {
-            return Err(SoraiError::bad_request(
-                "Provider is required",
-                Some(serde_json::json!("provider")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Provider is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(provider) => provider,
     };
 
     let model = match &request.model {
         None => {
-            return Err(SoraiError::bad_request(
-                "Model is required",
-                Some(serde_json::json!("model")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Model is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(model) if model.is_empty() => {
-            return Err(SoraiError::bad_request(
-                "Model is required",
-                Some(serde_json::json!("model")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Model is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(model) => model,
     };
 
-    // Check if text field is missing or empty
     let text = match &request.text {
         None => {
-            return Err(SoraiError::bad_request(
-                "Text prompt is required",
-                Some(serde_json::json!("text")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Text prompt is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(text) if text.is_empty() => {
-            return Err(SoraiError::bad_request(
-                "Text prompt is required",
-                Some(serde_json::json!("text")),
-            ));
+            return ApiResponse::<()>::error(
+                create_error(
+                    ErrorCode::MissingRequiredParameter,
+                    ErrorTypeKind::Internal,
+                    "Text prompt is required",
+                ),
+                request_id.clone(),
+            )
+            .into_response();
         }
         Some(text) => text,
     };
 
-    // TODO: Implement actual text completion logic
-    // TODO: Add provider-specific implementations
-    // TODO: Implement fallback mechanism
-    // TODO: Add request/response validation
-    // TODO: Implement streaming responses
-    // For now, return a placeholder response
     let completion_id = TextCompletionId::new();
     let response = TextCompletionResponse {
         id: completion_id.to_string(),
@@ -310,5 +344,5 @@ pub async fn text_completions(
         }),
     };
 
-    Ok(axum::Json(response))
+    ApiResponse::success(response, request_id).into_response()
 }

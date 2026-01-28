@@ -1,11 +1,10 @@
-use axum::Json;
 use axum::extract::State;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use metrics_exporter_prometheus::PrometheusHandle;
 use serde::{Deserialize, Serialize};
 
-use crate::http::response::SoraiError;
+use crate::http::response::{ApiResponse, ErrorCode, ErrorTypeKind, RequestId, create_error};
 
 /// Health check response data
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,38 +14,30 @@ pub struct HealthStatus {
     pub version: String,
 }
 
-/// Simple message response data
-#[derive(Debug, Serialize, Deserialize)]
-pub struct MessageResponse {
-    pub message: String,
-}
-
 /// Root endpoint handler
 /// Public endpoint - no authentication required
-pub async fn index() -> impl IntoResponse {
-    Json(MessageResponse {
-        message: "All is well".to_string(),
-    })
+pub async fn index(RequestId(request_id): RequestId) -> impl IntoResponse {
+    ApiResponse::success_with_message((), "All is well".to_string(), request_id)
 }
 
 /// Health check endpoint handler
 /// Public endpoint - no authentication required
-pub async fn health_check() -> impl IntoResponse {
-    let data = HealthStatus {
-        status: "OK".to_string(),
-        service: "Sorai".to_string(),
-        version: env!("CARGO_PKG_VERSION").to_string(),
-    };
-    Json(data)
+pub async fn health_check(RequestId(request_id): RequestId) -> impl IntoResponse {
+    ApiResponse::success_with_message(
+        HealthStatus {
+            status: "OK".to_string(),
+            service: "Sorai".to_string(),
+            version: env!("CARGO_PKG_VERSION").to_string(),
+        },
+        "healthy".to_string(),
+        request_id,
+    )
 }
 
 /// API status endpoint handler
 /// Public endpoint - no authentication required
-pub async fn status() -> impl IntoResponse {
-    let data = MessageResponse {
-        message: "Sorai Server is running".to_string(),
-    };
-    Json(data)
+pub async fn status(RequestId(request_id): RequestId) -> impl IntoResponse {
+    ApiResponse::success_with_message((), "Sorai Server is running".to_string(), request_id)
 }
 
 /// Metrics endpoint handler
@@ -66,15 +57,16 @@ pub async fn metrics(State(prometheus_handle): State<PrometheusHandle>) -> impl 
 
 /// Handler for 404 Not Found routes
 /// Public endpoint - no authentication required
-pub async fn not_found_handler() -> impl IntoResponse {
-    SoraiError::new(
-        axum::http::StatusCode::NOT_FOUND,
-        "invalid_request_error",
-        Some("route_not_found"),
-        "The requested route was not found on this server",
-        None,
-        true,
-    )
+pub async fn not_found_handler(RequestId(request_id): RequestId) -> impl IntoResponse {
+    let response = ApiResponse::<()>::error(
+        create_error(
+            ErrorCode::InvalidRequest,
+            ErrorTypeKind::Internal,
+            "The requested route was not found on this server",
+        ),
+        request_id,
+    );
+    (StatusCode::NOT_FOUND, response).into_response()
 }
 
 // TODO: Add protected system endpoints that require authentication:

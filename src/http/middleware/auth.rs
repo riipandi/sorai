@@ -1,10 +1,11 @@
-use axum::RequestPartsExt;
 use axum::extract::FromRequestParts;
-use axum::http::request::Parts;
+use axum::http::{request::Parts, StatusCode};
+use axum::response::{IntoResponse, Response};
+use axum::RequestPartsExt;
+use axum_extra::headers::{authorization::Bearer, Authorization};
 use axum_extra::TypedHeader;
-use axum_extra::headers::{Authorization, authorization::Bearer};
 
-use crate::http::response::SoraiError;
+use crate::http::response::{create_error, ApiResponse, ErrorCode, ErrorTypeKind};
 
 /// Valid API keys for authentication
 /// TODO: Move this to configuration file or database
@@ -41,30 +42,68 @@ impl ApiKey {
     // - API key metadata (name, created_at, last_used, etc.)
 }
 
+/// Auth rejection type
+pub struct AuthRejection {
+    request_id: Option<String>,
+    error: crate::http::response::ErrorType,
+}
+
+impl IntoResponse for AuthRejection {
+    fn into_response(self) -> Response {
+        let request_id = self.request_id.unwrap_or_else(|| {
+            let id = crate::http::response::HttpRequestId::new();
+            id.to_string()
+        });
+        (
+            StatusCode::UNAUTHORIZED,
+            ApiResponse::<()>::error(self.error, request_id),
+        )
+            .into_response()
+    }
+}
+
 impl<S> FromRequestParts<S> for ApiKey
 where
     S: Send + Sync,
 {
-    type Rejection = SoraiError;
+    type Rejection = AuthRejection;
 
     async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        const REQUEST_ID_HEADER_NAME: &str = "x-request-id";
+
         // Extract the token from the authorization header
         let TypedHeader(Authorization(bearer)) =
             parts
                 .extract::<TypedHeader<Authorization<Bearer>>>()
                 .await
-                .map_err(|_| {
-                    SoraiError::unauthorized(
+                .map_err(|_| AuthRejection {
+                    request_id: parts
+                        .headers
+                        .get(REQUEST_ID_HEADER_NAME)
+                        .and_then(|h| h.to_str().ok())
+                        .map(|s| s.to_string()),
+                    error: create_error(
+                        ErrorCode::AuthenticationError,
+                        ErrorTypeKind::Internal,
                         "Missing or invalid Authorization header. Please provide a valid Bearer token.",
-                    )
+                    ),
                 })?;
 
         let api_key = ApiKey::new(bearer.token().to_string());
 
         if !api_key.is_valid() {
-            return Err(SoraiError::unauthorized(
-                "Invalid API key. Please check your Bearer token.",
-            ));
+            return Err(AuthRejection {
+                request_id: parts
+                    .headers
+                    .get(REQUEST_ID_HEADER_NAME)
+                    .and_then(|h| h.to_str().ok())
+                    .map(|s| s.to_string()),
+                error: create_error(
+                    ErrorCode::AuthenticationError,
+                    ErrorTypeKind::Internal,
+                    "Invalid API key. Please check your Bearer token.",
+                ),
+            });
         }
 
         Ok(api_key)

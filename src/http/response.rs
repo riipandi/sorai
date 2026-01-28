@@ -1,50 +1,117 @@
 use axum::response::{IntoResponse, Response};
-use axum::{Json, http::StatusCode};
+use axum::{extract::FromRequestParts, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 use type_safe_id::{StaticType, TypeSafeId};
 
-/// Error event type for TypeID
+/// Request type for TypeID
 #[derive(Default)]
-struct ErrorEvent;
+pub struct HttpRequest;
 
-impl StaticType for ErrorEvent {
-    const TYPE: &'static str = "err";
+impl StaticType for HttpRequest {
+    const TYPE: &'static str = "";
 }
 
-/// Type alias for error event ID
-type ErrorEventId = TypeSafeId<ErrorEvent>;
+/// Type alias for request IDs
+pub type HttpRequestId = TypeSafeId<HttpRequest>;
 
-/// Standard API response wrapper for success cases
+/// Standard error codes
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum ErrorCode {
+    #[serde(rename = "MISSING_REQUIRED_PARAMETER")]
+    MissingRequiredParameter,
+    #[serde(rename = "INVALID_REQUEST")]
+    InvalidRequest,
+    #[serde(rename = "AUTHENTICATION_ERROR")]
+    AuthenticationError,
+    #[serde(rename = "AUTHORIZATION_ERROR")]
+    AuthorizationError,
+    #[serde(rename = "RATE_LIMIT_ERROR")]
+    RateLimitError,
+    #[serde(rename = "QUOTA_ERROR")]
+    QuotaError,
+    #[serde(rename = "API_ERROR")]
+    ApiError,
+    #[serde(rename = "PROVIDER_ERROR")]
+    ProviderError,
+    #[serde(rename = "SERVICE_ERROR")]
+    ServiceError,
+}
+
+/// Error type classification
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ErrorTypeKind {
+    Internal,
+    External,
+}
+
+impl From<&str> for ErrorTypeKind {
+    fn from(s: &str) -> Self {
+        match s.to_lowercase().as_str() {
+            "internal" => ErrorTypeKind::Internal,
+            _ => ErrorTypeKind::External,
+        }
+    }
+}
+
+/// Error information in response
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ErrorType {
+    pub code: ErrorCode,
+    #[serde(rename = "type")]
+    pub kind: ErrorTypeKind,
+    pub reason: ErrorReason,
+}
+
+/// Error reason can be a string or array of strings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ErrorReason {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+impl From<String> for ErrorReason {
+    fn from(s: String) -> Self {
+        ErrorReason::Single(s)
+    }
+}
+
+impl From<Vec<String>> for ErrorReason {
+    fn from(v: Vec<String>) -> Self {
+        ErrorReason::Multiple(v)
+    }
+}
+
+impl From<&str> for ErrorReason {
+    fn from(s: &str) -> Self {
+        ErrorReason::Single(s.to_string())
+    }
+}
+
+/// Response metadata
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ResponseMetadata {
+    pub request_id: String,
+}
+
+/// Standard API response wrapper
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse<T> {
-    pub success: bool,
-    pub data: T,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
-}
-
-/// Standard error response following Sorai specification
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SoraiError {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub event_id: Option<String>,
-    pub is_sorai_error: bool,
-    pub status_code: u16,
-    pub error: ErrorField,
-}
-
-/// Detailed error information
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ErrorField {
-    #[serde(rename = "type")]
-    pub error_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
+    pub status: ResponseStatus,
     pub message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub param: Option<serde_json::Value>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub event_id: Option<String>,
+    pub data: Option<T>,
+    pub error: Option<ErrorType>,
+    pub metadata: ResponseMetadata,
+}
+
+/// Response status
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ResponseStatus {
+    Success,
+    Error,
 }
 
 impl<T> ApiResponse<T>
@@ -52,20 +119,44 @@ where
     T: Serialize,
 {
     /// Create a new success response
-    pub fn success(data: T) -> Self {
+    pub fn success(data: T, request_id: String) -> Self {
         Self {
-            success: true,
-            data,
-            message: None,
+            status: ResponseStatus::Success,
+            message: String::new(),
+            data: Some(data),
+            error: None,
+            metadata: ResponseMetadata { request_id },
         }
     }
 
     /// Create a new success response with message
-    pub fn success_with_message(data: T, message: String) -> Self {
+    pub fn success_with_message(data: T, message: String, request_id: String) -> Self {
         Self {
-            success: true,
-            data,
-            message: Some(message),
+            status: ResponseStatus::Success,
+            message,
+            data: Some(data),
+            error: None,
+            metadata: ResponseMetadata { request_id },
+        }
+    }
+
+    /// Create an error response
+    pub fn error(error: ErrorType, request_id: String) -> Self {
+        Self {
+            status: ResponseStatus::Error,
+            message: error.clone().reason.to_string(),
+            data: None,
+            error: Some(error),
+            metadata: ResponseMetadata { request_id },
+        }
+    }
+}
+
+impl ErrorReason {
+    pub fn to_string(&self) -> String {
+        match self {
+            ErrorReason::Single(s) => s.clone(),
+            ErrorReason::Multiple(v) => v.join(", "),
         }
     }
 }
@@ -75,201 +166,69 @@ where
     T: Serialize,
 {
     fn into_response(self) -> Response {
-        Json(self).into_response()
-    }
-}
-
-impl SoraiError {
-    /// Create a new Sorai error
-    pub fn new(
-        status_code: StatusCode,
-        error_type: &str,
-        code: Option<&str>,
-        message: &str,
-        param: Option<serde_json::Value>,
-        is_sorai_error: bool,
-    ) -> Self {
-        let event_id = if is_sorai_error {
-            let id = ErrorEventId::new();
-            Some(id.to_string())
-        } else {
-            None
+        let status_code = match &self.status {
+            ResponseStatus::Success => StatusCode::OK,
+            ResponseStatus::Error => StatusCode::INTERNAL_SERVER_ERROR,
         };
-
-        Self {
-            event_id: event_id.clone(),
-            is_sorai_error,
-            status_code: status_code.as_u16(),
-            error: ErrorField {
-                error_type: error_type.to_string(),
-                code: code.map(|c| c.to_string()),
-                message: message.to_string(),
-                param,
-                event_id,
-            },
-        }
-    }
-
-    /// Create a bad request error (400)
-    pub fn bad_request(message: &str, param: Option<serde_json::Value>) -> Self {
-        Self::new(
-            StatusCode::BAD_REQUEST,
-            "invalid_request_error",
-            Some("missing_required_parameter"),
-            message,
-            param,
-            true,
-        )
-    }
-
-    /// Create an unauthorized error (401)
-    /// Used for authentication failures (missing or invalid API key)
-    pub fn unauthorized(message: &str) -> Self {
-        Self::new(
-            StatusCode::UNAUTHORIZED,
-            "authentication_error",
-            None,
-            message,
-            None,
-            true,
-        )
-    }
-
-    /// Create a forbidden error (403)
-    /// Used for authorization failures (valid API key but insufficient permissions)
-    /// TODO: Implement when role-based access control is added
-    pub fn forbidden(message: &str) -> Self {
-        Self::new(
-            StatusCode::FORBIDDEN,
-            "authorization_error",
-            Some("forbidden"),
-            message,
-            None,
-            true,
-        )
-    }
-
-    /// Create a rate limit error (429)
-    pub fn rate_limit_exceeded(message: &str) -> Self {
-        Self::new(
-            StatusCode::TOO_MANY_REQUESTS,
-            "rate_limit_error",
-            None,
-            message,
-            None,
-            false,
-        )
-    }
-
-    /// Create an internal server error (500)
-    pub fn internal_server_error(message: &str) -> Self {
-        Self::new(
-            StatusCode::INTERNAL_SERVER_ERROR,
-            "api_error",
-            None,
-            message,
-            None,
-            true,
-        )
-    }
-
-    /// Create a bad gateway error (502)
-    pub fn bad_gateway(message: &str) -> Self {
-        Self::new(
-            StatusCode::BAD_GATEWAY,
-            "provider_error",
-            Some("bad_gateway"),
-            message,
-            None,
-            true,
-        )
-    }
-
-    /// Create a service unavailable error (503)
-    pub fn service_unavailable(message: &str) -> Self {
-        Self::new(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "service_error",
-            Some("service_unavailable"),
-            message,
-            None,
-            true,
-        )
-    }
-
-    /// Create an API key related error (401)
-    /// Specific error for API key authentication issues
-    pub fn invalid_api_key(message: &str) -> Self {
-        Self::new(
-            StatusCode::UNAUTHORIZED,
-            "authentication_error",
-            None,
-            message,
-            Some(serde_json::json!({
-                "hint": "Please check your Bearer token format: 'Authorization: Bearer sk-xxxx'"
-            })),
-            true,
-        )
-    }
-
-    /// Create an API key quota exceeded error (429)
-    /// TODO: Implement when usage tracking is added
-    pub fn quota_exceeded(message: &str, quota_info: Option<serde_json::Value>) -> Self {
-        Self::new(
-            StatusCode::TOO_MANY_REQUESTS,
-            "quota_error",
-            Some("quota_exceeded"),
-            message,
-            quota_info,
-            true,
-        )
-    }
-}
-
-impl IntoResponse for SoraiError {
-    fn into_response(self) -> Response {
-        let status_code = StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
-
         (status_code, Json(self)).into_response()
     }
 }
 
-/// Helper function to create success response
-pub fn success<T>(data: T) -> ApiResponse<T>
+/// Request ID extractor
+pub struct RequestId(pub String);
+
+impl<S> FromRequestParts<S> for RequestId
+where
+    S: Send + Sync,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request_parts(parts: &mut axum::http::request::Parts, _state: &S) -> Result<Self, Self::Rejection> {
+        const REQUEST_ID_HEADER_NAME: &str = "x-request-id";
+
+        let request_id = parts
+            .headers
+            .get(REQUEST_ID_HEADER_NAME)
+            .and_then(|h| h.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| {
+                let id = HttpRequestId::new();
+                id.to_string()
+            });
+
+        Ok(RequestId(request_id))
+    }
+}
+
+/// Extension key for storing RequestId in request state
+pub struct RequestIdExtension(pub String);
+
+/// Create success response (request ID auto-injected via RequestId param)
+pub fn success<T>(data: T, request_id: String) -> ApiResponse<T>
 where
     T: Serialize,
 {
-    ApiResponse::success(data)
+    ApiResponse::success(data, request_id)
 }
 
-/// Helper function to create success response with message
-pub fn success_with_message<T>(data: T, message: String) -> ApiResponse<T>
+/// Create success response with message (request ID auto-injected via RequestId param)
+pub fn success_with_message<T>(data: T, message: String, request_id: String) -> ApiResponse<T>
 where
     T: Serialize,
 {
-    ApiResponse::success_with_message(data, message)
+    ApiResponse::success_with_message(data, message, request_id)
 }
 
-/// Helper function to create error response
-pub fn error(
-    status_code: StatusCode,
-    error_type: &str,
-    code: Option<&str>,
-    message: &str,
-    param: Option<serde_json::Value>,
-    is_sorai_error: bool,
-) -> SoraiError {
-    SoraiError::new(status_code, error_type, code, message, param, is_sorai_error)
+/// Create error response (request ID auto-injected via RequestId param)
+pub fn error(error: ErrorType, request_id: String) -> ApiResponse<()> {
+    ApiResponse::error(error, request_id)
 }
 
-// TODO: Add additional response utilities:
-// - Pagination response wrapper
-// - Streaming response helpers
-// - File upload/download response helpers
-// - Webhook response formatters
-// - API versioning response headers
-// - Response caching utilities
-// - Response compression helpers
-// - Custom error types for specific business logic
-// - Response validation utilities
-// - Response transformation middleware
+/// Create error type
+pub fn create_error(code: ErrorCode, kind: ErrorTypeKind, reason: impl Into<ErrorReason>) -> ErrorType {
+    ErrorType {
+        code,
+        kind,
+        reason: reason.into(),
+    }
+}
