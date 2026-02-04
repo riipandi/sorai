@@ -48,23 +48,75 @@ services:
     extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
 
-  prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
-    restart: always
-    hostname: prometheus
-    ports: ['3390:3390']
-    volumes: ['./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro']
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.listen-address=:3390'
+  # ================================================================================================
+  # LGTM Stack
+  # ================================================================================================
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:${OTEL_COLLECTOR_VERSION:-latest}
+    hostname: otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    configs:
+      - source: otel-collector-config
+        target: /etc/otelcol/config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Collector /metrics
+      - "9464:9464"   # Prometheus scrape endpoint
+      - "13133:13133" # Health check
+      - "1777:1777"   # pprof
+      - "55679:55679" # zpages
+    restart: unless-stopped
+    extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['sorai_network']
+    depends_on:
+      - tempo
+
+  tempo:
+    image: grafana/tempo:${TEMPO_VERSION:-latest}
+    hostname: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    configs:
+      - source: tempo-config
+        target: /etc/tempo.yaml
+    ports: ["3200:3200"]  # tempo HTTP API
+    expose: ["4317"]      # OTLP gRPC (internal)
+    volumes: ['tempo-data:/var/tempo:rw']
+    restart: unless-stopped
     extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
 
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
+    hostname: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.listen-address=:3390"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-remote-write-receiver"
+      - "--storage.tsdb.retention.time=15d"
+    ports: ["3390:3390"]
+    volumes:
+      # - './docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro'
+      - 'prometheus-data:/prometheus:rw'
+    configs:
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
+    restart: unless-stopped
+    extra_hosts: ['host.docker.internal:host-gateway']
+    networks: ['sorai_network']
+    depends_on:
+      - otel-collector
+
   grafana:
     image: grafana/grafana:${GRAFANA_VERSION:-latest}
-    restart: always
     hostname: grafana
-    ports: ['3300:3300']
+    depends_on:
+      - prometheus
+      - tempo
     environment:
       GF_SERVER_HTTP_PORT: '3300'
       GF_SERVER_HTTP_ADDR: '0.0.0.0'
@@ -77,15 +129,167 @@ services:
       GF_FEEDBACK_LINKS_ENABLED: 'false' # Disable feedback links
       GF_USERS_ALLOW_SIGN_UP: 'false' # Disable user sign up
       GF_USERS_ALLOW_ORG_CREATE: 'false' # Disable organization creation
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "grafana-pyroscope-app,grafana-exploretraces-app,grafana-metricsdrilldown-app"
+      GF_PLUGINS_ENABLE_ALPHA: "true"
+      GF_INSTALL_PLUGINS: ""
+    ports: ['3300:3300']
     volumes:
-      - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
+      # - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
       - './docker/grafana/dashboards:/var/lib/grafana/dashboards:ro'
+      - 'grafana-data:/var/lib/grafana:rw'
+    configs:
+      - source: grafana-datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+    restart: unless-stopped
     extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
-    depends_on:
-      - prometheus
+
+  # ================================================================================================
+  # Configuration file
+  # ================================================================================================
+
+configs:
+  otel-collector-config:
+    content: |
+      receivers:
+        otlp:
+          protocols:
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
+
+      processors:
+        batch:
+
+      exporters:
+        prometheus:
+          endpoint: 0.0.0.0:9464
+          namespace: otel
+          const_labels:
+            source: otelcol
+
+        otlp/tempo:
+          endpoint: tempo:4317
+          tls:
+            insecure: true
+
+        debug:
+          verbosity: detailed
+
+      extensions:
+        health_check:
+          endpoint: 0.0.0.0:13133
+        pprof:
+          endpoint: 0.0.0.0:1777
+        zpages:
+          endpoint: 0.0.0.0:55679
+
+      service:
+        extensions: [health_check, pprof, zpages]
+        telemetry:
+          logs:
+            level: debug
+          metrics:
+            level: detailed
+        pipelines:
+          traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [debug, otlp/tempo]
+          metrics:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [debug, prometheus]
+          logs:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [debug]
+
+  tempo-config:
+    content: |
+      server:
+        http_listen_port: 3200
+        log_level: info
+
+      distributor:
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+
+      ingester:
+        max_block_duration: 5m
+        trace_idle_period: 10s
+
+      storage:
+        trace:
+          backend: local
+          wal:
+            path: /var/tempo/wal
+          local:
+            path: /var/tempo/blocks
+
+      metrics_generator:
+        registry:
+          external_labels:
+            source: tempo
+        storage:
+          path: /var/tempo/generator/wal
+          remote_write:
+            - url: http://prometheus:3390/api/v1/write
+
+  prometheus-config:
+    content: |
+      global:
+        scrape_interval: 15s
+      scrape_configs:
+        - job_name: "otelcol-internal"
+          static_configs:
+            - targets: ["otel-collector:8888"]
+        - job_name: "otelcol-exporter"
+          static_configs:
+            - targets: ["otel-collector:9464"]
+        - job_name: "tempo"
+          static_configs:
+            - targets: ["tempo:3200"]
+        - job_name: "sorai-api"
+          static_configs:
+            - targets: ["host.docker.internal:8000"]
+
+
+  grafana-datasources:
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          uid: prometheus
+          type: prometheus
+          access: proxy
+          orgId: 1
+          url: http://prometheus:3390
+          isDefault: true
+          editable: true
+        - name: Tempo
+          uid: tempo
+          type: tempo
+          access: proxy
+          orgId: 1
+          url: http://tempo:3200
+          editable: true
+          jsonData:
+            tracesToMetrics:
+              datasourceUid: prometheus
+            nodeGraph:
+              enabled: true
 
 volumes:
+  prometheus-data:
+  grafana-data:
+  tempo-data:
   libsql_data:
     driver: local
   libsql_exts:

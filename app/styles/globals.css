@@ -75,7 +75,7 @@
   --kbd-foreground: var(--foreground);
   --kbd-border: oklch(0.8377 0.004 286.22);
 
-  --radius: 0.5rem; /* Base radius (8px) */
+  --radius: 0.25rem; /* Base radius (4px) */
   --radius-xs: max(0.15rem, calc(var(--radius) - 0.2rem));
   --radius-sm: calc(var(--radius) + 0.05rem);
   --radius-md: var(--radius);

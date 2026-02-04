@@ -34,18 +34,18 @@ export const cardStyles = tv({
     body: [
       'p-5 **:data-[slot=item]:px-5 *:data-[slot=stack]:-m-5',
       '*:data-[slot=table-container]:-m-5 **:data-[slot=table-head]:border-t-0',
-      'not-[:has(caption)]:[&_tbody>tr:last-child>td:first-child]:rounded-bl-xl',
-      'not-[:has(caption)]:[&_tbody>tr:last-child>td:last-child]:rounded-br-xl'
+      'not-[:has(caption)]:[&_tbody>tr:last-child>td:first-child]:rounded-bl-lg',
+      'not-[:has(caption)]:[&_tbody>tr:last-child>td:last-child]:rounded-br-lg'
     ],
     footer: [
       'flex items-center gap-1',
-      'bg-card-footer border-card-separator rounded-b-xl border-t px-6 py-4'
+      'bg-card-footer border-card-separator rounded-b-lg border-t px-6 py-4'
     ]
   },
   variants: {
     variant: {
       default: {
-        base: 'ring-card-border shadow-card bg-card rounded-xl ring',
+        base: 'ring-card-border shadow-card bg-card rounded-lg ring',
         header: 'border-card-separator border-b'
       },
       plain: {
