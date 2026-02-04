@@ -49,14 +49,14 @@ pub async fn metrics(State(prometheus_handle): State<PrometheusHandle>) -> impl 
         .unwrap()
 }
 
-/// Handler for 404 Not Found routes
-/// Public endpoint - no authentication required
-pub async fn not_found_handler(RequestId(request_id): RequestId) -> impl IntoResponse {
+/// Handler for 404 Not Found API routes
+/// Returns JSON error response for API endpoints
+pub async fn api_not_found_handler(RequestId(request_id): RequestId) -> impl IntoResponse {
     let response = ApiResponse::<()>::error(
         create_error(
             ErrorCode::InvalidRequest,
             ErrorTypeKind::Internal,
-            "The requested route was not found on this server",
+            "API endpoint not found",
         ),
         request_id,
     );

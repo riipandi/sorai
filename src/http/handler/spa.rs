@@ -1,9 +1,7 @@
-use axum::{
-    body::Body,
-    extract::Path as AxumPath,
-    http::{StatusCode, header},
-    response::{IntoResponse, Response},
-};
+use axum::body::Body;
+use axum::extract::Path as AxumPath;
+use axum::http::{StatusCode, header};
+use axum::response::{IntoResponse, Response};
 use rust_embed::RustEmbed;
 
 #[derive(RustEmbed)]
@@ -96,6 +94,21 @@ pub async fn spa_index() -> impl IntoResponse {
             .body(Body::from(content.data.to_vec()))
             .unwrap(),
         None => (StatusCode::NOT_FOUND, "index.html not found").into_response(),
+    }
+}
+
+/// Fallback handler for SPA routes - serves index.html for client-side routing
+pub async fn spa_fallback() -> impl IntoResponse {
+    let asset = Assets::get("index.html");
+
+    match asset {
+        Some(content) => Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "text/html; charset=utf-8")
+            .header(header::CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+            .body(Body::from(content.data.to_vec()))
+            .unwrap(),
+        None => (StatusCode::INTERNAL_SERVER_ERROR, "index.html not found").into_response(),
     }
 }
 

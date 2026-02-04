@@ -24,7 +24,9 @@ pub fn create_router(prometheus_handle: PrometheusHandle) -> Router {
             Router::new()
                 // API v1 routes - require Bearer token authentication
                 .route("/v1/chat/completions", post(completions::chat_completions))
-                .route("/v1/text/completions", post(completions::text_completions)),
+                .route("/v1/text/completions", post(completions::text_completions))
+                // Fallback for API routes - return JSON error
+                .fallback(system::api_not_found_handler),
         )
         // SPA routes with /ui prefix - serve embedded static files
         .nest(
@@ -33,8 +35,8 @@ pub fn create_router(prometheus_handle: PrometheusHandle) -> Router {
                 .route("/", get(spa::spa_index))
                 .route("/{*path}", get(spa::spa_handler)),
         )
-        // Fallback handler for 404 routes - public
-        .fallback(system::not_found_handler)
+        // Fallback handler for all other routes - serve SPA
+        .fallback(spa::spa_fallback)
         // Add Prometheus handle as shared state
         .with_state(prometheus_handle)
 
