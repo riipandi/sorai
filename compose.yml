@@ -55,18 +55,18 @@ services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib:${OTEL_COLLECTOR_VERSION:-latest}
     hostname: otel-collector
-    command: ["--config=/etc/otelcol/config.yaml"]
+    command: ['--config=/etc/otelcol/config.yaml']
     configs:
       - source: otel-collector-config
         target: /etc/otelcol/config.yaml
     ports:
-      - "4317:4317"   # OTLP gRPC
-      - "4318:4318"   # OTLP HTTP
-      - "8888:8888"   # Collector /metrics
-      - "9464:9464"   # Prometheus scrape endpoint
-      - "13133:13133" # Health check
-      - "1777:1777"   # pprof
-      - "55679:55679" # zpages
+      - '4317:4317' # OTLP gRPC
+      - '4318:4318' # OTLP HTTP
+      - '8888:8888' # Collector /metrics
+      - '9464:9464' # Prometheus scrape endpoint
+      - '13133:13133' # Health check
+      - '1777:1777' # pprof
+      - '55679:55679' # zpages
     restart: unless-stopped
     extra_hosts: ['host.docker.internal:host-gateway']
     networks: ['sorai_network']
@@ -76,12 +76,12 @@ services:
   tempo:
     image: grafana/tempo:${TEMPO_VERSION:-latest}
     hostname: tempo
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ['-config.file=/etc/tempo.yaml']
     configs:
       - source: tempo-config
         target: /etc/tempo.yaml
-    ports: ["3200:3200"]  # tempo HTTP API
-    expose: ["4317"]      # OTLP gRPC (internal)
+    ports: ['3200:3200'] # tempo HTTP API
+    expose: ['4317'] # OTLP gRPC (internal)
     volumes: ['tempo-data:/var/tempo:rw']
     restart: unless-stopped
     extra_hosts: ['host.docker.internal:host-gateway']
@@ -91,14 +91,14 @@ services:
     image: prom/prometheus:${PROMETHEUS_VERSION:-latest}
     hostname: prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.listen-address=:3390"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-      - "--web.enable-remote-write-receiver"
-      - "--storage.tsdb.retention.time=15d"
-    ports: ["3390:3390"]
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.listen-address=:3390'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-remote-write-receiver'
+      - '--storage.tsdb.retention.time=15d'
+    ports: ['3390:3390']
     volumes:
       # - './docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro'
       - 'prometheus-data:/prometheus:rw'
@@ -129,11 +129,11 @@ services:
       GF_FEEDBACK_LINKS_ENABLED: 'false' # Disable feedback links
       GF_USERS_ALLOW_SIGN_UP: 'false' # Disable user sign up
       GF_USERS_ALLOW_ORG_CREATE: 'false' # Disable organization creation
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
       GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: "grafana-pyroscope-app,grafana-exploretraces-app,grafana-metricsdrilldown-app"
-      GF_PLUGINS_ENABLE_ALPHA: "true"
-      GF_INSTALL_PLUGINS: ""
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: 'grafana-pyroscope-app,grafana-exploretraces-app,grafana-metricsdrilldown-app'
+      GF_PLUGINS_ENABLE_ALPHA: 'true'
+      GF_INSTALL_PLUGINS: ''
     ports: ['3300:3300']
     volumes:
       # - './docker/grafana/provisioning:/etc/grafana/provisioning:ro'
@@ -259,7 +259,6 @@ configs:
         - job_name: "sorai-api"
           static_configs:
             - targets: ["host.docker.internal:8000"]
-
 
   grafana-datasources:
     content: |

@@ -31,7 +31,7 @@ export const tableStyles = tv({
     body: '',
     row: 'border-table-separator hover:bg-table-accent border-b last:border-none',
     cell: ['px-5 py-3', 'has-[a]:p-0 *:[a]:inline-flex *:[a]:w-full *:[a]:px-5 *:[a]:py-3'],
-    footer: 'text-muted-foreground text-sm',
+    footer: 'text-muted text-sm',
     caption: 'text-muted my-3'
   },
   variants: {

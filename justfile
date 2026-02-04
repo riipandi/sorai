@@ -25,6 +25,8 @@ default:
 [doc('Start development server (frontend + backend)')]
 [no-exit-message]
 dev *args:
+  @pnpm --silent --package=kill-port-process-cli dlx kill-port 3000
+  @pnpm --silent --package=kill-port-process-cli dlx kill-port 8000
   @just dev-frontend &
   @just dev-backend {{args}}
 
