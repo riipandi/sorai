@@ -1,22 +1,17 @@
 use super::router::create_router;
 use crate::config::Config;
 use crate::http::middleware::MakeTypeSafeRequestId;
-use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
+use crate::http::middleware::{analytics_middleware, connection_info_middleware, create_cors_layer, track_metrics};
 use crate::metrics::{record_server_info, setup_metrics_recorder};
 use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
-use axum::extract::Request;
 use axum::http::{HeaderName, StatusCode};
 use axum::middleware;
-use axum::response::Response;
 use std::net::SocketAddr;
-use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
 use tokio::signal;
 use tower::ServiceBuilder;
 use tower_http::request_id::{PropagateRequestIdLayer, SetRequestIdLayer};
 use tower_http::timeout::TimeoutLayer;
-use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
-use tracing::Span;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 const LOG_NAME_PREFIX: &str = env!("CARGO_PKG_NAME");
@@ -31,63 +26,6 @@ impl HttpServer {
     /// Create new HTTP server instance
     pub fn new(config: Config) -> Self {
         Self { config }
-    }
-
-    /// Format duration with appropriate precision unit
-    fn format_duration(duration: Duration) -> String {
-        let nanos = duration.as_nanos();
-
-        if nanos >= 1_000_000 {
-            // >= 1ms, show in milliseconds
-            format!("{}ms", duration.as_millis())
-        } else if nanos >= 1_000 {
-            // >= 1μs, show in microseconds
-            format!("{}μs", duration.as_micros())
-        } else {
-            // < 1μs, show in nanoseconds
-            format!("{}ns", nanos)
-        }
-    }
-
-    /// Extract request ID from headers
-    fn extract_request_id(request: &Request<axum::body::Body>) -> String {
-        request
-            .headers()
-            .get(REQUEST_ID_HEADER)
-            .and_then(|v| v.to_str().ok())
-            .map(|id| id.to_string())
-            .unwrap_or_else(|| "unknown".to_string())
-    }
-
-    /// Extract request ID from response headers
-    fn extract_request_id_from_response(response: &Response) -> String {
-        response
-            .headers()
-            .get(REQUEST_ID_HEADER)
-            .and_then(|v| v.to_str().ok())
-            .map(|id| id.to_string())
-            .unwrap_or_else(|| "unknown".to_string())
-    }
-
-    /// Extract API key from Authorization header for logging
-    fn extract_api_key_for_logging(request: &Request<axum::body::Body>) -> Option<String> {
-        request
-            .headers()
-            .get("authorization")
-            .and_then(|v| v.to_str().ok())
-            .and_then(|auth| {
-                if auth.starts_with("Bearer ") {
-                    let key = &auth[7..]; // Remove "Bearer " prefix
-                    // Only show first 8 characters for security
-                    if key.len() > 8 {
-                        Some(format!("{}***", &key[..8]))
-                    } else {
-                        Some("***".to_string())
-                    }
-                } else {
-                    None
-                }
-            })
     }
 
     /// Parse rotation string to tracing_appender Rotation enum
@@ -353,90 +291,6 @@ impl HttpServer {
             false
         };
 
-        // Clone config values for use in closures
-        let request_sampling = self.config.logging.request_sampling;
-        let log_slow_only = self.config.logging.log_slow_requests_only;
-        let slow_threshold = self.config.logging.slow_threshold_ms;
-
-        // Create sampling counter (0-99, wraps around)
-        let sample_counter = std::sync::Arc::new(AtomicUsize::new(0));
-
-        let trace_layer_for_http = TraceLayer::new_for_http()
-            .make_span_with(|_request: &Request<_>| {
-                // Create empty span to avoid field duplication in logs
-                tracing::Span::none()
-            })
-            .on_request({
-                let sample_counter = sample_counter.clone();
-                move |request: &Request<_>, _span: &Span| {
-                    // Check if we should log this request based on sampling
-                    let should_sample = if request_sampling >= 100 {
-                        true
-                    } else if request_sampling == 0 {
-                        false
-                    } else {
-                        let count = sample_counter.fetch_add(1, Ordering::Relaxed);
-                        (count % 100) < request_sampling as usize
-                    };
-
-                    if !should_sample {
-                        return;
-                    }
-
-                    let request_id = Self::extract_request_id(request);
-                    let conn_info = ConnectionInfo::from_request_or_default(request);
-
-                    // Use short user agent for cleaner logs
-                    let short_ua = conn_info.short_user_agent();
-
-                    // Add bot indicator if detected
-                    let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
-
-                    // Extract API key for logging (masked for security)
-                    let api_key_info = Self::extract_api_key_for_logging(request)
-                        .map(|key| format!(" | Key: {}", key))
-                        .unwrap_or_default();
-
-                    tracing::debug!(
-                        "[REQ:{}] {} {} | IP: {} | UA: {}{}{}",
-                        request_id,
-                        request.method(),
-                        request.uri().path(),
-                        conn_info.client_ip,
-                        short_ua,
-                        bot_indicator,
-                        api_key_info
-                    );
-                }
-            })
-            .on_response(move |response: &Response, latency: Duration, _span: &Span| {
-                let status = response.status();
-                let duration_ms = latency.as_millis();
-
-                // Always log errors and slow requests
-                let should_log = !status.is_success() || duration_ms > slow_threshold as u128 || !log_slow_only;
-
-                if !should_log {
-                    return;
-                }
-
-                let duration_str = Self::format_duration(latency);
-                let request_id = Self::extract_request_id_from_response(response);
-
-                // Clean response log with [RES] prefix and precise timing
-                if duration_ms > slow_threshold as u128 {
-                    tracing::warn!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
-                } else if !status.is_success() {
-                    tracing::warn!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
-                } else {
-                    tracing::debug!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
-                }
-            })
-            .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
-                let duration_str = Self::format_duration(latency);
-                tracing::error!("[ERR] Request failed after {}: {:?}", duration_str, error);
-            });
-
         // Get timeout request from config
         let timeout_requests = self.config.sorai.timeout_request;
 
@@ -449,8 +303,9 @@ impl HttpServer {
             ))
             .layer(middleware::from_fn(connection_info_middleware))
             .layer(middleware::from_fn(track_metrics))
-            .layer(trace_layer_for_http)
-            // PropagateRequestIdLayer must come AFTER TraceLayer to send headers from request to response
+            // Use analytics middleware instead of TraceLayer for better performance
+            .layer(middleware::from_fn(analytics_middleware))
+            // PropagateRequestIdLayer must come AFTER analytics to send headers from request to response
             .layer(PropagateRequestIdLayer::new(x_request_id));
 
         // Apply middleware to the app

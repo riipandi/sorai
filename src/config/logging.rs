@@ -19,6 +19,8 @@ pub struct LoggingConfig {
     pub log_slow_requests_only: bool,
     #[serde(default = "default_slow_threshold_ms")]
     pub slow_threshold_ms: u64,
+    #[serde(default = "default_analytics_mode")]
+    pub analytics_mode: String,
 }
 
 impl Default for LoggingConfig {
@@ -32,6 +34,7 @@ impl Default for LoggingConfig {
             request_sampling: default_request_sampling(),
             log_slow_requests_only: default_log_slow_requests_only(),
             slow_threshold_ms: default_slow_threshold_ms(),
+            analytics_mode: default_analytics_mode(),
         }
     }
 }
@@ -78,6 +81,11 @@ impl LoggingConfig {
             key: "Slow Threshold (ms)".to_string(),
             value: self.slow_threshold_ms.to_string(),
         });
+        items.push(ConfigItem {
+            section: "Logging".to_string(),
+            key: "Analytics Mode".to_string(),
+            value: self.analytics_mode.clone(),
+        });
     }
 }
 
@@ -111,4 +119,8 @@ fn default_log_slow_requests_only() -> bool {
 
 fn default_slow_threshold_ms() -> u64 {
     1000
+}
+
+fn default_analytics_mode() -> String {
+    "full".to_string()
 }
