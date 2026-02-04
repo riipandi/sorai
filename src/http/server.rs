@@ -110,26 +110,28 @@ impl HttpServer {
 
     /// Initialize tracing subscriber for logging with config options
     pub fn init_tracing(&self) {
-        let log_level = match self.config.logging.level.to_lowercase().as_str() {
-            "trace" => "trace",
-            "debug" => "debug",
-            "info" => "info",
-            "warn" => "warn",
-            "error" => "error",
-            _ => "info", // default fallback
-        };
+        let env_filter = if self.config.logging.level.to_lowercase().as_str() == "none" {
+            tracing_subscriber::EnvFilter::new("off")
+        } else {
+            let log_level = match self.config.logging.level.to_lowercase().as_str() {
+                "trace" => "trace",
+                "debug" => "debug",
+                "info" => "info",
+                "warn" => "warn",
+                "error" => "error",
+                _ => "info",
+            };
 
-        let env_filter = tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-            // axum logs rejections from built-in extractors with the `axum::rejection`
-            // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
-            format!(
-                "{}={},tower_http={},axum::rejection=trace",
-                env!("CARGO_CRATE_NAME"),
-                log_level,
-                log_level
-            )
-            .into()
-        });
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                format!(
+                    "{}={},tower_http={},axum::rejection=trace",
+                    env!("CARGO_CRATE_NAME"),
+                    log_level,
+                    log_level
+                )
+                .into()
+            })
+        };
 
         // Determine what logging outputs to enable
         let enable_file = self.parse_rotation().is_some();
@@ -408,9 +410,13 @@ impl HttpServer {
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
         let app_env = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
 
-        tracing::info!("Starting Sorai HTTP Server");
-        tracing::info!("Listening on: http://{}", address);
-        tracing::info!("Environment: {}", app_env);
+        if self.config.logging.level.to_lowercase().as_str() == "none" {
+            println!("Starting Sorai HTTP Server on: http://{}", address);
+        } else {
+            tracing::info!("Starting Sorai HTTP Server");
+            tracing::info!("Listening on: http://{}", address);
+            tracing::info!("Environment: {}", app_env);
+        }
 
         let file_logging_enabled = self.parse_rotation().is_some();
 
@@ -449,7 +455,12 @@ impl HttpServer {
             }
         }
 
-        tracing::info!("Server started at: {}", format_timestamp_readable());
+        if self.config.logging.level.to_lowercase().as_str() == "none" {
+            println!("Server started at: {}", format_timestamp_readable());
+            println!("Environment: {}", app_env);
+        } else {
+            tracing::info!("Server started at: {}", format_timestamp_readable());
+        }
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
             Ok(listener) => listener,

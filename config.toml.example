@@ -12,7 +12,7 @@ timeout_request = 30
 [logging]
 # Show timestamp in logs (true/false)
 show_timestamp = true
-# Log level: trace, debug, info, warn, error (default: info)
+# Log level: trace, debug, info, warn, error, none (default: info)
 level = "info"
 # Log directory path (relative to working directory or absolute path)
 log_directory = "/data/logs"
