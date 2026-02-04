@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '#/components/selia/button'
+import { Button } from '#/components/button'
 import {
   Menu,
   MenuItem,
@@ -9,8 +9,8 @@ import {
   MenuSubmenuTrigger,
   MenuSubmenuPopup,
   MenuTrigger
-} from '#/components/selia/menu'
-import { Menubar } from '#/components/selia/menubar'
+} from '#/components/menu'
+import { Menubar } from '#/components/menubar'
 
 const meta = {
   title: 'Components/Menubar',
@@ -36,51 +36,84 @@ export const Example: Story = {
   render: () => (
     <Menubar>
       <Menu>
-        <MenuTrigger
-          render={
-            <Button size='xs' variant='plain'>
-              File
-            </Button>
-          }
-        />
+        <MenuTrigger render={<Button variant='plain' />}>Book</MenuTrigger>
+        <MenuPopup size='default'>
+          <MenuItem>New Book</MenuItem>
+          <MenuItem>Open</MenuItem>
+          <MenuItem>Save</MenuItem>
+          <MenuSubmenu>
+            <MenuSubmenuTrigger>Export</MenuSubmenuTrigger>
+            <MenuSubmenuPopup size='default'>
+              <MenuItem>PDF</MenuItem>
+              <MenuItem>EPUB</MenuItem>
+              <MenuItem>MOBI</MenuItem>
+            </MenuSubmenuPopup>
+          </MenuSubmenu>
+          <MenuSeparator />
+          <MenuItem>Close App</MenuItem>
+        </MenuPopup>
+      </Menu>
+      <Menu>
+        <MenuTrigger render={<Button variant='plain' />}>Edit</MenuTrigger>
+        <MenuPopup size='default'>
+          <MenuItem>Copy Spell</MenuItem>
+          <MenuItem>Paste Clue</MenuItem>
+          <MenuItem>Delete</MenuItem>
+        </MenuPopup>
+      </Menu>
+      <Menu>
+        <MenuTrigger render={<Button variant='plain' />}>View</MenuTrigger>
+        <MenuPopup size='default'>
+          <MenuItem>Zoom In</MenuItem>
+          <MenuItem>Zoom Out</MenuItem>
+          <MenuSubmenu>
+            <MenuSubmenuTrigger>Layout</MenuSubmenuTrigger>
+            <MenuSubmenuPopup size='default'>
+              <MenuItem>Single Page</MenuItem>
+              <MenuItem>Two Pages</MenuItem>
+              <MenuItem>Continuous</MenuItem>
+            </MenuSubmenuPopup>
+          </MenuSubmenu>
+          <MenuSeparator />
+          <MenuItem>Full Screen</MenuItem>
+        </MenuPopup>
+      </Menu>
+    </Menubar>
+  )
+}
+
+export const Compact: Story = {
+  args: {},
+  render: () => (
+    <Menubar>
+      <Menu>
+        <MenuTrigger render={<Button variant='plain' size='sm' />}>Book</MenuTrigger>
         <MenuPopup size='compact'>
-          <MenuItem>New File</MenuItem>
+          <MenuItem>New Book</MenuItem>
           <MenuItem>Open</MenuItem>
           <MenuItem>Save</MenuItem>
           <MenuSubmenu>
             <MenuSubmenuTrigger>Export</MenuSubmenuTrigger>
             <MenuSubmenuPopup size='compact'>
-              <MenuItem>PNG</MenuItem>
-              <MenuItem>JPG</MenuItem>
               <MenuItem>PDF</MenuItem>
+              <MenuItem>EPUB</MenuItem>
+              <MenuItem>MOBI</MenuItem>
             </MenuSubmenuPopup>
           </MenuSubmenu>
           <MenuSeparator />
-          <MenuItem>Exit App</MenuItem>
+          <MenuItem>Close App</MenuItem>
         </MenuPopup>
       </Menu>
       <Menu>
-        <MenuTrigger
-          render={
-            <Button size='xs' variant='plain'>
-              Edit
-            </Button>
-          }
-        />
+        <MenuTrigger render={<Button variant='plain' size='sm' />}>Edit</MenuTrigger>
         <MenuPopup size='compact'>
-          <MenuItem>Cut</MenuItem>
-          <MenuItem>Copy</MenuItem>
-          <MenuItem>Paste</MenuItem>
+          <MenuItem>Copy Spell</MenuItem>
+          <MenuItem>Paste Clue</MenuItem>
+          <MenuItem>Delete</MenuItem>
         </MenuPopup>
       </Menu>
       <Menu>
-        <MenuTrigger
-          render={
-            <Button size='xs' variant='plain'>
-              View
-            </Button>
-          }
-        />
+        <MenuTrigger render={<Button variant='plain' size='sm' />}>View</MenuTrigger>
         <MenuPopup size='compact'>
           <MenuItem>Zoom In</MenuItem>
           <MenuItem>Zoom Out</MenuItem>
@@ -89,7 +122,7 @@ export const Example: Story = {
             <MenuSubmenuPopup size='compact'>
               <MenuItem>Single Page</MenuItem>
               <MenuItem>Two Pages</MenuItem>
-              <MenuItem>Continous</MenuItem>
+              <MenuItem>Continuous</MenuItem>
             </MenuSubmenuPopup>
           </MenuSubmenu>
           <MenuSeparator />

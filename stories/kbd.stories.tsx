@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Kbd } from '#/components/selia/kbd'
+import { Kbd } from '#/components/kbd'
 
 const meta = {
   title: 'Components/Kbd',
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='flex space-x-4'>
+    <div className='flex items-center space-x-3'>
       <Kbd>Alt + F4</Kbd>
       <Kbd variant='outline'>Ctrl + V</Kbd>
       <Kbd variant='plain'>Ctrl + C</Kbd>

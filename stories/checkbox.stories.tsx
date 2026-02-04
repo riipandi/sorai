@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Checkbox } from '#/components/selia/checkbox'
-import { Label } from '#/components/selia/label'
+import * as React from 'react'
+import { Checkbox, CheckboxGroup, CheckboxGroupLabel } from '#/components/checkbox'
+import { Label } from '#/components/label'
 
 const meta = {
   title: 'Components/Checkbox',
@@ -26,7 +27,63 @@ export const Example: Story = {
   render: () => (
     <Label>
       <Checkbox />
-      <span>I agree that Liverpool is the best football club in the world.</span>
+      <span>I solemnly swear that I am up to no good.</span>
     </Label>
   )
+}
+
+export const Grouped: Story = {
+  args: {},
+  render: () => (
+    <div>
+      <CheckboxGroup defaultValue={['owl', 'patronus']} aria-labelledby='notifications-label'>
+        <CheckboxGroupLabel id='notifications-label'>Magical Communications</CheckboxGroupLabel>
+        <Label>
+          <Checkbox value='owl' />
+          Owl Post
+        </Label>
+        <Label>
+          <Checkbox value='patronus' />
+          Patronus Charm
+        </Label>
+        <Label>
+          <Checkbox value='floo-network' />
+          Floo Network
+        </Label>
+      </CheckboxGroup>
+    </div>
+  )
+}
+export const GroupNested: Story = {
+  args: {},
+  render: () => {
+    const [value, setValue] = React.useState<string[]>([])
+
+    const permissions = [
+      { label: 'Unforgivable Curses', value: 'unforgivable' },
+      { label: 'Defensive Magic', value: 'defensive' },
+      { label: 'Charms', value: 'charms' }
+    ]
+
+    return (
+      <CheckboxGroup
+        value={value}
+        onValueChange={setValue}
+        aria-labelledby='permissions-label'
+        allValues={permissions.map((p) => p.value)}
+      >
+        <CheckboxGroupLabel id='permissions-label'>Magical Permissions</CheckboxGroupLabel>
+        <Label>
+          <Checkbox parent name='wizard-permissions' />
+          Wizard Permissions
+        </Label>
+        {permissions.map((permission) => (
+          <Label key={permission.value} className='pl-4'>
+            <Checkbox value={permission.value} />
+            {permission.label}
+          </Label>
+        ))}
+      </CheckboxGroup>
+    )
+  }
 }

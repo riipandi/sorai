@@ -76,6 +76,8 @@ config.toml*
 !config.toml.example
 
 # Miscellaneous
+compose-dev.yaml
+compose-dev.yml
 pnpm-exec-summary.json
 slim.report.json
 RELEASE.md

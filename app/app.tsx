@@ -5,9 +5,11 @@ import type { LogType } from 'consola'
 import type { Options as NuqsOptions } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { Suspense, useEffect, useState } from 'react'
+import { UIProvider } from '#/components/provider'
+import { Toast } from '#/components/toast'
 import { AuthProvider } from '#/guards'
 import type { GlobalContext } from '#/routes/__root'
-import { authStore, uiStore } from '#/stores'
+import { authStore } from '#/stores'
 
 interface AppProps {
   basePath?: string
@@ -26,8 +28,7 @@ export default function App(props: AppProps) {
   // Use state to make context reactive to store changes
   const [routerContext, setRouterContext] = useState<GlobalContext>({
     queryClient: props.queryClient,
-    auth: authStore.get(),
-    ui: uiStore.get()
+    auth: authStore.get()
   })
 
   // Listen to auth store changes and update context
@@ -39,29 +40,23 @@ export default function App(props: AppProps) {
     return unsubscribe
   }, [])
 
-  // Listen to ui store changes and update context
-  useEffect(() => {
-    const unsubscribe = uiStore.subscribe(() => {
-      setRouterContext((prev) => ({ ...prev, ui: uiStore.get() }))
-    })
-
-    return unsubscribe
-  }, [])
-
   return (
     <NuqsAdapter defaultOptions={props.nuqsOptions}>
-      <QueryClientProvider client={props.queryClient}>
-        <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <RouterProvider
-              router={props.routes}
-              context={routerContext}
-              basepath={props.basePath}
-            />
-          </Suspense>
-          <TanStackDevtools {...props.devTools} />
-        </AuthProvider>
-      </QueryClientProvider>
+      <UIProvider direction='ltr'>
+        <QueryClientProvider client={props.queryClient}>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <RouterProvider
+                router={props.routes}
+                context={routerContext}
+                basepath={props.basePath}
+              />
+            </Suspense>
+            <TanStackDevtools {...props.devTools} />
+            <Toast showCloseButton position='bottom-right' />
+          </AuthProvider>
+        </QueryClientProvider>
+      </UIProvider>
     </NuqsAdapter>
   )
 }

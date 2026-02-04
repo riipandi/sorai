@@ -1,31 +1,29 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import * as Lucide from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { SidebarCloseIcon, SidebarOpenIcon } from 'lucide-react'
+import { useTheme } from 'tan-themer'
+import { Button } from '#/components/button'
+import { ScrollArea } from '#/components/scroll-area'
+import { ThemeSelector } from '#/components/theme-selector'
+import { Heading } from '#/components/typography'
 import { NotFound } from '#/errors'
-import { useAuth } from '#/guards'
-import { uiStore } from '#/stores'
+import { requireAuthentication, useAuth } from '#/guards'
+import { useSidebar } from '#/hooks/use-sidebar'
 import { Navbar } from './-navbar'
 
 export const Route = createFileRoute('/(app)')({
   component: RouteComponent,
   notFoundComponent: NotFound,
-  beforeLoad: ({ location, context }) => {
-    if (!context.auth.atoken) {
-      throw redirect({ to: '/signin', search: { redirect: location.href } })
-    }
+  beforeLoad: async ({ location }) => {
+    return requireAuthentication(location)
   }
 })
 
 function RouteComponent() {
   const navigate = Route.useNavigate()
-
   const { user, logout } = useAuth()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const { themes, theme, setTheme } = useTheme()
 
-  useEffect(() => {
-    const ui = uiStore.get()
-    setIsMobileSidebarOpen(ui.sidebar === 'show')
-  }, [])
+  const { sidebarOpen, toggleSidebar } = useSidebar()
 
   const handleLogout = () => {
     logout()
@@ -33,54 +31,35 @@ function RouteComponent() {
       .catch((error) => console.error('Logout failed', error))
   }
 
-  const toggleMobileSidebar = () => {
-    setIsMobileSidebarOpen((prev) => {
-      const newState = !prev
-      uiStore.set({ ...uiStore.get(), sidebar: newState ? 'show' : 'hide' })
-      return newState
-    })
-  }
-
   return (
-    <div className='bg-background text-foreground flex h-screen flex-col'>
-      {/* Mobile Header */}
-      <header className='border-b border-gray-200 bg-white px-4 py-3 lg:hidden'>
-        <div className='flex items-center justify-between'>
-          <button
-            type='button'
-            onClick={toggleMobileSidebar}
-            className='rounded-lg p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            aria-label='Toggle sidebar'
-          >
-            <Lucide.Menu className='size-6' />
-          </button>
-          <h1 className='text-lg font-semibold text-gray-900'>Sorai LLM Gateway</h1>
-          <div className='size-6' /> {/* Spacer for center alignment */}
-        </div>
-      </header>
+    <div className='flex h-dvh'>
+      {/* Sidebar navigation */}
+      <Navbar
+        user={user}
+        logoutFn={handleLogout}
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={toggleSidebar}
+      />
 
-      <div className='flex-1 overflow-hidden'>
-        <div className='flex h-full'>
-          {/* Mobile Sidebar Overlay */}
-          {isMobileSidebarOpen && (
-            <div
-              className='fixed inset-0 z-40 bg-black/50 lg:hidden'
-              onClick={toggleMobileSidebar}
-              aria-hidden='true'
-            />
-          )}
+      <main className='flex flex-1 flex-col'>
+        {/* Top navigation bar */}
+        <nav className='border-card-separator flex items-center gap-2.5 border-b p-4 pr-5'>
+          <Button variant='plain' size='icon-sm' className='text-muted' onClick={toggleSidebar}>
+            {sidebarOpen ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
+          </Button>
+          <Heading size='xs' level={5}>
+            New Chat
+          </Heading>
+          <ThemeSelector value={theme} themes={themes} onChange={setTheme} className='ml-auto' />
+        </nav>
 
-          {/* Sidebar Navigation */}
-          <Navbar user={user} logoutFn={handleLogout} />
-
-          {/* Main Content */}
-          <main className='flex-1 overflow-auto'>
-            <div className='h-auto px-4 py-8 lg:px-8 lg:pb-10'>
-              <Outlet />
-            </div>
-          </main>
-        </div>
-      </div>
+        {/* Main Container */}
+        <ScrollArea className='flex-1'>
+          <div className='mx-auto w-full shrink-0 px-4 py-4 lg:px-0'>
+            <Outlet />
+          </div>
+        </ScrollArea>
+      </main>
     </div>
   )
 }

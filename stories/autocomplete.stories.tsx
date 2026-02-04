@@ -9,7 +9,7 @@ import {
   AutocompleteGroup,
   AutocompleteGroupLabel,
   AutocompleteCollection
-} from '#/components/selia/autocomplete'
+} from '#/components/autocomplete'
 
 const meta = {
   title: 'Components/Autocomplete',
@@ -30,36 +30,100 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const items = [
+  {
+    group: 'Dan Brown Novels',
+    items: [
+      { value: 'da-vinci-code', label: 'The Da Vinci Code' },
+      { value: 'angels-demons', label: 'Angels & Demons' },
+      { value: 'inferno', label: 'Inferno' },
+      { value: 'lost-symbol', label: 'The Lost Symbol' },
+      { value: 'digital-fortress', label: 'Digital Fortress' },
+      { value: 'deception-point', label: 'Deception Point' },
+      { value: 'origin', label: 'Origin' },
+      { value: 'wild-symphony', label: 'Wild Symphony' }
+    ]
+  },
+  {
+    group: 'Harry Potter Books',
+    items: [
+      { value: 'sorcerers-stone', label: "Harry Potter and the Sorcerer's Stone" },
+      { value: 'chamber-secrets', label: 'Harry Potter and the Chamber of Secrets' },
+      { value: 'prisoner-azkaban', label: 'Harry Potter and the Prisoner of Azkaban' }
+    ]
+  }
+]
+
 export const Example: Story = {
   args: {},
   render: () => {
-    const items = [
-      {
-        group: 'Rock',
-        items: [
-          { value: 'radiohead', label: 'Radiohead' },
-          { value: 'deftones', label: 'Deftones' },
-          { value: 'tool', label: 'Tool' },
-          { value: 'blur', label: 'Blur' },
-          { value: 'nirvana', label: 'Nirvana' },
-          { value: 'soundgarden', label: 'Soundgarden' },
-          { value: 'foo-fighters', label: 'Foo Fighters' },
-          { value: 'pearl-jam', label: 'Pearl Jam' }
-        ]
-      },
-      {
-        group: 'Classic Rock',
-        items: [
-          { value: 'pink-floyd', label: 'Pink Floyd' },
-          { value: 'led-zeppelin', label: 'Led Zeppelin' },
-          { value: 'the-beatles', label: 'The Beatles' }
-        ]
-      }
-    ]
-
     return (
       <Autocomplete items={items}>
-        <AutocompleteInput placeholder='Search for bands...' className='w-full lg:w-64' />
+        <AutocompleteInput placeholder='Search for books...' className='w-full lg:w-72' />
+        <AutocompletePopup>
+          <AutocompleteEmpty>No results found</AutocompleteEmpty>
+          <AutocompleteList>
+            {(group) => (
+              <AutocompleteGroup key={group.group} items={group.items}>
+                <AutocompleteGroupLabel>{group.group}</AutocompleteGroupLabel>
+                <AutocompleteCollection>
+                  {(item) => (
+                    <AutocompleteItem key={item.value} value={item}>
+                      {item.label}
+                    </AutocompleteItem>
+                  )}
+                </AutocompleteCollection>
+              </AutocompleteGroup>
+            )}
+          </AutocompleteList>
+        </AutocompletePopup>
+      </Autocomplete>
+    )
+  }
+}
+
+export const VariantSubtle: Story = {
+  args: {},
+  render: () => {
+    return (
+      <Autocomplete items={items}>
+        <AutocompleteInput
+          placeholder='Search for books...'
+          className='w-full lg:w-72'
+          variant='subtle'
+        />
+        <AutocompletePopup>
+          <AutocompleteEmpty>No results found</AutocompleteEmpty>
+          <AutocompleteList>
+            {(group) => (
+              <AutocompleteGroup key={group.group} items={group.items}>
+                <AutocompleteGroupLabel>{group.group}</AutocompleteGroupLabel>
+                <AutocompleteCollection>
+                  {(item) => (
+                    <AutocompleteItem key={item.value} value={item}>
+                      {item.label}
+                    </AutocompleteItem>
+                  )}
+                </AutocompleteCollection>
+              </AutocompleteGroup>
+            )}
+          </AutocompleteList>
+        </AutocompletePopup>
+      </Autocomplete>
+    )
+  }
+}
+
+export const VariantPlain: Story = {
+  args: {},
+  render: () => {
+    return (
+      <Autocomplete items={items}>
+        <AutocompleteInput
+          placeholder='Search for books...'
+          className='w-full lg:w-72'
+          variant='plain'
+        />
         <AutocompletePopup>
           <AutocompleteEmpty>No results found</AutocompleteEmpty>
           <AutocompleteList>

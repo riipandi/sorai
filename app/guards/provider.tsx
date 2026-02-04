@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react'
-import { fetcher, logout as logoutApi } from '#/fetcher'
-import type { User } from '#/schemas/user.schema'
+import { useStore } from '@nanostores/react'
+import { useCallback, useEffect, useState } from 'react'
+import type { User, WhoamiData } from '#/schemas/user.schema'
 import { authStore } from '#/stores'
+import { fetcher, resetSessionExpiredFlag } from '#/utils/fetcher'
+import { toast } from '../components/toast'
 import { AuthContext, type AuthContextType } from './context'
+import { signout } from './procedures'
 
 /**
  * AuthProvider component that provides authentication state and methods
@@ -10,8 +13,8 @@ import { AuthContext, type AuthContextType } from './context'
  * User information is fetched from /auth/whoami endpoint.
  */
 export function AuthProvider({ children }: React.PropsWithChildren) {
-  // Get current auth state from store
-  const authState = authStore.get()
+  // Get current auth state from store reactively
+  const authState = useStore(authStore)
 
   // Check if user is authenticated based on access token
   const isAuthenticated = !!authState?.atoken
@@ -23,19 +26,16 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
   /**
    * Fetch user information from /auth/whoami endpoint
    */
-  const fetchUser = async (): Promise<User | null> => {
+  const fetchUser = useCallback(async (): Promise<User | null> => {
     try {
       const response = await fetcher<{
-        success: boolean
-        message: string | null
-        data: {
-          user_id: string
-          email: string
-          name: string
-        } | null
+        status: 'success' | 'error'
+        message: string
+        data: WhoamiData | null
+        error: any
       }>('/auth/whoami')
 
-      if (response.success && response.data) {
+      if (response.status === 'success' && response.data) {
         return {
           id: response.data.user_id,
           email: response.data.email,
@@ -47,36 +47,56 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
       console.error('Failed to fetch user info:', error)
       return null
     }
-  }
+  }, [])
 
   // Fetch user data when authenticated
   useEffect(() => {
+    let mounted = true
+
     if (isAuthenticated) {
       setIsLoading(true)
-      fetchUser().then((userData) => {
-        setUser(userData)
-        setIsLoading(false)
-      })
+      fetchUser()
+        .then((userData) => {
+          if (mounted) {
+            setUser(userData)
+            setIsLoading(false)
+          }
+        })
+        .catch((error) => {
+          if (mounted) {
+            console.error('Failed to fetch user info:', error)
+            setUser(null)
+            setIsLoading(false)
+          }
+        })
     } else {
-      setUser(null)
+      if (mounted) {
+        setUser(null)
+      }
     }
-  }, [isAuthenticated])
+
+    return () => {
+      mounted = false
+    }
+  }, [isAuthenticated, fetchUser])
 
   /**
    * Login function with API authentication
    * @param email - User email
    * @param password - User password
+   * @param remember - Whether to remember the user
    * @returns Promise with success status and optional error message
    */
   const login = async (
     email: string,
-    password: string
+    password: string,
+    remember: boolean = false
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       // Call the signin API endpoint
       const response = await fetcher<{
-        success: boolean
-        message: string | null
+        status: 'success' | 'error'
+        message: string
         data: {
           user_id: string
           email: string
@@ -87,24 +107,50 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
           access_token_expiry: number | null
           refresh_token_expiry: number | null
         }
+        error: any
       }>('/auth/signin', {
         method: 'POST',
         body: { email, password }
       })
 
-      if (!response.success || !response.data) {
+      if (response.status !== 'success' || !response.data) {
+        toast.add({
+          title: 'Login Failed',
+          description: response.message || 'Invalid email or password',
+          type: 'error',
+          timeout: 7000
+        })
         return { success: false, error: response.message || 'Invalid email or password' }
       }
 
       // Update auth store with session ID and tokens from backend (user info will be fetched from whoami)
-      authStore.setKey('atoken', response.data.access_token)
-      authStore.setKey('atokenexp', response.data.access_token_expiry)
-      authStore.setKey('rtoken', response.data.refresh_token)
-      authStore.setKey('rtokenexp', response.data.refresh_token_expiry)
+      authStore.set({
+        atoken: response.data.access_token,
+        atokenexp: response.data.access_token_expiry,
+        rtoken: response.data.refresh_token,
+        rtokenexp: response.data.refresh_token_expiry,
+        sessid: response.data.session_id,
+        remember
+      })
+
+      resetSessionExpiredFlag()
+
+      toast.add({
+        title: 'Welcome back!',
+        description: 'You have successfully signed in',
+        type: 'success',
+        timeout: 5000
+      })
 
       return { success: true }
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || 'Login failed'
+      toast.add({
+        title: 'Login Failed',
+        description: errorMessage,
+        type: 'error',
+        timeout: 7000
+      })
       return { success: false, error: errorMessage }
     }
   }
@@ -113,8 +159,17 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
    * Logout function that clears authentication state and calls logout API
    */
   const logout = async (): Promise<void> => {
-    await logoutApi() // Call logout API to revoke refresh token and deactivate session
+    await signout() // Call logout API to revoke refresh token and deactivate session
     setUser(null) // Clear user state
+  }
+
+  /**
+   * Refetch user data from /auth/whoami endpoint
+   * Useful after updating user profile
+   */
+  const refetchUser = async (): Promise<void> => {
+    const userData = await fetchUser()
+    setUser(userData)
   }
 
   const contextValue: AuthContextType = {
@@ -122,7 +177,8 @@ export function AuthProvider({ children }: React.PropsWithChildren) {
     isAuthenticated,
     isLoading,
     login,
-    logout
+    logout,
+    refetchUser
   }
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

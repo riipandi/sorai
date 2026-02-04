@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/selia/avatar'
-import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '#/components/selia/item'
-import { Separator } from '#/components/selia/separator'
-import { Stack } from '#/components/selia/stack'
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/avatar'
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '#/components/item'
+import { Separator } from '#/components/separator'
+import { Stack } from '#/components/stack'
 
 const meta = {
   title: 'Components/Stack',
@@ -31,15 +31,15 @@ export const Example: Story = {
         <ItemMedia>
           <Avatar>
             <AvatarImage
-              src='https://images.unsplash.com/photo-1628157588553-5eeea00af15c?q=80&w=880'
+              src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Harry+Potter'
               alt='Avatar'
             />
-            <AvatarFallback>JR</AvatarFallback>
+            <AvatarFallback>HP</AvatarFallback>
           </Avatar>
         </ItemMedia>
         <ItemContent>
-          <ItemTitle>Jane Randy</ItemTitle>
-          <ItemDescription>jane@example.com</ItemDescription>
+          <ItemTitle>Harry Potter</ItemTitle>
+          <ItemDescription>harry@hogwarts.edu</ItemDescription>
         </ItemContent>
       </Item>
       <Separator />
@@ -47,15 +47,15 @@ export const Example: Story = {
         <ItemMedia>
           <Avatar>
             <AvatarImage
-              src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&h=200&fit=crop&crop=top'
+              src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Robert+Langdon'
               alt='Avatar'
             />
-            <AvatarFallback>AD</AvatarFallback>
+            <AvatarFallback>RL</AvatarFallback>
           </Avatar>
         </ItemMedia>
         <ItemContent>
-          <ItemTitle>Andy Daniel</ItemTitle>
-          <ItemDescription>andy@example.com</ItemDescription>
+          <ItemTitle>Robert Langdon</ItemTitle>
+          <ItemDescription>langdon@example.edu</ItemDescription>
         </ItemContent>
       </Item>
       <Separator />
@@ -63,15 +63,53 @@ export const Example: Story = {
         <ItemMedia>
           <Avatar>
             <AvatarImage
-              src='https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=200&h=200&auto=format&fit=crop'
+              src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Hermione+Granger'
               alt='Avatar'
             />
-            <AvatarFallback>MH</AvatarFallback>
+            <AvatarFallback>HG</AvatarFallback>
           </Avatar>
         </ItemMedia>
         <ItemContent>
-          <ItemTitle>Maggie Hudson</ItemTitle>
-          <ItemDescription>maggie@example.com</ItemDescription>
+          <ItemTitle>Hermione Granger</ItemTitle>
+          <ItemDescription>hermione@hogwarts.edu</ItemDescription>
+        </ItemContent>
+      </Item>
+    </Stack>
+  )
+}
+
+export const DirectionRow: Story = {
+  args: {},
+  render: () => (
+    <Stack direction='row' className='w-full min-w-md items-center justify-center xl:w-6/12'>
+      <Item direction='column'>
+        <ItemMedia>
+          <Avatar>
+            <AvatarImage
+              src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Sophie+Neveu'
+              alt='Avatar'
+            />
+            <AvatarFallback>SN</AvatarFallback>
+          </Avatar>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Sophie Neveu</ItemTitle>
+          <ItemDescription>sophie@dgpj.fr</ItemDescription>
+        </ItemContent>
+      </Item>
+      <Item direction='column'>
+        <ItemMedia>
+          <Avatar>
+            <AvatarImage
+              src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Ron+Weasley'
+              alt='Avatar'
+            />
+            <AvatarFallback>RW</AvatarFallback>
+          </Avatar>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>Ron Weasley</ItemTitle>
+          <ItemDescription>ron@hogwarts.edu</ItemDescription>
         </ItemContent>
       </Item>
     </Stack>

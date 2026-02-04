@@ -2,18 +2,25 @@ import { useForm } from '@tanstack/react-form'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Activity, useState } from 'react'
 import { z } from 'zod'
-import { Alert } from '#/components/selia/alert'
-import { Button } from '#/components/selia/button'
-import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card'
-import { Checkbox } from '#/components/selia/checkbox'
-import { Field, FieldLabel, FieldError } from '#/components/selia/field'
-import { Fieldset } from '#/components/selia/fieldset'
-import { Form } from '#/components/selia/form'
-import { Input } from '#/components/selia/input'
-import { Label } from '#/components/selia/label'
-import { Spinner } from '#/components/selia/spinner'
-import { TextLink } from '#/components/selia/text'
+import { Alert } from '#/components/alert'
+import { Button } from '#/components/button'
+import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/card'
+import { Checkbox } from '#/components/checkbox'
+import { Field, FieldLabel, FieldError } from '#/components/field'
+import { Fieldset } from '#/components/fieldset'
+import { Form } from '#/components/form'
+import { Input } from '#/components/input'
+import { InputPassword } from '#/components/input-password'
+import { Label } from '#/components/label'
+import { Spinner } from '#/components/spinner'
+import { TextLink } from '#/components/typography'
 import { useAuth } from '#/guards'
+
+interface SearchParams {
+  message?: string
+  type?: 'success' | 'error'
+  redirect?: string
+}
 
 const signinSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' }),
@@ -29,7 +36,7 @@ function RouteComponent() {
   const { login } = useAuth()
 
   const navigate = Route.useNavigate()
-  const search = Route.useSearch() as { message?: string; type?: 'success' | 'error' }
+  const search: SearchParams = Route.useSearch()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useForm({
@@ -47,14 +54,15 @@ function RouteComponent() {
         return
       }
 
-      const loginResult = await login(value.email, value.password)
+      const loginResult = await login(value.email, value.password, value.remember)
       if (!loginResult.success) {
         setSubmitError(loginResult.error || 'Invalid email or password. Please try again.')
         return formApi.resetField('password')
       }
 
       formApi.resetField('password')
-      return navigate({ to: '/' })
+      const redirectTo = search.redirect || '/'
+      return navigate({ to: redirectTo })
     }
   })
 
@@ -132,14 +140,13 @@ function RouteComponent() {
                 {(field) => (
                   <Field>
                     <FieldLabel htmlFor='password'>Password</FieldLabel>
-                    <Input
+                    <InputPassword
                       id='password'
-                      type='password'
                       autoComplete='current-password'
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder='****************'
+                      placeholder='••••••••••••••••'
                     />
                     <FieldError match='valueMissing'>Password is required</FieldError>
                   </Field>
@@ -149,7 +156,7 @@ function RouteComponent() {
 
             <form.Field name='remember'>
               {(field) => (
-                <Field className='-mt-3'>
+                <Field className='-mt-1'>
                   <Label>
                     <Checkbox name={field.name} />
                     <span>Remember me</span>
@@ -158,9 +165,8 @@ function RouteComponent() {
               )}
             </form.Field>
 
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
                 <Button type='submit' disabled={!canSubmit || isSubmitting} block>
                   {isSubmitting ? (
                     <span className='flex items-center gap-2'>
@@ -172,11 +178,13 @@ function RouteComponent() {
                   )}
                 </Button>
               )}
-            />
+            </form.Subscribe>
           </Form>
 
-          <div className='mt-6 flex w-full items-center justify-center text-center'>
-            <TextLink render={<Link to='/forgot-password' />}>Forgot your password?</TextLink>
+          <div className='mt-6 flex w-full items-center justify-center gap-1 text-center'>
+            <TextLink className='no-underline' render={<Link to='/forgot-password' />}>
+              Forgot your password?
+            </TextLink>
           </div>
         </CardBody>
       </Card>

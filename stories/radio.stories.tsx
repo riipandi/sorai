@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Label } from '#/components/selia/label'
-import { Radio, RadioGroup, RadioGroupLabel } from '#/components/selia/radio'
+import { Item, ItemAction, ItemContent, ItemDescription, ItemTitle } from '#/components/item'
+import { Label } from '#/components/label'
+import { Radio, RadioGroup, RadioGroupLabel } from '#/components/radio'
 
 const meta = {
   title: 'Components/Radio',
@@ -24,20 +25,46 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: { value: null },
   render: () => (
-    <RadioGroup defaultValue='pink-floyd' aria-labelledby='radio-example'>
-      <RadioGroupLabel id='radio-example'>Select your favorite band</RadioGroupLabel>
+    <RadioGroup defaultValue='da-vinci' aria-labelledby='radio-example'>
+      <RadioGroupLabel id='radio-example'>Select your favorite book</RadioGroupLabel>
       <Label>
-        <Radio value='pink-floyd' />
-        Pink Floyd
+        <Radio value='da-vinci' />
+        The Da Vinci Code
       </Label>
       <Label>
-        <Radio value='the-beatles' />
-        The Beatles
+        <Radio value='angels-demons' />
+        Angels & Demons
       </Label>
       <Label>
-        <Radio value='led-zeppelin' />
-        Led Zeppelin
+        <Radio value='inferno' />
+        Inferno
       </Label>
+    </RadioGroup>
+  )
+}
+
+export const WithItem: Story = {
+  args: { value: null },
+  render: () => (
+    <RadioGroup className='w-full gap-4'>
+      <Item render={<Label />}>
+        <ItemContent className='px-1'>
+          <ItemTitle>Standard Wand</ItemTitle>
+          <ItemDescription>10 Galleons - Suitable for beginners</ItemDescription>
+        </ItemContent>
+        <ItemAction className='p-2'>
+          <Radio value='standard' />
+        </ItemAction>
+      </Item>
+      <Item render={<Label />}>
+        <ItemContent className='px-1'>
+          <ItemTitle>Premium Wand</ItemTitle>
+          <ItemDescription>100 Galleons - Professional quality</ItemDescription>
+        </ItemContent>
+        <ItemAction className='p-2'>
+          <Radio value='premium' />
+        </ItemAction>
+      </Item>
     </RadioGroup>
   )
 }

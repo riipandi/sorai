@@ -6,8 +6,13 @@ export interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (
+    email: string,
+    password: string,
+    remember?: boolean
+  ) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
+  refetchUser: () => Promise<void>
 }
 
 // Create auth context
@@ -29,18 +34,24 @@ function useAuthContext(): AuthContextType {
  * Custom hook to access authentication state and methods.
  * Provides reactive access to auth state using nanostores.
  *
- * @returns AuthContextType object containing user, isAuthenticated, isLoading, login, and logout
+ * @returns AuthContextType object containing user, isAuthenticated, isLoading, login, logout, and refetchUser
  *
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { user, isAuthenticated, login, logout } = useAuth()
+ *   const { user, isAuthenticated, login, logout, refetchUser } = useAuth()
  *
  *   if (isAuthenticated) {
  *     return <div>Welcome, {user?.name}! <button onClick={logout}>Logout</button></div>
  *   }
  *
  *   return <button onClick={() => login('user@example.com', 'password')}>Login</button>
+ * }
+ *
+ * // Example: Refetch user data after profile update
+ * const handleProfileUpdate = async () => {
+ *   await updateProfileAPI({ name: 'New Name' })
+ *   await refetchUser() // Refresh user data from server
  * }
  * ```
  */

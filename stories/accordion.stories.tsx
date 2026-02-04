@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Accordion, AccordionItem, AccordionHeader } from '#/components/selia/accordion'
-import { AccordionTrigger, AccordionPanel } from '#/components/selia/accordion'
-import { Text } from '#/components/selia/text'
+import { Accordion, AccordionItem, AccordionHeader } from '#/components/accordion'
+import { AccordionTrigger, AccordionPanel } from '#/components/accordion'
+import { Text } from '#/components/typography'
 
 const meta = {
   title: 'Components/Accordion',
@@ -24,35 +24,39 @@ type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
   render: () => (
-    <div className='flex w-full items-center justify-center'>
-      <Accordion className='w-96'>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>What is Liverpool Football Club?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>
-              Liverpool Football Club is the biggest football club in the world.
-            </Text>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>How many titles has Liverpool Football Club won?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>Liverpool Football Club has won 20 titles.</Text>
-          </AccordionPanel>
-        </AccordionItem>
-        <AccordionItem>
-          <AccordionHeader>
-            <AccordionTrigger>Will Jurgen Klopp manage Liverpool again?</AccordionTrigger>
-          </AccordionHeader>
-          <AccordionPanel>
-            <Text className='text-muted'>We will be there.</Text>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </div>
+    <Accordion className='w-md'>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>What is the Philosopher's Stone?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>
+            The Philosopher's Stone is a legendary alchemical substance capable of turning base
+            metals into gold and granting immortality.
+          </Text>
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>Who is Robert Langdon?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>
+            Robert Langdon is a professor of Religious Symbology at Harvard University.
+          </Text>
+        </AccordionPanel>
+      </AccordionItem>
+      <AccordionItem>
+        <AccordionHeader>
+          <AccordionTrigger>What are the Unforgivable Curses?</AccordionTrigger>
+        </AccordionHeader>
+        <AccordionPanel>
+          <Text className='text-muted'>
+            The Unforgivable Curses are three dark charms that cause torture, mind control, and
+            death.
+          </Text>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   )
 }

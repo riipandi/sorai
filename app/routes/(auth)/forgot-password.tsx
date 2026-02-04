@@ -3,16 +3,16 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { useState } from 'react'
 import { z } from 'zod'
-import { Alert, AlertDescription, AlertTitle } from '#/components/selia/alert'
-import { Button } from '#/components/selia/button'
-import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card'
-import { Field, FieldLabel, FieldError } from '#/components/selia/field'
-import { Fieldset } from '#/components/selia/fieldset'
-import { Form } from '#/components/selia/form'
-import { Input } from '#/components/selia/input'
-import { Spinner } from '#/components/selia/spinner'
-import { TextLink } from '#/components/selia/text'
-import fetcher from '#/fetcher'
+import { Alert, AlertDescription, AlertTitle } from '#/components/alert'
+import { Button } from '#/components/button'
+import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/card'
+import { Field, FieldLabel, FieldError } from '#/components/field'
+import { Fieldset } from '#/components/fieldset'
+import { Form } from '#/components/form'
+import { Input } from '#/components/input'
+import { Spinner } from '#/components/spinner'
+import { TextLink } from '#/components/typography'
+import { fetcher } from '#/utils/fetcher'
 
 const forgotPasswordSchema = z.object({
   email: z.email({ error: 'Please enter a valid email address' })
@@ -43,19 +43,20 @@ function RouteComponent() {
 
       try {
         const response = await fetcher<{
-          success: boolean
+          status: 'success' | 'error'
           message: string
           data: {
             token?: string
             reset_link?: string
             expires_at?: number
           } | null
+          error: any
         }>('/auth/password/forgot', {
           method: 'POST',
           body: { email: value.email }
         })
 
-        if (response.success) {
+        if (response.status === 'success') {
           setIsSuccess(true)
           setSuccessMessage(response.message)
           formApi.reset()
@@ -150,9 +151,8 @@ function RouteComponent() {
                   </form.Field>
                 </Fieldset>
 
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  children={([canSubmit, isSubmitting]) => (
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                  {([canSubmit, isSubmitting]) => (
                     <Button type='submit' disabled={!canSubmit || isSubmitting} block>
                       {isSubmitting ? (
                         <span className='flex items-center gap-2'>
@@ -164,11 +164,13 @@ function RouteComponent() {
                       )}
                     </Button>
                   )}
-                />
+                </form.Subscribe>
               </Form>
 
               <div className='mt-6 flex w-full items-center justify-center text-center'>
-                <TextLink render={<Link to='/signin' />}>Back to Sign in</TextLink>
+                <TextLink className='no-underline' render={<Link to='/signin' />}>
+                  Back to Sign in
+                </TextLink>
               </div>
             </>
           )}

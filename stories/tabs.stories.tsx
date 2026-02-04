@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Field, FieldLabel } from '#/components/selia/field'
-import { Fieldset, FieldsetLegend } from '#/components/selia/fieldset'
-import { Input } from '#/components/selia/input'
-import { Tabs, TabsItem, TabsList, TabsPanel } from '#/components/selia/tabs'
+import { Field, FieldLabel } from '#/components/field'
+import { Fieldset, FieldsetLegend } from '#/components/fieldset'
+import { Input } from '#/components/input'
+import { Tabs, TabsItem, TabsList, TabsPanel } from '#/components/tabs'
+import { Text } from '#/components/typography'
 
 const meta = {
   title: 'Components/Tabs',
@@ -31,9 +32,10 @@ export const Example: Story = {
         <TabsItem value='account'>Account</TabsItem>
         <TabsItem value='password'>Password</TabsItem>
       </TabsList>
+
       <TabsPanel value='account'>
         <Fieldset>
-          <FieldsetLegend>Account</FieldsetLegend>
+          <FieldsetLegend hidden>Account</FieldsetLegend>
           <Field>
             <FieldLabel>Name</FieldLabel>
             <Input id='name' placeholder='Enter your name' required />
@@ -44,9 +46,10 @@ export const Example: Story = {
           </Field>
         </Fieldset>
       </TabsPanel>
+
       <TabsPanel value='password'>
         <Fieldset>
-          <FieldsetLegend>Password</FieldsetLegend>
+          <FieldsetLegend hidden>Password</FieldsetLegend>
           <Field>
             <FieldLabel>Password</FieldLabel>
             <Input id='password' type='password' placeholder='Enter your password' required />
@@ -65,3 +68,243 @@ export const Example: Story = {
     </Tabs>
   )
 }
+
+export const Vertical: Story = {
+  args: {},
+  render: () => {
+    const tabs = [
+      {
+        name: 'Explore',
+        value: 'explore',
+        content: 'Discover fresh ideas, trending topics, and hidden gems curated just for you.'
+      },
+      {
+        name: 'Favorites',
+        value: 'favorites',
+        content: 'All your favorites are saved here for quick access anytime.'
+      },
+      {
+        name: 'Settings',
+        value: 'settings',
+        content: 'Customize your experience with personal preferences and configurations.'
+      }
+    ]
+
+    return (
+      <Tabs defaultValue='explore' orientation='vertical' className='w-full max-w-xl'>
+        <TabsList className='min-w-48'>
+          {tabs.map((tab) => (
+            <TabsItem key={tab.value} value={tab.value}>
+              {tab.name}
+            </TabsItem>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsPanel key={tab.value} value={tab.value}>
+            <Text>{tab.content}</Text>
+          </TabsPanel>
+        ))}
+      </Tabs>
+    )
+  }
+}
+
+// // FIXME: indicator styles (https://shadcnstudio.com/docs/components/tabs)
+// export const BottomLine: Story = {
+//   args: {},
+//   render: () => {
+//     const tabs = [
+//       {
+//         name: 'Explore',
+//         value: 'explore',
+//         content: (
+//           <>
+//             Discover <span className='text-foreground font-semibold'>fresh ideas</span>, trending
+//             topics, and hidden gems curated just for you. Start exploring and let your curiosity
+//             lead the way!
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Favorites',
+//         value: 'favorites',
+//         content: (
+//           <>
+//             All your <span className='text-foreground font-semibold'>favorites</span> are saved
+//             here. Revisit articles, collections, and moments you love, any time you want a little
+//             inspiration.
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Surprise Me',
+//         value: 'surprise',
+//         content: (
+//           <>
+//             <span className='text-foreground font-semibold'>Surprise!</span> Here&apos;s something
+//             unexpected—a fun fact, a quirky tip, or a daily challenge. Come back for a new surprise
+//             every day!
+//           </>
+//         )
+//       }
+//     ]
+
+//     return (
+//       <div className='w-full max-w-md'>
+//         <Tabs defaultValue='explore' className='gap-4'>
+//           <TabsList className='bg-background rounded-none border-b p-0'>
+//             {tabs.map((tab) => (
+//               <TabsItem
+//                 key={tab.value}
+//                 value={tab.value}
+//                 className={clx(
+//                   'bg-background h-full rounded-none border-0 border-b-2 border-transparent',
+//                   'data-[state=active]:border-primary dark:data-[state=active]:border-primary data-[state=active]:shadow-none'
+//                 )}
+//               >
+//                 {tab.name}
+//               </TabsItem>
+//             ))}
+//           </TabsList>
+
+//           {tabs.map((tab) => (
+//             <TabsPanel key={tab.value} value={tab.value}>
+//               <Text>{tab.content}</Text>
+//             </TabsPanel>
+//           ))}
+//         </Tabs>
+//       </div>
+//     )
+//   }
+// }
+
+// // FIXME: indicator styles (https://shadcnstudio.com/docs/components/tabs)
+// export const LiftStyle: Story = {
+//   args: {},
+//   render: () => {
+//     const tabs = [
+//       {
+//         name: 'Explore',
+//         value: 'explore',
+//         content: (
+//           <>
+//             Discover <span className='text-foreground font-semibold'>fresh ideas</span>, trending
+//             topics, and hidden gems curated just for you. Start exploring and let your curiosity
+//             lead the way!
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Favorites',
+//         value: 'favorites',
+//         content: (
+//           <>
+//             All your <span className='text-foreground font-semibold'>favorites</span> are saved
+//             here. Revisit articles, collections, and moments you love, any time you want a little
+//             inspiration.
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Surprise Me',
+//         value: 'surprise',
+//         content: (
+//           <>
+//             <span className='text-foreground font-semibold'>Surprise!</span> Here&apos;s something
+//             unexpected—a fun fact, a quirky tip, or a daily challenge. Come back for a new surprise
+//             every day!
+//           </>
+//         )
+//       }
+//     ]
+//     return (
+//       <div className='w-full max-w-md'>
+//         <Tabs defaultValue='explore' className='gap-4'>
+//           <TabsList className='bg-background justify-start rounded-none border-b p-0'>
+//             {tabs.map((tab) => (
+//               <TabsItem
+//                 key={tab.value}
+//                 value={tab.value}
+//                 className='bg-background border-b-border dark:data-[state=active]:bg-background data-[state=active]:border-border data-[state=active]:border-b-background h-full rounded-none rounded-t border border-transparent data-[state=active]:-mb-0.5 data-[state=active]:shadow-none dark:border-b-0 dark:data-[state=active]:-mb-0.5'
+//               >
+//                 {tab.name}
+//               </TabsItem>
+//             ))}
+//           </TabsList>
+
+//           {tabs.map((tab) => (
+//             <TabsPanel key={tab.value} value={tab.value}>
+//               <Text>{tab.content}</Text>
+//             </TabsPanel>
+//           ))}
+//         </Tabs>
+//       </div>
+//     )
+//   }
+// }
+
+// // FIXME: indicator styles (https://shadcnstudio.com/docs/components/tabs)
+// export const VerticalLine: Story = {
+//   args: {},
+//   render: () => {
+//     const tabs = [
+//       {
+//         name: 'Explore',
+//         value: 'explore',
+//         content: (
+//           <>
+//             Discover <span className='text-foreground font-semibold'>fresh ideas</span>, trending
+//             topics, and hidden gems curated just for you. Start exploring and let your curiosity
+//             lead the way!
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Favorites',
+//         value: 'favorites',
+//         content: (
+//           <>
+//             All your <span className='text-foreground font-semibold'>favorites</span> are saved
+//             here. Revisit articles, collections, and moments you love, any time you want a little
+//             inspiration.
+//           </>
+//         )
+//       },
+//       {
+//         name: 'Surprise Me',
+//         value: 'surprise',
+//         content: (
+//           <>
+//             <span className='text-foreground font-semibold'>Surprise!</span> Here&apos;s something
+//             unexpected—a fun fact, a quirky tip, or a daily challenge. Come back for a new surprise
+//             every day!
+//           </>
+//         )
+//       }
+//     ]
+
+//     return (
+//       <div className='w-full max-w-lg'>
+//         <Tabs defaultValue='explore' className='flex-row'>
+//           <TabsList className='bg-background h-full flex-col rounded-none p-0'>
+//             {tabs.map((tab) => (
+//               <TabsItem
+//                 key={tab.value}
+//                 value={tab.value}
+//                 className='bg-background data-[state=active]:border-primary dark:data-[state=active]:border-primary h-full w-full justify-start rounded-none border-0 border-l-2 border-transparent data-[state=active]:shadow-none'
+//               >
+//                 {tab.name}
+//               </TabsItem>
+//             ))}
+//           </TabsList>
+
+//           {tabs.map((tab) => (
+//             <TabsPanel key={tab.value} value={tab.value}>
+//               <Text>{tab.content}</Text>
+//             </TabsPanel>
+//           ))}
+//         </Tabs>
+//       </div>
+//     )
+//   }
+// }

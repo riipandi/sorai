@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Slider, SliderThumb } from '#/components/selia/slider'
+import { Slider, SliderThumb } from '#/components/slider'
 
 const meta = {
   title: 'Components/Slider',
@@ -23,8 +23,8 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='flex w-64 flex-col gap-6'>
-      <Slider className='w-64' defaultValue={20}>
+    <div className='flex w-full max-w-sm flex-col gap-10'>
+      <Slider defaultValue={20}>
         <SliderThumb />
       </Slider>
       <Slider defaultValue={[33, 66]}>

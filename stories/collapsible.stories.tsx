@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '#/components/selia/collapsible'
-import { Text } from '#/components/selia/text'
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from '#/components/collapsible'
+import { Text } from '#/components/typography'
 
 const meta = {
   title: 'Components/Collapsible',
@@ -24,12 +24,30 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='flex h-40 w-full min-w-xl items-center justify-center'>
-      <Collapsible className='w-full lg:w-7/12 xl:w-5/12'>
-        <CollapsibleTrigger>What is Linux?</CollapsibleTrigger>
+    <div className='flex h-40 w-full items-center justify-center'>
+      <Collapsible className='w-full max-w-sm'>
+        <CollapsibleTrigger>What is the Illuminati?</CollapsibleTrigger>
         <CollapsiblePanel>
           <Text className='text-muted'>
-            Linux is a free and open-source operating system that is based on the Linux kernel.
+            The Illuminati was a secret society formed in Bavaria in 1776, allegedly seeking to
+            oppose religious influence and abuses of state power.
+          </Text>
+        </CollapsiblePanel>
+      </Collapsible>
+    </div>
+  )
+}
+
+export const Indicator: Story = {
+  args: {},
+  render: () => (
+    <div className='flex h-40 w-full items-center justify-center'>
+      <Collapsible className='w-full max-w-sm'>
+        <CollapsibleTrigger expandableIndicator>What is the Illuminati?</CollapsibleTrigger>
+        <CollapsiblePanel>
+          <Text className='text-muted'>
+            The Illuminati was a secret society formed in Bavaria in 1776, allegedly seeking to
+            oppose religious influence and abuses of state power.
           </Text>
         </CollapsiblePanel>
       </Collapsible>

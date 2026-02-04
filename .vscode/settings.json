@@ -7,8 +7,7 @@
     "*.css": "tailwindcss",
     "*.vars": "dotenv",
     "*.toml.example": "toml",
-    "*.yml.example": "yaml",
-    "wrangler.json": "jsonc"
+    "*.yml.example": "yaml"
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true,

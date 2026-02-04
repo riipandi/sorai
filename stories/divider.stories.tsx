@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Divider } from '#/components/selia/divider'
+import { Divider } from '#/components/divider'
 
 const meta = {
   title: 'Components/Divider',
@@ -24,12 +24,12 @@ export const Example: Story = {
   args: {},
   render: () => (
     <div className='w-full min-w-md lg:w-6/12'>
-      <Divider className='my-4'>Text on the left</Divider>
+      <Divider className='my-4'>Chapter 1</Divider>
       <Divider className='my-4' variant='center'>
-        Text on the center
+        The Da Vinci Code
       </Divider>
       <Divider className='my-4' variant='right'>
-        Text on the right
+        Harry Potter Series
       </Divider>
     </div>
   )

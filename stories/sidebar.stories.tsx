@@ -1,25 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/selia/avatar'
-import { Menu, MenuPopup, MenuItem, MenuTrigger } from '#/components/selia/menu'
-import {
-  Sidebar,
-  SidebarCollapsible,
-  SidebarCollapsiblePanel,
-  SidebarCollapsibleTrigger,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupTitle,
-  SidebarHeader,
-  SidebarItem,
-  SidebarItemButton,
-  SidebarList,
-  SidebarLogo,
-  SidebarMenu,
-  SidebarSubmenu
-} from '#/components/selia/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '#/components/avatar'
+import { Menu, MenuPopup, MenuItem, MenuTrigger } from '#/components/menu'
+import { Sidebar, SidebarContent, SidebarCollapsible } from '#/components/sidebar'
+import { SidebarCollapsiblePanel, SidebarCollapsibleTrigger } from '#/components/sidebar'
+import { SidebarGroup, SidebarGroupAction, SidebarSubmenu } from '#/components/sidebar'
+import { SidebarGroupTitle, SidebarFooter, SidebarHeader } from '#/components/sidebar'
+import { SidebarList, SidebarLogo, SidebarMenu } from '#/components/sidebar'
+import { SidebarItem, SidebarItemButton } from '#/components/sidebar'
 
 const meta = {
   title: 'Components/Sidebar',
@@ -46,14 +34,14 @@ export const Example: Story = {
     <Sidebar className='lg:w-72'>
       <SidebarHeader>
         <SidebarLogo>
-          <img src='https://selia.earth/selia.png' alt='Selia' className='size-8' />
-          <span className='font-semibold'>Selia</span>
+          <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Logo' />
+          <span className='sr-only'>Mystery & Magic</span>
         </SidebarLogo>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
           <SidebarGroup>
-            <SidebarGroupTitle>Navigation</SidebarGroupTitle>
+            <SidebarGroupTitle>Library</SidebarGroupTitle>
             <SidebarGroupAction>
               <button>
                 <Lucide.PlusIcon />
@@ -63,19 +51,19 @@ export const Example: Story = {
               <SidebarItem>
                 <SidebarItemButton active>
                   <Lucide.HomeIcon />
-                  Dashboard
+                  Home
                 </SidebarItemButton>
               </SidebarItem>
               <SidebarItem>
                 <SidebarItemButton>
-                  <Lucide.ShoppingBagIcon />
-                  Products
+                  <Lucide.BookIcon />
+                  Books
                 </SidebarItemButton>
               </SidebarItem>
               <SidebarItem>
                 <SidebarItemButton>
-                  <Lucide.TagsIcon />
-                  Categories
+                  <Lucide.BookmarkIcon />
+                  Reading List
                 </SidebarItemButton>
               </SidebarItem>
               <SidebarItem>
@@ -83,8 +71,8 @@ export const Example: Story = {
                   <SidebarCollapsibleTrigger
                     render={
                       <SidebarItemButton>
-                        <Lucide.ChartAreaIcon />
-                        Reports
+                        <Lucide.UsersIcon />
+                        Characters
                       </SidebarItemButton>
                     }
                   />
@@ -92,13 +80,13 @@ export const Example: Story = {
                     <SidebarSubmenu>
                       <SidebarList>
                         <SidebarItem>
-                          <SidebarItemButton>Sales</SidebarItemButton>
+                          <SidebarItemButton>Harry Potter</SidebarItemButton>
                         </SidebarItem>
                         <SidebarItem>
-                          <SidebarItemButton>Traffic</SidebarItemButton>
+                          <SidebarItemButton>Robert Langdon</SidebarItemButton>
                         </SidebarItem>
                         <SidebarItem>
-                          <SidebarItemButton>Conversion</SidebarItemButton>
+                          <SidebarItemButton>Hermione Granger</SidebarItemButton>
                         </SidebarItem>
                       </SidebarList>
                     </SidebarSubmenu>
@@ -137,14 +125,14 @@ export const Example: Story = {
                     <SidebarItemButton>
                       <Avatar size='sm'>
                         <AvatarImage
-                          src='https://pbs.twimg.com/profile_images/1881314507865411584/aXlN8o5e_400x400.jpg'
+                          src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=John+Doe'
                           alt='Avatar'
                         />
-                        <AvatarFallback>RF</AvatarFallback>
+                        <AvatarFallback>JD</AvatarFallback>
                       </Avatar>
                       <div className='flex flex-col'>
-                        <span className='font-medium'>Rizal Fakhri</span>
-                        <span className='text-muted text-sm'>rizal@yayan.com</span>
+                        <span className='font-medium'>John Doe</span>
+                        <span className='text-muted text-sm'>john@example.com</span>
                       </div>
                       <Lucide.ChevronsUpDownIcon className='ml-auto' />
                     </SidebarItemButton>
@@ -169,6 +157,180 @@ export const Example: Story = {
           </SidebarList>
         </SidebarMenu>
       </SidebarFooter>
+    </Sidebar>
+  )
+}
+
+export const Compact: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border rounded-2xl border lg:w-72' size='compact'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Logo' />
+          <span className='sr-only'>Mystery & Magic</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Dan Brown Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton active>The Da Vinci Code</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Angels & Demons</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Lost Symbol</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Inferno</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Harry Potter Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>The Sorcerer's Stone</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Chamber of Secrets</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Prisoner of Azkaban</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Goblet of Fire</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Order of the Phoenix</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Half-Blood Prince</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+
+export const Loose: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border rounded-2xl border lg:w-72' size='loose'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Logo' />
+          <span className='sr-only'>Mystery & Magic</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Dan Brown Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>The Da Vinci Code</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Angels & Demons</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Lost Symbol</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Inferno</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Harry Potter Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>The Sorcerer's Stone</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Chamber of Secrets</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Prisoner of Azkaban</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Goblet of Fire</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Order of the Phoenix</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Half-Blood Prince</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
+    </Sidebar>
+  )
+}
+
+export const Background: Story = {
+  args: {},
+  render: () => (
+    <Sidebar className='border-border shadow-card bg-card rounded-2xl border lg:w-72'>
+      <SidebarHeader>
+        <SidebarLogo>
+          <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Logo' />
+          <span className='sr-only'>Mystery & Magic</span>
+        </SidebarLogo>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupTitle>Dan Brown Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>The Da Vinci Code</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Angels & Demons</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Lost Symbol</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>Inferno</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupTitle>Harry Potter Series</SidebarGroupTitle>
+            <SidebarList>
+              <SidebarItem>
+                <SidebarItemButton>The Sorcerer's Stone</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Chamber of Secrets</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Prisoner of Azkaban</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Goblet of Fire</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton active>The Order of the Phoenix</SidebarItemButton>
+              </SidebarItem>
+              <SidebarItem>
+                <SidebarItemButton>The Half-Blood Prince</SidebarItemButton>
+              </SidebarItem>
+            </SidebarList>
+          </SidebarGroup>
+        </SidebarMenu>
+      </SidebarContent>
     </Sidebar>
   )
 }

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Label } from '#/components/selia/label'
-import { Switch } from '#/components/selia/switch'
+import { Label } from '#/components/label'
+import { Switch } from '#/components/switch'
+import { Text } from '#/components/typography'
 
 const meta = {
   title: 'Components/Switch',
@@ -26,7 +27,7 @@ export const Example: Story = {
   render: () => (
     <Label>
       <Switch />
-      <span>Turn on notifications</span>
+      <Text>Turn on notifications</Text>
     </Label>
   )
 }

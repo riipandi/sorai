@@ -4,8 +4,8 @@ export interface User {
   name: string
 }
 
-export interface WhoamiResponse {
-  success: boolean
-  message: string | null
-  data: User | null
+export interface WhoamiData {
+  user_id: string
+  email: string
+  name: string
 }

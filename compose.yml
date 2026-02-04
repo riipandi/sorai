@@ -15,11 +15,11 @@ services:
       - libsql_data:/var/lib/sqld/data
       - libsql_exts:/var/lib/sqld/extensions
     environment:
-        SQLD_NODE: 'primary'
-        SQLD_DB_PATH: '/var/lib/sqld/data/data.sqld'
-        SQLD_GRPC_LISTEN_ADDR: '0.0.0.0:5001'
-        SQLD_HTTP_LISTEN_ADDR: '0.0.0.0:8080'
-        SQLD_ADMIN_LISTEN_ADDR: '0.0.0.0:8081'
+      SQLD_NODE: 'primary'
+      SQLD_DB_PATH: '/var/lib/sqld/data/data.sqld'
+      SQLD_GRPC_LISTEN_ADDR: '0.0.0.0:5001'
+      SQLD_HTTP_LISTEN_ADDR: '0.0.0.0:8080'
+      SQLD_ADMIN_LISTEN_ADDR: '0.0.0.0:8081'
     # @ref: https://github.com/tursodatabase/libsql/tree/main/libsql-server#sqlite-extensions-support
     # command: '/bin/sqld --enable-namespaces --enable-http-console --extensions-path=/var/lib/sqld/extensions'
     command: '/bin/sqld --enable-namespaces --enable-http-console --max-active-namespaces 2000'

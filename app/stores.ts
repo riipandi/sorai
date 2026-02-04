@@ -14,6 +14,7 @@ export interface AuthStore {
   atokenexp: number | null
   rtoken: string | null
   rtokenexp: number | null
+  sessid: string | null
   remember: boolean
 }
 
@@ -25,6 +26,7 @@ export const authStore = persistentMap<AuthStore>(
     atokenexp: null,
     rtoken: null,
     rtokenexp: null,
+    sessid: null,
     remember: false
   },
   {
@@ -47,24 +49,29 @@ function decodeValue(encoded: string): string | number | boolean | null {
 }
 
 export interface UIStore {
-  sidebar: 'show' | 'hide'
-  theme: 'light' | 'dark'
+  sidebarOpen: boolean
+  theme: 'system' | 'light' | 'dark'
 }
 
 const uiStoreDefaults: UIStore = {
-  sidebar: 'hide',
+  sidebarOpen: true,
   theme: 'light'
 }
 
 export const uiStore = persistentMap<UIStore>(`${pkg.name}_ui:`, uiStoreDefaults, {
   encode: (value: UIStore[keyof UIStore]) => (value == null ? '' : String(value)),
   decode: (encoded: string, key?: keyof UIStore): UIStore[keyof UIStore] => {
-    if (key === 'sidebar') {
-      return encoded === 'show' || encoded === 'hide' ? encoded : uiStoreDefaults.sidebar
+    if (encoded === '') {
+      return uiStoreDefaults[key ?? 'sidebarOpen']
+    }
+    if (key === 'sidebarOpen') {
+      return encoded === 'true'
     }
     if (key === 'theme') {
-      return encoded === 'light' || encoded === 'dark' ? encoded : uiStoreDefaults.theme
+      return encoded === 'system' || encoded === 'light' || encoded === 'dark'
+        ? encoded
+        : uiStoreDefaults.theme
     }
-    return encoded === '' ? uiStoreDefaults.sidebar : (encoded as UIStore[keyof UIStore])
+    return encoded as UIStore[keyof UIStore]
   }
 })

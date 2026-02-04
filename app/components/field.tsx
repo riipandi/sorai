@@ -1,0 +1,97 @@
+/**
+ * A component that provides labeling and validation for form controls.
+ *
+ * @see: https://base-ui.com/react/components/field
+ *
+ * Anatomy:
+ * <Field.Root>
+ *   <Field.Label />
+ *   <Field.Control />
+ *   <Field.Description />
+ *   <Field.Item />
+ *   <Field.Error />
+ *   <Field.Validity />
+ * </Field.Root>
+ */
+
+import { Field as BaseField } from '@base-ui/react/field'
+import * as React from 'react'
+import { clx, tv } from '#/utils/variant'
+
+export const fieldStyles = tv({
+  base: 'flex flex-col gap-2',
+  slots: {
+    item: [
+      'grid items-center gap-x-2.5 gap-y-1 not-last:mb-2',
+      'grid-cols-[auto_1fr]',
+      '**:data-[slot=field-description]:col-start-2'
+    ],
+    label: 'text-foreground flex items-center gap-2.5',
+    description: 'text-muted text-base leading-relaxed',
+    error: 'text-danger',
+    validity: '',
+    control: ''
+  }
+})
+
+export type FieldRootProps = React.ComponentProps<typeof BaseField.Root>
+export type FieldItemProps = React.ComponentProps<typeof BaseField.Item>
+export type FieldLabelProps = React.ComponentProps<typeof BaseField.Label>
+export type FieldDescriptionProps = React.ComponentProps<typeof BaseField.Description>
+export type FieldErrorProps = React.ComponentProps<typeof BaseField.Error>
+export type FieldValidityProps = React.ComponentProps<typeof BaseField.Validity>
+export type FieldControlProps = React.ComponentProps<typeof BaseField.Control>
+
+export function Field({ className, ...props }: FieldRootProps) {
+  const styles = fieldStyles()
+  return <BaseField.Root data-slot='field' className={clx(styles.base(), className)} {...props} />
+}
+
+export function FieldItem({ className, ...props }: FieldItemProps) {
+  const styles = fieldStyles()
+  return (
+    <BaseField.Item data-slot='field-item' className={clx(styles.item(), className)} {...props} />
+  )
+}
+
+export function FieldLabel({ className, ...props }: FieldLabelProps) {
+  const styles = fieldStyles()
+  return (
+    <BaseField.Label
+      data-slot='field-label'
+      className={clx(styles.label(), className)}
+      {...props}
+    />
+  )
+}
+
+export function FieldDescription({ className, ...props }: FieldDescriptionProps) {
+  const styles = fieldStyles()
+  return (
+    <BaseField.Description
+      data-slot='field-description'
+      className={clx(styles.description(), className)}
+      {...props}
+    />
+  )
+}
+
+export function FieldError({ className, ...props }: FieldErrorProps) {
+  const styles = fieldStyles()
+  return (
+    <BaseField.Error
+      data-slot='field-error'
+      className={clx(styles.error(), className)}
+      {...props}
+    />
+  )
+}
+
+export function FieldValidity({ ...props }: FieldValidityProps) {
+  return <BaseField.Validity data-slot='field-validity' {...props} />
+}
+
+export function FieldControl({ ...props }: FieldControlProps) {
+  const styles = fieldStyles()
+  return <BaseField.Control data-slot='field-control' className={styles.control()} {...props} />
+}

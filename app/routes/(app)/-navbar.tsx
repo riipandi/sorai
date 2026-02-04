@@ -1,26 +1,24 @@
-import { Link, type LinkProps, useLocation } from '@tanstack/react-router'
+import { Link, useLocation, type LinkProps } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
-import { Avatar, AvatarFallbackInitial, AvatarImage } from '#/components/selia/avatar'
-import { Menu, MenuPopup, MenuItem, MenuTrigger, MenuSeparator } from '#/components/selia/menu'
-import {
-  Sidebar,
-  SidebarCollapsible,
-  SidebarCollapsiblePanel,
-  SidebarCollapsibleTrigger,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupTitle,
-  SidebarHeader,
-  SidebarItem,
-  SidebarItemButton,
-  SidebarList,
-  SidebarLogo,
-  SidebarMenu,
-  SidebarSubmenu
-} from '#/components/selia/sidebar'
+import * as React from 'react'
+import { Button } from '#/components/button'
+import { Sidebar, SidebarContent, SidebarCollapsible } from '#/components/sidebar'
+import { SidebarCollapsiblePanel, SidebarCollapsibleTrigger } from '#/components/sidebar'
+import { SidebarGroup, SidebarGroupAction, SidebarSubmenu } from '#/components/sidebar'
+import { SidebarGroupTitle, SidebarFooter, SidebarHeader } from '#/components/sidebar'
+import { SidebarList, SidebarLogo, SidebarMenu } from '#/components/sidebar'
+import { SidebarItem, SidebarItemButton } from '#/components/sidebar'
 import type { User } from '#/schemas/user.schema'
+import { clx } from '#/utils/variant'
+import { CommandBar } from './-command'
+import { UserMenu } from './-user-menu'
+
+interface NavbarProp {
+  user: User | null
+  logoutFn: () => void
+  sidebarOpen: boolean
+  toggleSidebar: () => void
+}
 
 interface NavItem {
   label: string
@@ -36,28 +34,14 @@ interface NavGroup {
   action?: {
     label: string
     action: () => void
+    icon: React.ComponentType<{ className?: string }>
   }
   items: NavItem[]
 }
 
-interface NavbarProps {
-  user: User | null
-  logoutFn: () => void
-}
-
 const primaryGroup: NavGroup = {
-  items: [{ to: '/', label: 'Dashboard', icon: Lucide.HomeIcon, exact: true }]
-}
-
-const secondaryGroup: NavGroup = {
-  title: 'Navigation',
-  action: {
-    label: 'Add new',
-    action: () => console.log('Add new item')
-  },
   items: [
-    { href: '#', label: 'Products', icon: Lucide.ShoppingBagIcon },
-    { href: '#', label: 'Categories', icon: Lucide.TagsIcon },
+    { to: '/', label: 'Dashboard', icon: Lucide.HomeIcon, exact: true },
     {
       label: 'Reports',
       icon: Lucide.ChartAreaIcon,
@@ -70,9 +54,25 @@ const secondaryGroup: NavGroup = {
   ]
 }
 
+const secondaryGroup: NavGroup = {
+  title: 'Manage',
+  action: {
+    label: 'Add new',
+    icon: Lucide.PlusIcon,
+    action: () => console.log('Add new item')
+  },
+  items: [
+    { href: '#', label: 'Products', icon: Lucide.ShoppingBagIcon },
+    { href: '#', label: 'Categories', icon: Lucide.TagsIcon }
+  ]
+}
+
 const settingsGroup: NavGroup = {
   title: 'Settings',
-  items: [{ to: '/profile', label: 'User Profile', icon: Lucide.UserIcon, exact: true }]
+  items: [
+    { href: '#', label: 'Manage Users', icon: Lucide.UsersIcon, exact: true },
+    { href: '#', label: 'Organizations', icon: Lucide.Building, exact: true }
+  ]
 }
 
 function renderNavItem(item: NavItem) {
@@ -127,9 +127,14 @@ function renderNavGroup(group: NavGroup, index: number) {
       {group.title && <SidebarGroupTitle>{group.title}</SidebarGroupTitle>}
       {group.action && (
         <SidebarGroupAction>
-          <button onClick={group.action.action} aria-label={group.action.label}>
-            <Lucide.PlusIcon />
-          </button>
+          <Button
+            size='icon-xs'
+            variant='plain'
+            onClick={group.action.action}
+            aria-label={group.action.label}
+          >
+            <group.action.icon />
+          </Button>
         </SidebarGroupAction>
       )}
       <SidebarList>{group.items.map((item) => renderNavItem(item))}</SidebarList>
@@ -137,57 +142,51 @@ function renderNavGroup(group: NavGroup, index: number) {
   )
 }
 
-function UserMenu({ user, logoutFn }: NavbarProps) {
-  return (
-    <Menu>
-      <MenuTrigger
-        data-slot='sidebar-item-button'
-        render={
-          <SidebarItemButton>
-            <Avatar size='sm'>
-              <AvatarImage
-                src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?radius=50&seed=${user?.email}`}
-                alt={user?.name}
-              />
-              <AvatarFallbackInitial name={user?.name} />
-            </Avatar>
-            <div className='flex flex-col'>
-              <span className='font-medium'>{user?.name}</span>
-              <span className='text-muted text-sm'>{user?.email}</span>
-            </div>
-            <Lucide.ChevronsUpDownIcon className='ml-auto' />
-          </SidebarItemButton>
-        }
-      />
-      <MenuPopup className='w-(--anchor-width)' side='top'>
-        <MenuItem render={<Link to='/profile' />}>
-          <Lucide.SettingsIcon />
-          Settings
-        </MenuItem>
-        <MenuSeparator />
-        <MenuItem onClick={logoutFn}>
-          <Lucide.LogOutIcon />
-          Logout
-        </MenuItem>
-      </MenuPopup>
-    </Menu>
-  )
-}
-
-export function Navbar({ user, logoutFn }: NavbarProps) {
-  const navGroups = [primaryGroup, secondaryGroup, settingsGroup]
+export function Navbar({ sidebarOpen, toggleSidebar, user, logoutFn }: NavbarProp) {
+  const [openCommandbar, setOpenCommandbar] = React.useState(false)
 
   return (
-    <Sidebar className='border-border/50 border-r bg-gray-50' size='default'>
+    <Sidebar
+      className={clx(
+        'border-separator/30 size-full border-r bg-neutral-50 dark:bg-neutral-950',
+        'transition-all duration-200 lg:sticky lg:h-dvh lg:w-72',
+        'max-lg:bg-background fixed top-0 z-50 size-full',
+        // FIXME: sidebar state always show when refresh on desktop
+        sidebarOpen ? 'left-0 ml-0' : '-left-full lg:-ml-72'
+      )}
+      size='loose'
+    >
       <SidebarHeader>
-        <SidebarLogo className='px-2 py-1'>
-          <img src='/images/vite.svg' alt='Selia' className='size-6' />
-          <span className='font-semibold'>Sorai</span>
-        </SidebarLogo>
+        <div className='flex items-center justify-between'>
+          <SidebarLogo className='items-center px-2'>
+            <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Sorai' />
+            <span className='sr-only'>Sorai Console</span>
+          </SidebarLogo>
+          <div className='flex items-center gap-2.5'>
+            {/* Command Bar */}
+            <CommandBar open={openCommandbar} setOpen={setOpenCommandbar} />
+            <Button size='icon-sm' variant='plain' className='lg:hidden' onClick={toggleSidebar}>
+              {sidebarOpen ? <Lucide.SidebarClose /> : <Lucide.SidebarOpen />}
+            </Button>
+          </div>
+        </div>
+
+        <SidebarMenu className='mt-6'>
+          <Button variant='primary' size='sm' block>
+            <Lucide.Plus />
+            New Chat
+          </Button>
+        </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarMenu>{navGroups.map((group, index) => renderNavGroup(group, index))}</SidebarMenu>
+
+      <SidebarContent className='py-2!'>
+        <SidebarMenu>
+          {[primaryGroup, secondaryGroup, settingsGroup].map((group, index) =>
+            renderNavGroup(group, index)
+          )}
+        </SidebarMenu>
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarList>

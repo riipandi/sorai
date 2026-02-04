@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
-import { Progress, ProgressLabel, ProgressValue } from '#/components/selia/progress'
+import { Progress, ProgressLabel, ProgressValue } from '#/components/progress'
 
 const meta = {
   title: 'Components/Progress',
@@ -35,7 +35,7 @@ export const Example: Story = {
 
     return (
       <Progress value={value} className='w-full'>
-        <ProgressLabel>Uploading</ProgressLabel>
+        <ProgressLabel>Casting Spell</ProgressLabel>
         <ProgressValue />
       </Progress>
     )

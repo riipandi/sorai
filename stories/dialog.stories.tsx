@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '#/components/selia/button'
+import * as Lucide from 'lucide-react'
+import { Button } from '#/components/button'
 import {
   Dialog,
   DialogBody,
@@ -10,8 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger
-} from '#/components/selia/dialog'
-import { Textarea } from '#/components/selia/textarea'
+} from '#/components/dialog'
+import { IconBox } from '#/components/icon-box'
+import { Textarea } from '#/components/textarea'
 
 const meta = {
   title: 'Components/Dialog',
@@ -39,15 +41,40 @@ export const Example: Story = {
       <DialogTrigger render={<Button>Open Dialog</Button>} />
       <DialogPopup>
         <DialogHeader>
-          <DialogTitle>Feedback</DialogTitle>
+          <DialogTitle>Send Owl</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <DialogDescription>Please provide your feedback.</DialogDescription>
-          <Textarea placeholder='Enter your feedback' className='h-28' />
+          <DialogDescription>Send your message via owl post to Hogwarts.</DialogDescription>
+          <Textarea placeholder='Enter your message' className='h-28' />
         </DialogBody>
         <DialogFooter>
           <DialogClose>Close</DialogClose>
-          <DialogClose render={<Button>Send Feedback</Button>} />
+          <DialogClose render={<Button size='sm' />}>Send Owl</DialogClose>
+        </DialogFooter>
+      </DialogPopup>
+    </Dialog>
+  )
+}
+
+export const WithIconHeader: Story = {
+  args: {},
+  render: () => (
+    <Dialog>
+      <DialogTrigger render={<Button>Open Dialog</Button>} />
+      <DialogPopup>
+        <DialogHeader>
+          <IconBox size='sm'>
+            <Lucide.MessageSquareIcon />
+          </IconBox>
+          <DialogTitle>Decode the Message</DialogTitle>
+        </DialogHeader>
+        <DialogBody>
+          <DialogDescription>Help Professor Langdon decode this ancient symbol.</DialogDescription>
+          <Textarea placeholder='Enter your translation' />
+        </DialogBody>
+        <DialogFooter>
+          <DialogClose>Close</DialogClose>
+          <DialogClose render={<Button size='sm' />}>Submit Solution</DialogClose>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

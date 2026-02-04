@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Field, FieldLabel } from '#/components/selia/field'
+import { Field, FieldLabel } from '#/components/field'
 import {
   NumberField,
   NumberFieldDecrement,
@@ -8,7 +8,7 @@ import {
   NumberFieldIncrement,
   NumberFieldInput,
   NumberFieldScrubArea
-} from '#/components/selia/number-field'
+} from '#/components/number-field'
 
 const meta = {
   title: 'Components/NumberField',
@@ -32,21 +32,40 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <Field>
-      <NumberField defaultValue={1} min={1} max={1000}>
-        <NumberFieldScrubArea>
-          <FieldLabel>Instances</FieldLabel>
-        </NumberFieldScrubArea>
-        <NumberFieldGroup>
-          <NumberFieldDecrement>
-            <Lucide.MinusIcon />
-          </NumberFieldDecrement>
-          <NumberFieldInput />
-          <NumberFieldIncrement>
-            <Lucide.PlusIcon />
-          </NumberFieldIncrement>
-        </NumberFieldGroup>
-      </NumberField>
-    </Field>
+    <div className='flex flex-col gap-6'>
+      <Field>
+        <NumberField defaultValue={999} min={1} max={10000}>
+          <NumberFieldScrubArea>
+            <FieldLabel>Default variant</FieldLabel>
+          </NumberFieldScrubArea>
+          <NumberFieldGroup variant='default'>
+            <NumberFieldDecrement>
+              <Lucide.MinusIcon />
+            </NumberFieldDecrement>
+            <NumberFieldInput />
+            <NumberFieldIncrement>
+              <Lucide.PlusIcon />
+            </NumberFieldIncrement>
+          </NumberFieldGroup>
+        </NumberField>
+      </Field>
+
+      <Field>
+        <NumberField defaultValue={999} min={1} max={10000}>
+          <NumberFieldScrubArea>
+            <FieldLabel>Plain variant</FieldLabel>
+          </NumberFieldScrubArea>
+          <NumberFieldGroup variant='plain'>
+            <NumberFieldDecrement>
+              <Lucide.MinusIcon />
+            </NumberFieldDecrement>
+            <NumberFieldInput />
+            <NumberFieldIncrement>
+              <Lucide.PlusIcon />
+            </NumberFieldIncrement>
+          </NumberFieldGroup>
+        </NumberField>
+      </Field>
+    </div>
   )
 }

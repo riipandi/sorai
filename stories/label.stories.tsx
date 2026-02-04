@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Input } from '#/components/selia/input'
-import { Label } from '#/components/selia/label'
+import { Input } from '#/components/input'
+import { Label } from '#/components/label'
 
 const meta = {
   title: 'Components/Label',
@@ -24,9 +24,9 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <div className='w-full space-y-2.5 xl:w-10/12 2xl:w-8/12'>
-      <Label htmlFor='name'>Name</Label>
-      <Input id='name' placeholder='Enter your name' />
+    <div className='w-full space-y-1.5'>
+      <Label htmlFor='name'>Wizard Name</Label>
+      <Input id='name' placeholder='Enter your wizard name' />
     </div>
   )
 }

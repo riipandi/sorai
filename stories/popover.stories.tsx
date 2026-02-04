@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as Lucide from 'lucide-react'
-import { Button } from '#/components/selia/button'
+import { Button } from '#/components/button'
 import {
   Popover,
   PopoverPopup,
   PopoverDescription,
   PopoverTitle,
   PopoverTrigger
-} from '#/components/selia/popover'
+} from '#/components/popover'
 
 const meta = {
   title: 'Components/Popover',
@@ -32,14 +32,15 @@ export const Example: Story = {
   args: {},
   render: () => (
     <Popover>
-      <PopoverTrigger render={<Button>Upgrade</Button>} />
+      <PopoverTrigger render={<Button variant='tertiary' />}>Learn Spell</PopoverTrigger>
       <PopoverPopup className='w-72'>
-        <PopoverTitle>Upgrade to Pro</PopoverTitle>
+        <PopoverTitle>Learn Expelliarmus</PopoverTitle>
         <PopoverDescription>
-          Upgrade to Pro to get more features and access to exclusive content.
+          Master this disarming charm to protect yourself in magical duels. Taught by Professor
+          Filius Flitwick at Hogwarts.
         </PopoverDescription>
-        <Button size='sm' variant='tertiary' pill>
-          Upgrade
+        <Button variant='tertiary' size='xs'>
+          Learn Now
           <Lucide.ArrowRightIcon />
         </Button>
       </PopoverPopup>

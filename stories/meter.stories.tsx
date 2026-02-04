@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Meter, MeterLabel, MeterValue } from '#/components/selia/meter'
+import { Meter, MeterLabel, MeterValue } from '#/components/meter'
 
 const meta = {
   title: 'Components/Meter',
@@ -21,10 +21,10 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
-  args: { value: 50 },
+  args: { value: 69 },
   render: (args) => (
     <Meter {...args} className='w-full'>
-      <MeterLabel>Storage</MeterLabel>
+      <MeterLabel>Magic Power</MeterLabel>
       <MeterValue />
     </Meter>
   )

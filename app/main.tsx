@@ -26,8 +26,7 @@ const appRoutes = createRouter({
   defaultPreloadStaleTime: 0,
   context: {
     queryClient: undefined!,
-    auth: undefined!,
-    ui: undefined!
+    auth: undefined!
   }
 })
 

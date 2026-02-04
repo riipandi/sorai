@@ -10,8 +10,8 @@ import {
   AutocompleteGroupLabel,
   AutocompleteCollection,
   AutocompleteItem
-} from '#/components/selia/autocomplete'
-import { Button } from '#/components/selia/button'
+} from '#/components/autocomplete'
+import { Button } from '#/components/button'
 import {
   Command,
   CommandTrigger,
@@ -20,9 +20,9 @@ import {
   CommandFooter,
   CommandFooterItem,
   CommandFooterText
-} from '#/components/selia/command'
-import { InputGroup, InputGroupAddon } from '#/components/selia/input-group'
-import { Kbd, KbdGroup } from '#/components/selia/kbd'
+} from '#/components/command'
+import { InputGroup, InputGroupAddon } from '#/components/input-group'
+import { Kbd, KbdGroup } from '#/components/kbd'
 
 const meta = {
   title: 'Components/Command',
@@ -50,61 +50,34 @@ export const Example: Story = {
 
     const items = [
       {
-        label: 'Suggestions',
+        label: 'Spells',
         items: [
-          {
-            label: 'Figma',
-            value: 'figma'
-          },
-          {
-            label: 'Adobe XD',
-            value: 'adobe-xd'
-          },
-          {
-            label: 'Sketch',
-            value: 'sketch'
-          }
+          { label: 'Expelliarmus', value: 'expelliarmus' },
+          { label: 'Expecto Patronum', value: 'expecto-patronum' },
+          { label: 'Wingardium Leviosa', value: 'wingardium-leviosa' }
         ]
       },
       {
-        label: 'File Management',
+        label: 'Books',
         items: [
-          {
-            label: 'File Explorer',
-            value: 'file-explorer'
-          },
-          {
-            label: 'File Search',
-            value: 'file-search'
-          },
-          {
-            label: 'File Transfer',
-            value: 'file-transfer'
-          }
+          { label: 'The Da Vinci Code', value: 'da-vinci-code' },
+          { label: 'Angels & Demons', value: 'angels-demons' },
+          { label: "The Sorcerer's Stone", value: 'sorcerers-stone' }
         ]
       },
       {
         label: 'Settings',
         items: [
-          {
-            label: 'General',
-            value: 'general'
-          },
-          {
-            label: 'Appearance',
-            value: 'appearance'
-          },
-          {
-            label: 'Accessibility',
-            value: 'accessibility'
-          }
+          { label: 'Wand Settings', value: 'wand-settings' },
+          { label: 'Hogwarts House', value: 'hogwarts-house' },
+          { label: 'Magical Abilities', value: 'magical-abilities' }
         ]
       }
     ]
 
     return (
       <Command open={open} onOpenChange={setOpen}>
-        <CommandTrigger render={<Button>Open Command</Button>} />
+        <CommandTrigger render={<Button>Open Magical Command</Button>} />
         <CommandContent>
           <CommandBody>
             <Autocomplete items={items} autoHighlight open>
@@ -113,7 +86,7 @@ export const Example: Story = {
                   <Lucide.SearchIcon />
                 </InputGroupAddon>
                 <AutocompleteInput
-                  placeholder='Search apps or commands...'
+                  placeholder='Search spells or books...'
                   variant='plain'
                   onKeyDown={(e) => {
                     if (e.key === 'Escape') {
@@ -144,17 +117,23 @@ export const Example: Story = {
               </AutocompleteList>
             </Autocomplete>
           </CommandBody>
-          <CommandFooter>
+          <CommandFooter className='justify-between'>
             <CommandFooterItem>
-              <Kbd>↵</Kbd>
-              <CommandFooterText>Select Item</CommandFooterText>
-            </CommandFooterItem>
-            <CommandFooterItem>
-              <KbdGroup>
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
+              <KbdGroup className='gap-2'>
+                <Kbd variant='outline' className='rounded-xs pb-1'>
+                  ↑
+                </Kbd>
+                <Kbd variant='outline' className='rounded-xs pb-1'>
+                  ↓
+                </Kbd>
               </KbdGroup>
               <CommandFooterText>Navigate</CommandFooterText>
+            </CommandFooterItem>
+            <CommandFooterItem>
+              <Kbd variant='outline' className='rounded-xs pb-1'>
+                ↵
+              </Kbd>
+              <CommandFooterText>Select Item</CommandFooterText>
             </CommandFooterItem>
           </CommandFooter>
         </CommandContent>

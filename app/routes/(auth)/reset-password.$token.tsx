@@ -3,20 +3,17 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import * as Lucide from 'lucide-react'
 import { useState } from 'react'
 import { z } from 'zod'
-import { Alert, AlertDescription, AlertTitle } from '#/components/selia/alert'
-import { Button } from '#/components/selia/button'
-import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/selia/card'
-import { Field, FieldLabel, FieldError } from '#/components/selia/field'
-import { Fieldset } from '#/components/selia/fieldset'
-import { Form } from '#/components/selia/form'
-import { Input } from '#/components/selia/input'
-import { Spinner } from '#/components/selia/spinner'
-import { TextLink } from '#/components/selia/text'
-import fetcher from '#/fetcher'
-
-interface ResetPasswordLoaderData {
-  isValidToken: boolean
-}
+import { Alert, AlertDescription, AlertTitle } from '#/components/alert'
+import { Button } from '#/components/button'
+import { Card, CardBody, CardDescription, CardHeader, CardTitle } from '#/components/card'
+import { Field, FieldLabel, FieldError } from '#/components/field'
+import { Fieldset } from '#/components/fieldset'
+import { Form } from '#/components/form'
+import { Input } from '#/components/input'
+import { InputPassword } from '#/components/input-password'
+import { Spinner } from '#/components/spinner'
+import { TextLink } from '#/components/typography'
+import { fetcher } from '#/utils/fetcher'
 
 export const Route = createFileRoute('/(auth)/reset-password/$token')({
   component: RouteComponent,
@@ -29,14 +26,15 @@ export const Route = createFileRoute('/(auth)/reset-password/$token')({
 
     try {
       const response = await fetcher<{
-        success: boolean
+        status: 'success' | 'error'
         message: string
         data: { is_token_valid: boolean }
+        error: any
       }>(`/auth/validate-token?token=${token}`, {
         method: 'GET'
       })
 
-      return { isValidToken: response.success && response.data?.is_token_valid }
+      return { isValidToken: response.status === 'success' && response.data?.is_token_valid }
     } catch (error) {
       console.error(error)
       return { isValidToken: false }
@@ -62,7 +60,7 @@ const resetPasswordSchema = z
 
 function RouteComponent() {
   const { token } = Route.useParams()
-  const loaderData = Route.useLoaderData() as ResetPasswordLoaderData
+  const loaderData = Route.useLoaderData()
   const [isSuccess, setIsSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -83,15 +81,16 @@ function RouteComponent() {
 
       try {
         const response = await fetcher<{
-          success: boolean
+          status: 'success' | 'error'
           message: string
           data: null
-        }>(`/auth/password/reset?token=${token}`, {
+          error: any
+        }>('/auth/password/reset', {
           method: 'POST',
-          body: { password: value.password }
+          body: { token, password: value.password }
         })
 
-        if (response.success) {
+        if (response.status === 'success') {
           setIsSuccess(true)
           setSuccessMessage(response.message)
           formApi.reset()
@@ -187,9 +186,8 @@ function RouteComponent() {
                     {(field) => (
                       <Field>
                         <FieldLabel htmlFor='password'>New Password</FieldLabel>
-                        <Input
+                        <InputPassword
                           id='password'
-                          type='password'
                           autoComplete='new-password'
                           value={field.state.value}
                           onBlur={field.handleBlur}
@@ -239,9 +237,8 @@ function RouteComponent() {
                   </form.Field>
                 </Fieldset>
 
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  children={([canSubmit, isSubmitting]) => (
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                  {([canSubmit, isSubmitting]) => (
                     <Button type='submit' disabled={!canSubmit || isSubmitting} block>
                       {isSubmitting ? (
                         <span className='flex items-center gap-2'>
@@ -253,11 +250,13 @@ function RouteComponent() {
                       )}
                     </Button>
                   )}
-                />
+                </form.Subscribe>
               </Form>
 
               <div className='mt-6 flex w-full items-center justify-center text-center'>
-                <TextLink render={<Link to='/signin' />}>Back to Sign in</TextLink>
+                <TextLink className='no-underline' render={<Link to='/signin' />}>
+                  Back to Sign in
+                </TextLink>
               </div>
             </>
           )}

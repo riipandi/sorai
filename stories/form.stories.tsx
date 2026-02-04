@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '#/components/selia/button'
-import { Field, FieldError, FieldLabel } from '#/components/selia/field'
-import { Fieldset, FieldsetLegend } from '#/components/selia/fieldset'
-import { Form } from '#/components/selia/form'
-import { Input } from '#/components/selia/input'
-import { Text } from '#/components/selia/text'
+import { Button } from '#/components/button'
+import { Field, FieldError, FieldLabel } from '#/components/field'
+import { Fieldset, FieldsetLegend } from '#/components/fieldset'
+import { Form } from '#/components/form'
+import { Input } from '#/components/input'
+import { Text } from '#/components/typography'
 
 const meta = {
   title: 'Components/Form',
@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>
 export const Example: Story = {
   args: {},
   render: () => (
-    <Form className='w-full min-w-md xl:w-8/12'>
+    <Form className='w-full max-w-sm'>
       <Fieldset>
         <FieldsetLegend>Personal Information</FieldsetLegend>
         <Text>We need your name and email to create your account.</Text>
