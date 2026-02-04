@@ -7,8 +7,6 @@ pub struct LoggingConfig {
     pub show_timestamp: bool,
     #[serde(default = "default_log_level")]
     pub level: String,
-    #[serde(default = "default_log_directory")]
-    pub log_directory: String,
     #[serde(default = "default_log_rotation")]
     pub rotation: String,
     #[serde(default = "default_show_module")]
@@ -28,7 +26,6 @@ impl Default for LoggingConfig {
         Self {
             show_timestamp: default_show_timestamp(),
             level: default_log_level(),
-            log_directory: default_log_directory(),
             rotation: default_log_rotation(),
             show_module: default_show_module(),
             request_sampling: default_request_sampling(),
@@ -50,11 +47,6 @@ impl LoggingConfig {
             section: "Logging".to_string(),
             key: "Level".to_string(),
             value: self.level.clone(),
-        });
-        items.push(ConfigItem {
-            section: "Logging".to_string(),
-            key: "Log Directory".to_string(),
-            value: self.log_directory.clone(),
         });
         items.push(ConfigItem {
             section: "Logging".to_string(),
@@ -95,10 +87,6 @@ fn default_show_timestamp() -> bool {
 
 fn default_log_level() -> String {
     "info".to_string()
-}
-
-fn default_log_directory() -> String {
-    "./logs".to_string()
 }
 
 fn default_log_rotation() -> String {

@@ -8,9 +8,12 @@ use sorai::{Config, http::HttpServer};
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Sets a custom config file
-    #[arg(short, long, value_name = "FILE", global = true)]
-    config: Option<PathBuf>,
+    /// Sets a custom env file
+    #[arg(long, value_name = "FILE", global = true)]
+    env_file: Option<PathBuf>,
+    /// Sets the data directory for application data
+    #[arg(long, value_name = "DIR", global = true)]
+    data_dir: Option<PathBuf>,
 
     #[command(subcommand)]
     command: Option<Commands>,
@@ -48,11 +51,9 @@ async fn main() {
 
     match command {
         Commands::Serve { host, port } => {
-            // Convert PathBuf to String for config loading
-            let config_path = cli.config.as_ref().map(|p| p.to_string_lossy().to_string());
+            let env_file = cli.env_file.as_ref().map(|p| p.to_string_lossy().to_string());
 
-            // Load configuration
-            let mut config = match Config::load(config_path).await {
+            let mut config = match Config::load(env_file) {
                 Ok(config) => config,
                 Err(e) => {
                     eprintln!("Failed to load config: {e}");
@@ -60,15 +61,16 @@ async fn main() {
                 }
             };
 
-            // Override config with command line arguments if provided
             if let Some(host) = host {
                 config.sorai.host = host;
             }
             if let Some(port) = port {
                 config.sorai.port = port;
             }
+            if let Some(data_dir) = cli.data_dir {
+                config.app.data_dir = data_dir.to_string_lossy().to_string();
+            }
 
-            // Create and start HTTP server
             let server = HttpServer::new(config);
             if let Err(e) = server.start().await {
                 eprintln!("Failed to start server: {}", e);
@@ -76,11 +78,9 @@ async fn main() {
             }
         }
         Commands::Debug => {
-            // Convert PathBuf to String for config loading
-            let config_path = cli.config.as_ref().map(|p| p.to_string_lossy().to_string());
+            let env_file = cli.env_file.as_ref().map(|p| p.to_string_lossy().to_string());
 
-            // Load configuration for debug display
-            let config = match Config::load(config_path).await {
+            let mut config = match Config::load(env_file) {
                 Ok(config) => config,
                 Err(e) => {
                     eprintln!("Failed to load config: {e}");
@@ -88,7 +88,10 @@ async fn main() {
                 }
             };
 
-            // Display configuration in table format
+            if let Some(data_dir) = cli.data_dir {
+                config.app.data_dir = data_dir.to_string_lossy().to_string();
+            }
+
             config.display_debug_table();
         }
     }

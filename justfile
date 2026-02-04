@@ -27,7 +27,8 @@ default:
 dev *args:
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 3000
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 8000
-  @watchexec -r -e rs -- cargo run -q -- serve --port 3000 {{args}}
+  @watchexec -r -e rs -- cargo run -q -- serve --data-dir .data \
+    --port 3000 --env-file .env.local {{args}}
 
 [group('Development Tasks')]
 [doc('Run development for CLI')]
@@ -103,18 +104,15 @@ docker-build *args:
 [group('Docker Tasks')]
 [doc('Run the Docker image')]
 docker-run *args:
-  @docker run --network=host --rm -it \
-    -v ./config.toml:/etc/sorai.toml:ro \
-    -v ./.data/logs:/data/logs:rw \
+  @docker run --network=host --rm -it -v ./.data:/data:rw \
     {{app_image}}:{{app_version}} {{args}}
 
 [group('Docker Tasks')]
 [doc('Debug the Docker image')]
 [no-exit-message]
-docker-shell:
-  @docker run --network=host --rm -it \
-    -v ./config.toml:/etc/sorai.toml:ro -v ./logs:/data/logs:rw \
-    --entrypoint sh {{app_image}}:{{app_version}}-debug
+docker-shell *args:
+  @docker run --network=host --rm -it -v ./.data:/data:rw \
+    --entrypoint sh {{app_image}}:{{app_version}}-debug {{args}}
 
 [group('Docker Tasks')]
 [doc('Get Docker image list')]

@@ -47,6 +47,11 @@ impl HttpServer {
         }
     }
 
+    /// Get log directory from data_dir
+    fn get_log_dir(&self) -> String {
+        format!("{}/logs", self.config.app.data_dir)
+    }
+
     /// Initialize tracing subscriber for logging with config options
     pub fn init_tracing(&self) {
         let env_filter = if self.config.logging.level.to_lowercase().as_str() == "none" {
@@ -80,11 +85,9 @@ impl HttpServer {
         match (enable_file, show_timestamp, show_module) {
             // File and console, with timestamp and module for console
             (true, true, true) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
+                let log_dir = &self.get_log_dir();
+                if let Err(e) = std::fs::create_dir_all(log_dir) {
+                    eprintln!("Failed to create log directory '{}': {}", log_dir, e);
                     eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
@@ -97,7 +100,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
+                        .build(&&self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -119,11 +122,8 @@ impl HttpServer {
             }
             // File and console, with timestamp but without module for console
             (true, true, false) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
+                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                    eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
@@ -136,7 +136,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
+                        .build(&&self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -158,11 +158,8 @@ impl HttpServer {
             }
             // File and console, without timestamp but with module for console
             (true, false, true) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
+                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                    eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
@@ -175,7 +172,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
+                        .build(&&self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -197,11 +194,8 @@ impl HttpServer {
             }
             // File and console, without timestamp and without module for console
             (true, false, false) => {
-                if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
-                    eprintln!(
-                        "Failed to create log directory '{}': {}",
-                        self.config.logging.log_directory, e
-                    );
+                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                    eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
@@ -214,7 +208,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&self.config.logging.log_directory)
+                        .build(&&self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -305,7 +299,7 @@ impl HttpServer {
         };
 
         // Get timeout request from config
-        let timeout_requests = self.config.sorai.timeout_request;
+        let timeout_requests = 30u64;
 
         // Add middleware layers in correct order
         let middleware = ServiceBuilder::new()
@@ -342,12 +336,12 @@ impl HttpServer {
             self.config.logging.level,
             file_logging_enabled,
             if file_logging_enabled {
-                self.config.logging.rotation
+                self.config.logging.rotation.clone()
             } else {
                 "disabled".to_string()
             },
             if file_logging_enabled {
-                self.config.logging.log_directory
+                self.get_log_dir()
             } else {
                 "disabled".to_string()
             },

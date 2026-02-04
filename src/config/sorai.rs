@@ -7,10 +7,6 @@ pub struct SoraiConfig {
     pub host: String,
     #[serde(default = "default_port")]
     pub port: u16,
-    #[serde(default = "default_pool_size")]
-    pub pool_size: u32,
-    #[serde(default = "default_timeout_request")]
-    pub timeout_request: u64,
 }
 
 impl Default for SoraiConfig {
@@ -18,8 +14,6 @@ impl Default for SoraiConfig {
         Self {
             host: default_host(),
             port: default_port(),
-            pool_size: default_pool_size(),
-            timeout_request: default_timeout_request(),
         }
     }
 }
@@ -36,16 +30,6 @@ impl SoraiConfig {
             key: "Port".to_string(),
             value: self.port.to_string(),
         });
-        items.push(ConfigItem {
-            section: "Sorai".to_string(),
-            key: "Pool Size".to_string(),
-            value: self.pool_size.to_string(),
-        });
-        items.push(ConfigItem {
-            section: "Sorai".to_string(),
-            key: "Timeout Request".to_string(),
-            value: format!("{}s", self.timeout_request),
-        });
     }
 }
 
@@ -55,12 +39,4 @@ fn default_host() -> String {
 
 fn default_port() -> u16 {
     8000
-}
-
-fn default_pool_size() -> u32 {
-    300
-}
-
-fn default_timeout_request() -> u64 {
-    30
 }

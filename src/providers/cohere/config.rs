@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 pub struct CohereConfig {
     #[serde(default)]
     pub api_key: String,
+    #[serde(default)]
+    pub base_url: String,
 }
 
 impl CohereConfig {
@@ -13,6 +15,15 @@ impl CohereConfig {
             section: "Cohere".to_string(),
             key: "API Key".to_string(),
             value: redact_sensitive(&self.api_key),
+        });
+        items.push(ConfigItem {
+            section: "Cohere".to_string(),
+            key: "Base URL".to_string(),
+            value: if self.base_url.is_empty() {
+                "<default>".to_string()
+            } else {
+                self.base_url.clone()
+            },
         });
     }
 }

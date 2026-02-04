@@ -7,6 +7,8 @@ pub struct VertexConfig {
     pub project_id: String,
     #[serde(default)]
     pub credentials: String,
+    #[serde(default)]
+    pub base_url: String,
 }
 
 impl VertexConfig {
@@ -27,6 +29,15 @@ impl VertexConfig {
                 "<not set>".to_string()
             } else {
                 self.credentials.clone()
+            },
+        });
+        items.push(ConfigItem {
+            section: "Google Vertex AI".to_string(),
+            key: "Base URL".to_string(),
+            value: if self.base_url.is_empty() {
+                "<default>".to_string()
+            } else {
+                self.base_url.clone()
             },
         });
     }

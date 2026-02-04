@@ -7,6 +7,8 @@ pub struct BedrockConfig {
     pub api_key: String,
     #[serde(default)]
     pub access_key: String,
+    #[serde(default)]
+    pub base_url: String,
 }
 
 impl BedrockConfig {
@@ -20,6 +22,15 @@ impl BedrockConfig {
             section: "AWS Bedrock".to_string(),
             key: "Access Key".to_string(),
             value: redact_sensitive(&self.access_key),
+        });
+        items.push(ConfigItem {
+            section: "AWS Bedrock".to_string(),
+            key: "Base URL".to_string(),
+            value: if self.base_url.is_empty() {
+                "<default>".to_string()
+            } else {
+                self.base_url.clone()
+            },
         });
     }
 }
