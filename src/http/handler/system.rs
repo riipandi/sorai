@@ -1,10 +1,10 @@
 use axum::extract::State;
-use axum::http::{StatusCode, header};
+use axum::http::{header, StatusCode};
 use axum::response::{IntoResponse, Response};
 use metrics_exporter_prometheus::PrometheusHandle;
 use serde::{Deserialize, Serialize};
 
-use crate::http::response::{ApiResponse, ErrorCode, ErrorTypeKind, RequestId, create_error};
+use crate::http::response::{create_error, ApiResponse, ErrorCode, ErrorTypeKind, RequestId};
 
 /// Health check response data
 #[derive(Debug, Serialize, Deserialize)]

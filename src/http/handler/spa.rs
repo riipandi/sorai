@@ -1,6 +1,6 @@
 use axum::body::Body;
 use axum::extract::Path as AxumPath;
-use axum::http::{StatusCode, header};
+use axum::http::{header, StatusCode};
 use axum::response::{IntoResponse, Response};
 use rust_embed::RustEmbed;
 

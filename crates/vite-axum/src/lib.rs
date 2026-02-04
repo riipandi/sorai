@@ -1,33 +1,42 @@
-/**
- * Portions of this file are based on code from Vite Actix by Drew Chase.
- * Vite Actix is a library designed to enable seamless integration of the
- * Vite development server with the Actix web framework
- *
- * Vite Actix licensed under GNU General Public License v3.0.
- * @see: https://github.com/Drew-Chase/vite-actix/blob/master/LICENSE
- *
- * Ported to Axum framework
- */
-pub mod proxy_vite_options;
-pub mod vite_app_factory;
+// Copyright (c) 2025 Aris Ripandi <aris@duck.com>
+//
+// Portions of this file are based on Vite Actix by Drew Chase.
+// Vite Actix is a library designed to enable seamless integration of the
+// Vite development server with the Actix web framework.
+//
+// Vite Actix is licensed under GNU General Public License v3.0.
+// @see: https://github.com/Drew-Chase/vite-actix
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-use crate::proxy_vite_options::ProxyViteOptions;
+pub mod vite_app_factory;
+pub mod vite_proxy_options;
+
+pub use vite_app_factory::create_vite_router;
+pub use vite_proxy_options::ViteProxyOptions;
+
 use anyhow::anyhow;
-use axum::{
-    body::{Body, Bytes},
-    extract::{Request, State},
-    http::{HeaderMap, HeaderValue, Method, StatusCode, Uri},
-    response::{IntoResponse, Response},
-};
+use axum::body::{Body, Bytes};
+use axum::extract::Request;
+use axum::http::{HeaderMap, Method, StatusCode, Uri};
+use axum::response::{IntoResponse, Response};
 use http_body_util::{BodyExt, Full};
 use hyper::body::Incoming;
-use hyper_util::{
-    client::legacy::{connect::HttpConnector, Client},
-    rt::TokioExecutor,
-};
+use hyper_util::client::legacy::{connect::HttpConnector, Client};
+use hyper_util::rt::TokioExecutor;
 use log::{debug, error, info, trace, warn};
 use regex::Regex;
-use std::time::Duration;
 
 type HttpClient = Client<HttpConnector, Full<Bytes>>;
 
@@ -39,8 +48,8 @@ pub struct ViteProxyState {
     pub port: u16,
 }
 
-pub async fn proxy_to_vite(State(state): State<ViteProxyState>, req: Request) -> Result<Response, StatusCode> {
-    let options = ProxyViteOptions::global();
+pub async fn proxy_to_vite(req: Request) -> Result<Response, StatusCode> {
+    let options = ViteProxyOptions::global();
 
     let port = options.port.ok_or(StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -55,11 +64,10 @@ pub async fn proxy_to_vite(State(state): State<ViteProxyState>, req: Request) ->
     let http_req = build_forward_request(&forward_uri, forward_method, forward_headers, body_bytes)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let response = state
-        .client
-        .request(http_req)
-        .await
-        .map_err(|_| StatusCode::BAD_GATEWAY)?;
+    let connector = HttpConnector::new();
+    let client = Client::builder(TokioExecutor::new()).build(connector);
+
+    let response = client.request(http_req).await.map_err(|_| StatusCode::BAD_GATEWAY)?;
 
     Ok(build_axum_response(response).await)
 }
@@ -73,20 +81,16 @@ fn build_forward_uri(port: u16, uri: &Uri) -> Result<Uri, StatusCode> {
 }
 
 async fn collect_request_body(body: Body) -> Result<Bytes, StatusCode> {
-    let mut body_bytes = BytesMut::new();
-    let mut body = body;
+    use http_body_util::BodyExt;
 
-    while let Some(chunk) = body.next().await {
-        let chunk = chunk.map_err(|_| StatusCode::BAD_REQUEST)?;
+    let collected = body.collect().await.map_err(|_| StatusCode::BAD_REQUEST)?;
+    let body_bytes = collected.to_bytes();
 
-        if (body_bytes.len() + chunk.len()) > MAX_PAYLOAD_SIZE {
-            return Err(StatusCode::PAYLOAD_TOO_LARGE);
-        }
-
-        body_bytes.extend_from_slice(&chunk);
+    if body_bytes.len() > MAX_PAYLOAD_SIZE {
+        return Err(StatusCode::PAYLOAD_TOO_LARGE);
     }
 
-    Ok(body_bytes.freeze())
+    Ok(body_bytes)
 }
 
 fn build_forward_request(
@@ -127,40 +131,108 @@ async fn build_axum_response(response: hyper::Response<Incoming>) -> Response {
         .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response())
 }
 
-use bytes::{BufMut, BytesMut};
+/// Find Vite executable by trying multiple strategies
+fn find_vite_executable(options: &ViteProxyOptions) -> anyhow::Result<String> {
+    // Strategy 1: Check environment variable
+    if let Ok(vite_path) = std::env::var("VITE_PATH") {
+        if std::path::Path::new(&vite_path).exists() {
+            debug!("Using VITE_PATH: {}", vite_path);
+            return Ok(vite_path);
+        }
+    }
 
-pub fn start_vite_server() -> anyhow::Result<std::process::Child> {
+    let working_dir = &options.working_directory;
+
+    // Strategy 2: Check node_modules/.bin/vite (local installation)
+    let local_vite = std::path::Path::new(working_dir).join("node_modules/.bin/vite");
+    if local_vite.exists() {
+        #[cfg(target_os = "windows")]
+        let vite_path = local_vite.with_extension("cmd");
+        #[cfg(not(target_os = "windows"))]
+        let vite_path = local_vite;
+
+        if vite_path.exists() {
+            debug!("Found local Vite at: {:?}", vite_path);
+            return Ok(vite_path.to_string_lossy().to_string());
+        }
+    }
+
+    // Strategy 3: Detect package manager and use it
+    let package_managers: Vec<(&str, Vec<&str>)> = vec![
+        ("pnpm", vec!["pnpm", "exec", "vite"]),
+        ("yarn", vec!["yarn", "vite"]),
+        ("bun", vec!["bun", "vite"]),
+        ("npm", vec!["npm", "exec", "vite"]),
+        ("npx", vec!["npx", "vite"]),
+    ];
+
+    for (pm_name, cmd_args) in package_managers {
+        let cmd = cmd_args.first().unwrap();
+
+        // Check if package manager exists
+        let check_result = if cfg!(target_os = "windows") {
+            std::process::Command::new("where").arg(cmd).output()
+        } else {
+            std::process::Command::new("which").arg(cmd).output()
+        };
+
+        if check_result.is_ok() {
+            debug!("Found package manager: {}", pm_name);
+            // Return the command and its args as a single string
+            let full_cmd = cmd_args.join(" ");
+            return Ok(full_cmd);
+        }
+    }
+
+    // Strategy 4: Try global vite executable
     #[cfg(target_os = "windows")]
     let find_cmd = "where";
     #[cfg(not(target_os = "windows"))]
     let find_cmd = "which";
 
-    let vite = std::process::Command::new(find_cmd)
+    let vite_global = std::process::Command::new(find_cmd)
         .arg("vite")
         .stdout(std::process::Stdio::piped())
-        .output()?
-        .stdout;
+        .output();
 
-    let vite = String::from_utf8(vite)?;
-    let vite = vite.as_str().trim();
+    if let Ok(output) = vite_global {
+        let vite = String::from_utf8(output.stdout)?;
+        let vite = vite.trim();
 
-    if vite.is_empty() {
-        error!("vite not found, make sure it's installed with npm install -g vite");
-        Err(std::io::Error::new(std::io::ErrorKind::NotFound, "vite not found"))?;
+        if !vite.is_empty() {
+            let vite_path = vite.split("\n").last().unwrap_or(vite).trim();
+
+            debug!("Found global Vite at: {:?}", vite_path);
+            return Ok(vite_path.to_string());
+        }
     }
 
-    let vite = vite
-        .split("\n")
-        .collect::<Vec<_>>()
-        .last()
-        .expect("Failed to get vite executable")
-        .trim();
+    // Nothing found
+    Err(anyhow::anyhow!(
+        "Vite not found. Tried:\n\
+         - VITE_PATH environment variable\n\
+         - node_modules/.bin/vite in {}\n\
+         - Package managers: pnpm, yarn, bun, npm, npx\n\
+         - Global vite executable\n\
+         \n\
+         Install Vite with: npm install -D vite",
+        working_dir
+    ))
+}
 
-    debug!("found vite at: {:?}", vite);
+pub fn start_vite_server() -> anyhow::Result<std::process::Child> {
+    let options = ViteProxyOptions::global();
+    let vite_cmd = find_vite_executable(&options)?;
 
-    let options = ProxyViteOptions::global();
+    debug!("Starting Vite with command: {}", vite_cmd);
 
-    let mut vite_process = std::process::Command::new(vite);
+    // Parse command and arguments
+    let parts: Vec<&str> = vite_cmd.split_whitespace().collect();
+    let cmd = parts.first().unwrap();
+    let args = &parts[1..];
+
+    let mut vite_process = std::process::Command::new(cmd);
+    vite_process.args(args);
     vite_process.current_dir(&options.working_directory);
     vite_process.stdout(std::process::Stdio::piped());
 
@@ -211,7 +283,7 @@ pub fn start_vite_server() -> anyhow::Result<std::process::Child> {
                         let port = url.split(":").last().unwrap();
                         let port: u16 = port.parse().unwrap();
 
-                        if let Err(e) = ProxyViteOptions::update_port(port) {
+                        if let Err(e) = ViteProxyOptions::update_port(port) {
                             debug!("Failed to update Vite port to {}: {}", port, e);
                         } else {
                             debug!("Successfully updated Vite port to {}", port);
@@ -270,9 +342,7 @@ pub fn start_vite_server() -> anyhow::Result<std::process::Child> {
 
 pub fn create_vite_state(port: u16) -> ViteProxyState {
     let connector = HttpConnector::new();
-    let client = Client::builder(TokioExecutor::new())
-        .timeout(Duration::from_secs(60))
-        .build(connector);
+    let client = Client::builder(TokioExecutor::new()).build(connector);
 
     ViteProxyState { client, port }
 }

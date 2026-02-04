@@ -1,26 +1,40 @@
-/**
- * Portions of this file are based on code from Vite Actix by Drew Chase.
- * Vite Actix is a library designed to enable seamless integration of the
- * Vite development server with the Actix web framework
- *
- * Vite Actix licensed under GNU General Public License v3.0.
- * @see: https://github.com/Drew-Chase/vite-actix/blob/master/LICENSE
- */
+// Copyright (c) 2025 Aris Ripandi <aris@duck.com>
+//
+// Portions of this file are based on Vite Actix by Drew Chase.
+// Vite Actix is a library designed to enable seamless integration of the
+// Vite development server with the Actix web framework.
+//
+// Vite Actix is licensed under GNU General Public License v3.0.
+// @see: https://github.com/Drew-Chase/vite-actix
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 use log::Level::Debug;
 use std::env::current_dir;
 use std::sync::{Mutex, OnceLock};
 
 // Use OnceLock to ensure the Mutex is initialized only once
-static PROXY_VITE_OPTIONS: OnceLock<Mutex<ProxyViteOptions>> = OnceLock::new();
+static PROXY_VITE_OPTIONS: OnceLock<Mutex<ViteProxyOptions>> = OnceLock::new();
 
 #[derive(Clone)]
-pub struct ProxyViteOptions {
+pub struct ViteProxyOptions {
     pub port: Option<u16>,
     pub working_directory: String,
     pub log_level: Option<log::Level>,
 }
 
-impl Default for ProxyViteOptions {
+impl Default for ViteProxyOptions {
     fn default() -> Self {
         Self {
             port: None,
@@ -30,7 +44,7 @@ impl Default for ProxyViteOptions {
     }
 }
 
-impl ProxyViteOptions {
+impl ViteProxyOptions {
     pub fn new() -> Self {
         Self::default()
     }
@@ -89,7 +103,7 @@ impl ProxyViteOptions {
         match options.lock() {
             Ok(guard) => guard.clone(),
             Err(_) => {
-                log::warn!("Failed to lock ProxyViteOptions, returning default instance");
+                log::warn!("Failed to lock ViteProxyOptions, returning default instance");
                 Self::default()
             }
         }
@@ -97,10 +111,10 @@ impl ProxyViteOptions {
 }
 
 // Helper function to initialize the mutex if needed and return a reference to it
-fn get_or_init_mutex() -> &'static Mutex<ProxyViteOptions> {
+fn get_or_init_mutex() -> &'static Mutex<ViteProxyOptions> {
     PROXY_VITE_OPTIONS.get_or_init(|| {
-        log::warn!("No initial ProxyViteOptions found, initializing with default values");
-        Mutex::new(ProxyViteOptions::default())
+        log::warn!("No initial ViteProxyOptions found, initializing with default values");
+        Mutex::new(ViteProxyOptions::default())
     })
 }
 
@@ -109,7 +123,7 @@ fn get_or_init_mutex() -> &'static Mutex<ProxyViteOptions> {
 ///
 /// # Returns
 ///
-/// Returns `Some(String)` with the path of the directory containing the `vite.config.[ts|js]` file,
+/// Returns `Some(String)` with the path of the directory containing the `vite.config.[ts|js|mjs|mts]` file,
 /// if found. Otherwise, returns `None` if the file is not located or an error occurs during traversal.
 ///
 /// # Example
@@ -126,8 +140,12 @@ pub fn try_find_vite_dir() -> Option<String> {
 
     // Continue traversing upwards in the directory hierarchy until the root directory is reached.
     while cwd != std::path::Path::new("/") {
-        // Check if 'vite.config.ts' exists in the current directory.
-        if cwd.join("vite.config.ts").exists() || cwd.join("vite.config.js").exists() {
+        // Check if vite.config exists in the current directory (any extension)
+        if cwd.join("vite.config.ts").exists()
+            || cwd.join("vite.config.js").exists()
+            || cwd.join("vite.config.mts").exists()
+            || cwd.join("vite.config.mjs").exists()
+        {
             // If found, convert the path to a `String` and return it.
             return Some(cwd.to_str()?.to_string());
         }
@@ -140,6 +158,6 @@ pub fn try_find_vite_dir() -> Option<String> {
         }
     }
 
-    // Return `None` if 'vite.config.[ts|js]' was not found.
+    // Return `None` if vite.config was not found.
     None
 }

@@ -27,16 +27,7 @@ default:
 dev *args:
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 3000
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 8000
-  @just dev-frontend &
-  @just dev-backend {{args}}
-
-[private]
-dev-backend *args:
   @watchexec -r -e rs -- cargo run -q -- serve --port 3000 {{args}}
-
-[private]
-dev-frontend:
-  @pnpm run dev
 
 [group('Development Tasks')]
 [doc('Run development for CLI')]

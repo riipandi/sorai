@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use type_safe_id::{StaticType, TypeSafeId};
 
-use crate::http::response::{ApiResponse, ErrorCode, ErrorTypeKind, RequestId, create_error};
+use crate::http::response::{create_error, ApiResponse, ErrorCode, ErrorTypeKind, RequestId};
 
 /// Chat completion type for TypeID
 #[derive(Default)]

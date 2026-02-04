@@ -56,19 +56,12 @@ log_slow_requests_only = false
 [cors]
 # Enable or disable CORS (Cross-Origin Resource Sharing)
 enabled = true
-# Allowed origins - use ["*"] for any origin, or specify domains like ["http://localhost:3000", "https://example.com"]
+# Allowed origins - use ["*"] for any origin, or specify domains like ["http://localhost", "https://example.com"]
 allow_origins = ["*"]
 # Allowed HTTP methods
 allow_methods = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"]
 # Allowed request headers
-allow_headers = [
-  "accept",
-  "accept-language",
-  "authorization",
-  "content-type",
-  "user-agent",
-  "x-requested-id"
-]
+allow_headers = ["accept", "accept-language", "authorization", "content-type", "user-agent", "x-requested-id"]
 # Headers to expose to the browser
 expose_headers = []
 # Allow credentials (cookies, authorization headers, etc.)

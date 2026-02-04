@@ -67,7 +67,7 @@ function RouteComponent() {
     }
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     e.stopPropagation()
     form.handleSubmit()

@@ -1,4 +1,5 @@
 pub mod completions;
+#[cfg(not(debug_assertions))]
 pub mod spa;
 pub mod system;
 

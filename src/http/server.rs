@@ -270,6 +270,19 @@ impl HttpServer {
         // Initialize tracing with config
         self.init_tracing();
 
+        // Setup Vite dev server in debug mode
+        #[cfg(debug_assertions)]
+        {
+            use vite_axum::ViteProxyOptions;
+            ViteProxyOptions::new()
+                .port(8000)
+                .build()
+                .expect("Failed to configure Vite plugin");
+
+            #[allow(clippy::zombie_processes)]
+            vite_axum::start_vite_server().expect("Failed to start Vite dev server");
+        }
+
         // Setup Prometheus metrics recorder
         let prometheus_handle = setup_metrics_recorder();
 
