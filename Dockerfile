@@ -80,12 +80,77 @@ LABEL org.opencontainers.image.authors="Aris Ripandi"
 LABEL org.opencontainers.image.vendor="Aris Ripandi"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
-# Optional: read application environment variables
+# App Configuration
+ARG SORAI_APP_MODE=production
+ARG SORAI_APP_SECRET_KEY
+ARG SORAI_JWT_SECRET_KEY
+ARG SORAI_JWT_ACCESS_TOKEN_EXPIRY=900
+ARG SORAI_JWT_REFRESH_TOKEN_EXPIRY=7200
+ARG SORAI_SESSION_STORAGE=database
+
+# Logging Configuration
+ARG SORAI_LOG_LEVEL=info
+ARG SORAI_LOG_SHOW_TIMESTAMP=true
+ARG SORAI_LOG_ROTATION=daily
+ARG SORAI_LOG_SHOW_MODULE=true
+ARG SORAI_LOG_REQUEST_SAMPLING=100
+ARG SORAI_LOG_SLOW_REQUESTS_ONLY=false
+ARG SORAI_LOG_SLOW_THRESHOLD_MS=1000
+ARG SORAI_LOG_ANALYTICS_MODE=full
+
+# CORS Configuration
+ARG SORAI_CORS_ENABLED=true
+ARG SORAI_CORS_ALLOW_ORIGINS
+ARG SORAI_CORS_ALLOW_METHODS
+ARG SORAI_CORS_ALLOW_HEADERS
+ARG SORAI_CORS_ALLOW_CREDENTIALS
+ARG SORAI_CORS_MAX_AGE=3600
+
+# Database Configuration
+ARG SORAI_DATABASE_AUTO_MIGRATE=true
+ARG SORAI_DATABASE_URL
+ARG SORAI_DATABASE_TOKEN
+
+# Mailer Configuration
+ARG MAILER_FROM_EMAIL
+ARG MAILER_FROM_NAME
+ARG MAILER_SMTP_HOST
+ARG MAILER_SMTP_PORT
+ARG MAILER_SMTP_USERNAME
+ARG MAILER_SMTP_PASSWORD
+ARG MAILER_SMTP_SECURE
+
+# Storage Configuration
+ARG STORAGE_S3_ACCESS_KEY_ID
+ARG STORAGE_S3_SECRET_ACCESS_KEY
+ARG STORAGE_S3_BUCKET_DEFAULT
+ARG STORAGE_S3_FORCE_PATH_STYLE
+ARG STORAGE_S3_PATH_PREFIX
+ARG STORAGE_S3_ENDPOINT_URL
+ARG STORAGE_S3_PUBLIC_URL
+ARG STORAGE_S3_REGION
+ARG STORAGE_S3_SIGNED_URL_EXPIRES
+ARG STORAGE_MAX_UPLOAD_SIZE
+
+# Provider Configuration
+ARG PROVIDER_OPENAI_API_KEY
+ARG PROVIDER_OPENAI_BASE_URL
+ARG PROVIDER_ANTHROPIC_API_KEY
+ARG PROVIDER_ANTHROPIC_BASE_URL
+ARG PROVIDER_BEDROCK_API_KEY
+ARG PROVIDER_BEDROCK_ACCESS_KEY
+ARG PROVIDER_BEDROCK_BASE_URL
+ARG PROVIDER_COHERE_API_KEY
+ARG PROVIDER_COHERE_BASE_URL
+ARG PROVIDER_AZURE_OPENAI_API_KEY
+ARG PROVIDER_AZURE_OPENAI_ENDPOINT
+ARG PROVIDER_VERTEX_PROJECT_ID
+ARG PROVIDER_VERTEX_CREDENTIALS
+ARG PROVIDER_VERTEX_BASE_URL
 
 # Copy the build output files and necessary utilities from previous stage.
 # To enhance security, consider avoiding the copying of sysutils.
 COPY --from=base --chown=root:root --chmod=0775 /usr/bin/tini /usr/bin/tini
-COPY --from=builder --chown=nonroot:nonroot /usr/src/config.toml.example /etc/sorai.toml
 COPY --from=builder --chown=nonroot:nonroot /usr/src/sorai /usr/bin/sorai
 COPY --from=builder --chown=nonroot:nonroot /data /data
 
@@ -95,7 +160,7 @@ ENV RUST_LOG=$RUST_LOG HOST=$HOST PORT=$PORT
 ENV TINI_SUBREAPER=true PATH="/usr/bin:$PATH"
 
 # Define volumes for persistent storage.
-VOLUME /data /etc/sorai.toml
+VOLUME /data
 
 WORKDIR /data
 USER nonroot:nonroot
@@ -105,4 +170,4 @@ EXPOSE $PORT/tcp
 # HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 CMD sorai healthcheck
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sorai", "--config", "/etc/sorai.toml", "serve"]
+CMD ["sorai", "--data-dir", "/data", "serve"]

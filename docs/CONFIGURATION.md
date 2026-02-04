@@ -27,6 +27,7 @@ Sorai uses environment variables for configuration. You can set these variables 
 | `SORAI_JWT_SECRET_KEY`           | -             | Secret key for JWT token encryption              | Yes*     |
 | `SORAI_JWT_ACCESS_TOKEN_EXPIRY`  | `900`         | JWT access token expiry time in seconds          | No       |
 | `SORAI_JWT_REFRESH_TOKEN_EXPIRY` | `7200`        | JWT refresh token expiry time in seconds         | No       |
+| `SORAI_SESSION_STORAGE`          | `database`    | Session storage type: `database`, `redis`        | No       |
 
 *Required in production mode
 
@@ -64,11 +65,6 @@ Sorai uses environment variables for configuration. You can set these variables 
 | `SORAI_DATABASE_TOKEN`        | -       | Database authentication token      | Conditional |
 | `SORAI_DATABASE_AUTO_MIGRATE` | `false` | Run database migrations on startup | No          |
 
-## Session Configuration
-
-| Variable                | Default    | Description                               | Required |
-|-------------------------|------------|-------------------------------------------|----------|
-| `SORAI_SESSION_STORAGE` | `database` | Session storage type: `database`, `redis` | No       |
 
 ## Mailer Configuration
 

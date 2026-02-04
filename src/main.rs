@@ -8,7 +8,7 @@ use sorai::{Config, http::HttpServer};
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
-    /// Sets a custom env file
+    /// Sets a custom environment variable file
     #[arg(long, value_name = "FILE", global = true)]
     env_file: Option<PathBuf>,
     /// Sets the data directory for application data

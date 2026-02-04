@@ -27,14 +27,14 @@ default:
 dev *args:
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 3000
   @pnpm --silent --package=kill-port-process-cli dlx kill-port 8000
-  @watchexec -r -e rs -- cargo run -q -- serve --data-dir .data \
+  @watchexec -r -e rs -- cargo run -q -- serve --data-dir data \
     --port 3000 --env-file .env.local {{args}}
 
 [group('Development Tasks')]
 [doc('Run development for CLI')]
 [no-exit-message]
 run *args:
-  @cargo run -q -- {{args}}
+  @cargo run -q -- --env-file .env.local {{args}}
 
 [group('Development Tasks')]
 [doc('Build the application (release)')]
@@ -53,14 +53,14 @@ build *args:
 [no-exit-message]
 start *args:
   @echo "Starting {{app_identifier}} v{{app_version}} in release mode..."
-  @target/release/{{app_identifier}} {{args}}
+  @target/release/{{app_identifier}} --env-file .env.local {{args}}
 
 [group('Development Tasks')]
 [doc('Start the application from build (debug)')]
 [no-exit-message]
 start-debug *args:
   @echo "Starting {{app_identifier}} v{{app_version}} in debug mode..."
-  @target/debug/{{app_identifier}} {{args}}
+  @target/debug/{{app_identifier}} --env-file .env.local {{args}}
 
 [group('Development Tasks')]
 [doc('Tests the application')]
@@ -104,14 +104,14 @@ docker-build *args:
 [group('Docker Tasks')]
 [doc('Run the Docker image')]
 docker-run *args:
-  @docker run --network=host --rm -it -v ./.data:/data:rw \
+  @docker run --network=host --rm -it -v ./data:/data:rw \
     {{app_image}}:{{app_version}} {{args}}
 
 [group('Docker Tasks')]
 [doc('Debug the Docker image')]
 [no-exit-message]
 docker-shell *args:
-  @docker run --network=host --rm -it -v ./.data:/data:rw \
+  @docker run --network=host --rm -it -v ./data:/data:rw \
     --entrypoint sh {{app_image}}:{{app_version}}-debug {{args}}
 
 [group('Docker Tasks')]

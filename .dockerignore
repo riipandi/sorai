@@ -26,9 +26,12 @@ README.md
 DEPLOY.md
 *.profraw
 *.log
-.env*
+.env.*
+!.env.example
 docker-compose*.yaml
 compose*.yaml
+/docs/
+/data/
 /storage/
 /specs/
 target/
