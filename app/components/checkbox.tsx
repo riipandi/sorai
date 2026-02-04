@@ -22,7 +22,7 @@ import { clx, tv } from '#/utils/variant'
 export const checkboxStyles = tv({
   slots: {
     root: [
-      'border-input-border bg-input shadow-input flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-xs border',
+      'border-input-border bg-input shadow-input flex size-4 shrink-0 cursor-pointer items-center justify-center rounded border',
       'outline-primary focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
       'data-checked:bg-primary data-checked:border-primary',
       'hover:border-input-accent-border transition-colors duration-75',

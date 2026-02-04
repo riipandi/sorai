@@ -57,7 +57,7 @@ const autocompleteVariants = tv({
       'max-h-[min(23rem,var(--available-height))] overflow-y-auto p-1 dark:scheme-dark'
     ],
     group: 'pb-1.5 last:pb-0',
-    groupLabel: 'text-dimmed px-2.5 py-1 text-base font-medium',
+    groupLabel: 'text-dimmed px-2.5 py-1 text-base',
     row: '',
     item: [
       'text-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2',

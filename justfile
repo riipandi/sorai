@@ -48,9 +48,9 @@ run *args:
 build *args:
   @echo "Building {{app_identifier}} v{{app_version}} frontend..."
   @pnpm --silent run build
-  @echo "Building {{app_identifier}} v{{app_version}} in release mode..."
+  @echo "Compiling {{app_identifier}} v{{app_version}} in release mode..."
   @cargo build --release --locked {{args}}
-  @echo "Building {{app_identifier}} v{{app_version}} in debug mode..."
+  @echo "Compiling {{app_identifier}} v{{app_version}} in debug mode..."
   @cargo build --locked {{args}}
   @ls -lh target/{debug,release}/{{app_identifier}}
 

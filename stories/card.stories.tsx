@@ -330,9 +330,8 @@ export const LoginForm: Story = {
             <Input id='password' type='password' placeholder='Enter your password' />
           </Field>
           <Button
-            variant='primary'
             block
-            size='lg'
+            variant='primary'
             progress={pending}
             onClick={() => {
               setPending(true)
