@@ -1,4 +1,5 @@
 pub mod completions;
+pub mod spa;
 pub mod system;
 
 // TODO: Add additional handler modules:

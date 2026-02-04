@@ -28,6 +28,8 @@ toml = "0.9.8"
 tower = { version = "0.5.3", features = ["full"] }
 tower-http = { version = "0.6.8", features = ["cors", "request-id", "timeout", "trace"] }
 tracing = "0.1.44"
+rust-embed = { version = "8.5.0", features = ["include-exclude", "interpolate-folder-path"] }
+mime_guess = "2.0.5"
 tracing-appender = "0.2.4"
 tracing-subscriber = { version = "0.3.22", features = ["chrono", "env-filter", "time"] }
 turso = "0.4.4"

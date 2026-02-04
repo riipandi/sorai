@@ -1,6 +1,6 @@
-use super::handler::{completions, system};
-use axum::routing::{get, post};
+use super::handler::{completions, spa, system};
 use axum::Router;
+use axum::routing::{get, post};
 use metrics_exporter_prometheus::PrometheusHandle;
 
 /// Create application router with all routes
@@ -10,6 +10,14 @@ pub fn create_router(prometheus_handle: PrometheusHandle) -> Router {
         .route("/", get(system::index))
         .route("/healthz", get(system::health_check))
         .route("/metrics", get(system::metrics))
+        // Static assets routes - serve embedded SPA assets
+        .route("/assets/{*path}", get(spa::assets_handler))
+        .route("/images/{*path}", get(spa::images_handler))
+        // Favicon routes - serve embedded SPA favicons
+        .route("/favicon.ico", get(spa::favicon_ico))
+        .route("/favicon.png", get(spa::favicon_png))
+        .route("/favicon.svg", get(spa::favicon_svg))
+        .route("/robots.txt", get(spa::robots_txt))
         // API routes with /api prefix
         .nest(
             "/api",
@@ -18,13 +26,12 @@ pub fn create_router(prometheus_handle: PrometheusHandle) -> Router {
                 .route("/v1/chat/completions", post(completions::chat_completions))
                 .route("/v1/text/completions", post(completions::text_completions)),
         )
-        // SPA routes with /ui prefix
+        // SPA routes with /ui prefix - serve embedded static files
         .nest(
             "/ui",
             Router::new()
-                .route("/", get(system::spa_wip))
-                .route("/ui", get(system::spa_wip))
-                .fallback(get(system::spa_wip)),
+                .route("/", get(spa::spa_index))
+                .route("/{*path}", get(spa::spa_handler)),
         )
         // Fallback handler for 404 routes - public
         .fallback(system::not_found_handler)
