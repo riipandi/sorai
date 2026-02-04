@@ -80,10 +80,10 @@ createRoot(rootElement).render(
     <App
       routes={appRoutes}
       apiUrl={import.meta.env.PUBLIC_API_BASE_URL ?? '/api'}
+      basePath={import.meta.env.PUBLIC_UI_BASE_URL ?? '/ui'}
       logLevel={import.meta.env.DEV ? 'debug' : 'info'}
       devTools={devToolsOptions}
       queryClient={queryClient}
-      basePath='/'
     />
   </StrictMode>
 )

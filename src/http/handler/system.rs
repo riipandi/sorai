@@ -20,6 +20,12 @@ pub async fn index(RequestId(request_id): RequestId) -> impl IntoResponse {
     ApiResponse::success_with_message((), "All is well".to_string(), request_id)
 }
 
+/// SPA WIP endpoint handler
+/// Public endpoint - no authentication required
+pub async fn spa_wip(RequestId(request_id): RequestId) -> impl IntoResponse {
+    ApiResponse::success_with_message((), "WIP".to_string(), request_id)
+}
+
 /// Health check endpoint handler
 /// Public endpoint - no authentication required
 pub async fn health_check(RequestId(request_id): RequestId) -> impl IntoResponse {
@@ -32,12 +38,6 @@ pub async fn health_check(RequestId(request_id): RequestId) -> impl IntoResponse
         "healthy".to_string(),
         request_id,
     )
-}
-
-/// API status endpoint handler
-/// Public endpoint - no authentication required
-pub async fn status(RequestId(request_id): RequestId) -> impl IntoResponse {
-    ApiResponse::success_with_message((), "Sorai Server is running".to_string(), request_id)
 }
 
 /// Metrics endpoint handler
