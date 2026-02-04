@@ -216,7 +216,7 @@ export interface ToastProps extends Omit<
 }
 
 export function Toast({
-  timeout = 3000,
+  timeout = 5000,
   limit = 5,
   showCloseButton = false,
   ...props

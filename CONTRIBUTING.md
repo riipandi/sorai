@@ -347,7 +347,7 @@ sorai debug
 cargo run -- serve --config /path/to/config.toml
 
 # Start server with config file and override host/port
-cargo run -- serve --config config.toml --host 0.0.0.0 --port 3000
+cargo run -- serve --config config.toml --host 0.0.0.0 --port 8000
 
 # Debug configuration
 cargo run -- debug --config config.toml

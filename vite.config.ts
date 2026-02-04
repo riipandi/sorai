@@ -35,15 +35,15 @@ export default defineConfig({
     chunkSizeWarningLimit: 1024 * 2,
     minify: isProduction ? 'oxc' : false
   },
-  preview: { port: 3000, strictPort: true },
+  preview: { port: 8000, strictPort: true },
   clearScreen: false,
   server: {
-    port: 3000,
+    port: 8000,
     strictPort: true,
     cors: { origin: '*' },
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:3000',
         rewrite: (path) => path.replace(/^\/api/, ''),
         changeOrigin: true
       }

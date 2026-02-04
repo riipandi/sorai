@@ -30,7 +30,7 @@ dev *args:
 
 [private]
 dev-backend *args:
-  @watchexec -r -e rs -- cargo run -q -- serve {{args}}
+  @watchexec -r -e rs -- cargo run -q -- serve --port 3000 {{args}}
 
 [private]
 dev-frontend:
