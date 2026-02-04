@@ -14,7 +14,7 @@ edition = "2024"
 axum = { version = "0.8.8", features = ["macros"] }
 axum-extra = { version = "0.12.5", features = ["json-lines", "typed-header"] }
 chrono = { version = "0.4.43", features = ["serde"] }
-clap = "4.5.55"
+clap = "4.5.57"
 clap_derive = "4.5.55"
 metrics = { version = "0.24.3", default-features = false }
 metrics-exporter-prometheus = { version = "0.18.1", default-features = false }
@@ -30,7 +30,7 @@ tower-http = { version = "0.6.8", features = ["cors", "request-id", "timeout", "
 tracing = "0.1.44"
 tracing-appender = "0.2.4"
 tracing-subscriber = { version = "0.3.22", features = ["chrono", "env-filter", "time"] }
-turso = "0.4.3"
+turso = "0.4.4"
 type-safe-id = { version = "0.3.3", features = ["serde"] }
 
 # Optimized for bundle size. If you want faster builds comment out/delete this section.

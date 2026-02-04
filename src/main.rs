@@ -55,7 +55,7 @@ async fn main() {
             let mut config = match Config::load(config_path).await {
                 Ok(config) => config,
                 Err(e) => {
-                    eprintln!("❌ Failed to load config: {e}");
+                    eprintln!("Failed to load config: {e}");
                     std::process::exit(1);
                 }
             };
@@ -71,7 +71,7 @@ async fn main() {
             // Create and start HTTP server
             let server = HttpServer::new(config);
             if let Err(e) = server.start().await {
-                eprintln!("💥 Failed to start server: {}", e);
+                eprintln!("Failed to start server: {}", e);
                 std::process::exit(1);
             }
         }
@@ -83,7 +83,7 @@ async fn main() {
             let config = match Config::load(config_path).await {
                 Ok(config) => config,
                 Err(e) => {
-                    eprintln!("❌ Failed to load config: {e}");
+                    eprintln!("Failed to load config: {e}");
                     std::process::exit(1);
                 }
             };

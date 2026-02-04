@@ -1,9 +1,9 @@
 use super::router::create_router;
 use crate::config::Config;
 use crate::http::middleware::MakeTypeSafeRequestId;
-use crate::http::middleware::{connection_info_middleware, create_cors_layer, track_metrics, ConnectionInfo};
+use crate::http::middleware::{ConnectionInfo, connection_info_middleware, create_cors_layer, track_metrics};
 use crate::metrics::{record_server_info, setup_metrics_recorder};
-use crate::utils::time::{format_timestamp_readable, PreciseTimeFormat};
+use crate::utils::time::{PreciseTimeFormat, format_timestamp_readable};
 use axum::extract::Request;
 use axum::http::{HeaderName, StatusCode};
 use axum::middleware;
@@ -77,7 +77,7 @@ impl HttpServer {
             .and_then(|auth| {
                 if auth.starts_with("Bearer ") {
                     let key = &auth[7..]; // Remove "Bearer " prefix
-                                          // Only show first 8 characters for security
+                    // Only show first 8 characters for security
                     if key.len() > 8 {
                         Some(format!("{}***", &key[..8]))
                     } else {
@@ -141,10 +141,10 @@ impl HttpServer {
             (true, true, true) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
+                        "Failed to create log directory '{}': {}",
                         self.config.logging.log_directory, e
                     );
-                    eprintln!("📝 Falling back to console-only logging");
+                    eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
                         .with(env_filter)
@@ -177,10 +177,10 @@ impl HttpServer {
             (true, true, false) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
+                        "Failed to create log directory '{}': {}",
                         self.config.logging.log_directory, e
                     );
-                    eprintln!("📝 Falling back to console-only logging");
+                    eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
                         .with(env_filter)
@@ -213,10 +213,10 @@ impl HttpServer {
             (true, false, true) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
+                        "Failed to create log directory '{}': {}",
                         self.config.logging.log_directory, e
                     );
-                    eprintln!("📝 Falling back to console-only logging");
+                    eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
                         .with(env_filter)
@@ -249,10 +249,10 @@ impl HttpServer {
             (true, false, false) => {
                 if let Err(e) = std::fs::create_dir_all(&self.config.logging.log_directory) {
                     eprintln!(
-                        "❌ Failed to create log directory '{}': {}",
+                        "Failed to create log directory '{}': {}",
                         self.config.logging.log_directory, e
                     );
-                    eprintln!("📝 Falling back to console-only logging");
+                    eprintln!("Falling back to console-only logging");
 
                     tracing_subscriber::registry()
                         .with(env_filter)
@@ -408,35 +408,40 @@ impl HttpServer {
         let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
         let app_env = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
 
-        tracing::info!("🚀 Starting Sorai HTTP Server");
-        tracing::info!("📡 Listening on: http://{}", address);
-        tracing::info!("🖥️  Environment: {}", app_env);
-        tracing::debug!("🎱 Pool Size: {}", self.config.sorai.pool_size);
-        tracing::debug!("⏱️  Timeout Request: {}s", self.config.sorai.timeout_request);
-        tracing::debug!("📝 Log Level: {}", self.config.logging.level);
+        tracing::info!("Starting Sorai HTTP Server");
+        tracing::info!("Listening on: http://{}", address);
+        tracing::info!("Environment: {}", app_env);
 
         let file_logging_enabled = self.parse_rotation().is_some();
-        tracing::debug!(
-            "📄 Log to File: {}",
-            if file_logging_enabled { "enabled" } else { "disabled" }
+
+        tracing::info!(
+            "Log config: level={} log_to_file={} log_rotation={} log_path={}",
+            self.config.logging.level,
+            file_logging_enabled,
+            if file_logging_enabled {
+                self.config.logging.rotation
+            } else {
+                "disabled".to_string()
+            },
+            if file_logging_enabled {
+                self.config.logging.log_directory
+            } else {
+                "disabled".to_string()
+            },
         );
 
-        if file_logging_enabled {
-            tracing::debug!("📁 Log Directory: {}", self.config.logging.log_directory);
-            tracing::debug!("🔄 Log Rotation: {}", self.config.logging.rotation);
-        }
-
         if cors_enabled {
+            tracing::debug!("CORS: Allow headers = {}", self.config.cors.allow_headers.join(", "));
             match self.config.cors.allow_origins.as_slice() {
                 [origin] if origin == "*" => {
-                    tracing::info!("🌐 CORS enabled. Allow origins = * (any)");
+                    tracing::info!("CORS enabled. Allow origins = * (any)");
                 }
                 origins if origins.is_empty() => {
-                    tracing::warn!("🌐 CORS enabled but no origins configured");
+                    tracing::warn!("CORS enabled but no origins configured");
                 }
                 origins => {
                     tracing::info!(
-                        "🌐 CORS enabled. Allow origins = {} (total: {})",
+                        "CORS enabled. Allow origins = {} (total: {})",
                         origins.join(", "),
                         origins.len()
                     );
@@ -444,24 +449,24 @@ impl HttpServer {
             }
         }
 
-        tracing::info!("🕐 Server started at: {}", format_timestamp_readable());
+        tracing::info!("Server started at: {}", format_timestamp_readable());
 
         let listener = match tokio::net::TcpListener::bind(&address).await {
             Ok(listener) => listener,
             Err(e) => {
-                tracing::error!("❌ Failed to bind to address {}: {}", address, e);
+                tracing::error!("Failed to bind to address {}: {}", address, e);
                 std::process::exit(1);
             }
         };
 
-        tracing::info!("🎯 Server ready to accept connections");
+        tracing::info!("Server ready to accept connections");
 
         // Use axum::serve with ConnectInfo to capture client socket addresses
         if let Err(e) = axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>())
             .with_graceful_shutdown(Self::shutdown_signal())
             .await
         {
-            tracing::error!("💥 Server error: {}", e);
+            tracing::error!("Server error: {}", e);
             std::process::exit(1);
         }
 
@@ -489,7 +494,7 @@ impl HttpServer {
                 tracing::info!("👋 Ctrl+C received, shutting down...");
             }
             _ = terminate => {
-                tracing::info!("🔄 Termination signal received, shutting down...");
+                tracing::info!("Termination signal received, shutting down...");
             }
         }
     }
