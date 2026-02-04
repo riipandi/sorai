@@ -36,9 +36,11 @@ export default defineConfig({
     minify: isProduction ? 'oxc' : false
   },
   preview: { port: 3000, strictPort: true },
+  clearScreen: false,
   server: {
     port: 3000,
     strictPort: true,
+    cors: { origin: '*' },
     proxy: {
       '/api': {
         target: 'http://localhost:8000',

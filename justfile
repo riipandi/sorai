@@ -20,11 +20,21 @@ default:
 
 #----- Development and Build tasks --------------------------------------------
 
+# FIXME: `error: Interrupted by SIGINT`
 [group('Development Tasks')]
-[doc('Start development server')]
+[doc('Start development server (frontend + backend)')]
 [no-exit-message]
 dev *args:
+  @just dev-frontend &
+  @just dev-backend {{args}}
+
+[private]
+dev-backend *args:
   @watchexec -r -e rs -- cargo run -q -- serve {{args}}
+
+[private]
+dev-frontend:
+  @pnpm run dev
 
 [group('Development Tasks')]
 [doc('Run development for CLI')]
@@ -36,6 +46,8 @@ run *args:
 [doc('Build the application (release)')]
 [no-exit-message]
 build *args:
+  @echo "Building {{app_identifier}} v{{app_version}} frontend..."
+  @pnpm --silent run build
   @echo "Building {{app_identifier}} v{{app_version}} in release mode..."
   @cargo build --release --locked {{args}}
   @echo "Building {{app_identifier}} v{{app_version}} in debug mode..."
