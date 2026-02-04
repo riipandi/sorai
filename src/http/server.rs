@@ -9,6 +9,7 @@ use axum::http::{HeaderName, StatusCode};
 use axum::middleware;
 use axum::response::Response;
 use std::net::SocketAddr;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
 use tokio::signal;
 use tower::ServiceBuilder;
@@ -161,11 +162,14 @@ impl HttpServer {
                         .build(&self.config.logging.log_directory)
                         .expect("failed to initialize rolling file appender");
 
+                    // Use non-blocking writer for better performance
+                    let (non_blocking_appender, _guard) = tracing_appender::non_blocking(file_appender);
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
                             fmt::layer()
-                                .with_writer(file_appender)
+                                .with_writer(non_blocking_appender)
                                 .with_ansi(false)
                                 .compact()
                                 .with_timer(PreciseTimeFormat)
@@ -197,11 +201,14 @@ impl HttpServer {
                         .build(&self.config.logging.log_directory)
                         .expect("failed to initialize rolling file appender");
 
+                    // Use non-blocking writer for better performance
+                    let (non_blocking_appender, _guard) = tracing_appender::non_blocking(file_appender);
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
                             fmt::layer()
-                                .with_writer(file_appender)
+                                .with_writer(non_blocking_appender)
                                 .with_ansi(false)
                                 .compact()
                                 .with_timer(PreciseTimeFormat)
@@ -233,11 +240,14 @@ impl HttpServer {
                         .build(&self.config.logging.log_directory)
                         .expect("failed to initialize rolling file appender");
 
+                    // Use non-blocking writer for better performance
+                    let (non_blocking_appender, _guard) = tracing_appender::non_blocking(file_appender);
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
                             fmt::layer()
-                                .with_writer(file_appender)
+                                .with_writer(non_blocking_appender)
                                 .with_ansi(false)
                                 .compact()
                                 .with_timer(PreciseTimeFormat)
@@ -269,11 +279,14 @@ impl HttpServer {
                         .build(&self.config.logging.log_directory)
                         .expect("failed to initialize rolling file appender");
 
+                    // Use non-blocking writer for better performance
+                    let (non_blocking_appender, _guard) = tracing_appender::non_blocking(file_appender);
+
                     tracing_subscriber::registry()
                         .with(env_filter)
                         .with(
                             fmt::layer()
-                                .with_writer(file_appender)
+                                .with_writer(non_blocking_appender)
                                 .with_ansi(false)
                                 .compact()
                                 .with_timer(PreciseTimeFormat)
@@ -340,47 +353,83 @@ impl HttpServer {
             false
         };
 
+        // Clone config values for use in closures
+        let request_sampling = self.config.logging.request_sampling;
+        let log_slow_only = self.config.logging.log_slow_requests_only;
+        let slow_threshold = self.config.logging.slow_threshold_ms;
+
+        // Create sampling counter (0-99, wraps around)
+        let sample_counter = std::sync::Arc::new(AtomicUsize::new(0));
+
         let trace_layer_for_http = TraceLayer::new_for_http()
             .make_span_with(|_request: &Request<_>| {
                 // Create empty span to avoid field duplication in logs
                 tracing::Span::none()
             })
-            .on_request(|request: &Request<_>, _span: &Span| {
-                let request_id = Self::extract_request_id(request);
-                let conn_info = ConnectionInfo::from_request_or_default(request);
+            .on_request({
+                let sample_counter = sample_counter.clone();
+                move |request: &Request<_>, _span: &Span| {
+                    // Check if we should log this request based on sampling
+                    let should_sample = if request_sampling >= 100 {
+                        true
+                    } else if request_sampling == 0 {
+                        false
+                    } else {
+                        let count = sample_counter.fetch_add(1, Ordering::Relaxed);
+                        (count % 100) < request_sampling as usize
+                    };
 
-                // Use short user agent for cleaner logs
-                let short_ua = conn_info.short_user_agent();
+                    if !should_sample {
+                        return;
+                    }
 
-                // Add bot indicator if detected
-                let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
+                    let request_id = Self::extract_request_id(request);
+                    let conn_info = ConnectionInfo::from_request_or_default(request);
 
-                // Extract API key for logging (masked for security)
-                let api_key_info = Self::extract_api_key_for_logging(request)
-                    .map(|key| format!(" | Key: {}", key))
-                    .unwrap_or_default();
+                    // Use short user agent for cleaner logs
+                    let short_ua = conn_info.short_user_agent();
 
-                tracing::info!(
-                    "[REQ:{}] {} {} | IP: {} | UA: {}{}{}",
-                    request_id,
-                    request.method(),
-                    request.uri().path(),
-                    conn_info.client_ip,
-                    short_ua,
-                    bot_indicator,
-                    api_key_info
-                );
+                    // Add bot indicator if detected
+                    let bot_indicator = if conn_info.is_bot() { " [BOT]" } else { "" };
+
+                    // Extract API key for logging (masked for security)
+                    let api_key_info = Self::extract_api_key_for_logging(request)
+                        .map(|key| format!(" | Key: {}", key))
+                        .unwrap_or_default();
+
+                    tracing::debug!(
+                        "[REQ:{}] {} {} | IP: {} | UA: {}{}{}",
+                        request_id,
+                        request.method(),
+                        request.uri().path(),
+                        conn_info.client_ip,
+                        short_ua,
+                        bot_indicator,
+                        api_key_info
+                    );
+                }
             })
-            .on_response(|response: &Response, latency: Duration, _span: &Span| {
+            .on_response(move |response: &Response, latency: Duration, _span: &Span| {
                 let status = response.status();
+                let duration_ms = latency.as_millis();
+
+                // Always log errors and slow requests
+                let should_log = !status.is_success() || duration_ms > slow_threshold as u128 || !log_slow_only;
+
+                if !should_log {
+                    return;
+                }
+
                 let duration_str = Self::format_duration(latency);
                 let request_id = Self::extract_request_id_from_response(response);
 
                 // Clean response log with [RES] prefix and precise timing
-                if latency.as_millis() > 1000 {
-                    tracing::info!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
+                if duration_ms > slow_threshold as u128 {
+                    tracing::warn!("[RES:{}] {} {} SLOW", request_id, status.as_u16(), duration_str);
+                } else if !status.is_success() {
+                    tracing::warn!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
                 } else {
-                    tracing::info!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
+                    tracing::debug!("[RES:{}] {} {}", request_id, status.as_u16(), duration_str);
                 }
             })
             .on_failure(|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
@@ -411,11 +460,11 @@ impl HttpServer {
         let app_env = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
 
         if self.config.logging.level.to_lowercase().as_str() == "none" {
-            println!("Starting Sorai HTTP Server on: http://{}", address);
+            println!("Starting Sorai HTTP Server ({})", app_env);
+            println!("Server listening on: http://{}", address);
         } else {
-            tracing::info!("Starting Sorai HTTP Server");
-            tracing::info!("Listening on: http://{}", address);
-            tracing::info!("Environment: {}", app_env);
+            tracing::info!("Starting Sorai HTTP Server ({})", app_env);
+            tracing::info!("Server listening on: http://{}", address);
         }
 
         let file_logging_enabled = self.parse_rotation().is_some();
@@ -457,7 +506,6 @@ impl HttpServer {
 
         if self.config.logging.level.to_lowercase().as_str() == "none" {
             println!("Server started at: {}", format_timestamp_readable());
-            println!("Environment: {}", app_env);
         } else {
             tracing::info!("Server started at: {}", format_timestamp_readable());
         }
@@ -502,7 +550,7 @@ impl HttpServer {
 
         tokio::select! {
             _ = ctrl_c => {
-                tracing::info!("👋 Ctrl+C received, shutting down...");
+                tracing::info!("Ctrl+C received, shutting down...");
             }
             _ = terminate => {
                 tracing::info!("Termination signal received, shutting down...");

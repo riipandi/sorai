@@ -13,14 +13,24 @@ timeout_request = 30
 # Show timestamp in logs (true/false)
 show_timestamp = true
 # Log level: trace, debug, info, warn, error, none (default: info)
+# For high-traffic production, consider using "warn" or "error"
 level = "info"
 # Log directory path (relative to working directory or absolute path)
 log_directory = "/data/logs"
 # Log rotation frequency: minutely, hourly, daily, never, none
 # Use "none" to disable file logging completely (console logging is always enabled)
-rotation = "daily"
+rotation = "hourly"
 # Show module name in logs (true/false) - controls display of module paths like "sorai::http::server:"
-show_module = true
+show_module = false
+# Request sampling rate (0-100). Only log X% of requests. 100 = log all, 0 = log none
+# For production: 10-30%, For development: 100%
+request_sampling = 10
+# Only log slow requests (true/false). When enabled, only requests exceeding slow_threshold_ms are logged
+# Recommended: true for production, false for development
+log_slow_requests_only = false
+# Threshold in milliseconds for considering a request as "slow"
+# Requests exceeding this threshold are always logged regardless of sampling rate
+slow_threshold_ms = 1000
 
 [cors]
 # Enable or disable CORS (Cross-Origin Resource Sharing)
