@@ -21,10 +21,11 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 use crate::proxy_to_vite;
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 
 pub fn create_vite_router() -> Router {
     Router::new()
-        .route("/{file:.*}", get(proxy_to_vite))
-        .route("/node_modules/{file:.*}", get(proxy_to_vite))
+        .route("/", get(proxy_to_vite))
+        .route("/{*path}", get(proxy_to_vite))
+        .route("/node_modules/{*path}", get(proxy_to_vite))
 }

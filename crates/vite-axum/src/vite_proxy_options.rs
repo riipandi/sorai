@@ -161,3 +161,96 @@ pub fn try_find_vite_dir() -> Option<String> {
     // Return `None` if vite.config was not found.
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_creation() {
+        let options = ViteProxyOptions::new();
+        assert_eq!(options.port, None);
+        assert!(options.working_directory.contains("./") || options.working_directory.contains("."));
+        assert_eq!(options.log_level, Some(log::Level::Debug));
+    }
+
+    #[test]
+    fn test_port_builder() {
+        let options = ViteProxyOptions::new().port(3000);
+        assert_eq!(options.port, Some(3000));
+    }
+
+    #[test]
+    fn test_working_directory_builder() {
+        let dir = "/custom/dir";
+        let options = ViteProxyOptions::new().working_directory(dir);
+        assert_eq!(options.working_directory, dir);
+    }
+
+    #[test]
+    fn test_log_level_builder() {
+        let options = ViteProxyOptions::new().log_level(log::Level::Info);
+        assert_eq!(options.log_level, Some(log::Level::Info));
+    }
+
+    #[test]
+    fn test_disable_logging_builder() {
+        let options = ViteProxyOptions::new().disable_logging();
+        assert_eq!(options.log_level, None);
+    }
+
+    #[test]
+    fn test_clone() {
+        let options1 = ViteProxyOptions::new()
+            .port(9999)
+            .working_directory("/test")
+            .log_level(log::Level::Warn);
+
+        let options2 = options1.clone();
+
+        assert_eq!(options1.port, options2.port);
+        assert_eq!(options1.working_directory, options2.working_directory);
+        assert_eq!(options1.log_level, options2.log_level);
+    }
+
+    #[test]
+    fn test_build_and_global() {
+        // Build initial configuration
+        ViteProxyOptions::new()
+            .port(5000)
+            .working_directory("/test/dir")
+            .log_level(log::Level::Error)
+            .build()
+            .unwrap();
+
+        let global = ViteProxyOptions::global();
+        assert_eq!(global.port, Some(5000));
+        assert_eq!(global.working_directory, "/test/dir");
+        assert_eq!(global.log_level, Some(log::Level::Error));
+    }
+
+    #[test]
+    fn test_update_port() {
+        ViteProxyOptions::new().port(3000).build().unwrap();
+
+        ViteProxyOptions::update_port(4000).unwrap();
+
+        let global = ViteProxyOptions::global();
+        assert_eq!(global.port, Some(4000));
+    }
+
+    #[test]
+    fn test_override_global() {
+        // First configuration
+        ViteProxyOptions::new().port(1111).build().unwrap();
+
+        let global1 = ViteProxyOptions::global();
+        assert_eq!(global1.port, Some(1111));
+
+        // Override with new configuration
+        ViteProxyOptions::new().port(2222).build().unwrap();
+
+        let global2 = ViteProxyOptions::global();
+        assert_eq!(global2.port, Some(2222));
+    }
+}

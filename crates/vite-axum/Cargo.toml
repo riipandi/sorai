@@ -18,8 +18,21 @@ http-body-util = ">=0.1"
 log = ">=0.4"
 regex = ">=1"
 strip-ansi-escapes = ">=0.2"
-tokio = { version = ">=1", features = ["rt", "sync"] }
+tokio = { version = ">=1", features = ["rt", "rt-multi-thread", "sync", "signal", "macros"] }
 tower = ">=0.5"
 
 [dev-dependencies]
 env_logger = ">=0"
+tempfile = "3"
+tower-http = { version = ">=0.5", features = ["cors"] }
+hyper = { version = ">=1", features = ["full"] }
+serde_json = ">=1"
+tokio-test = ">=0.4"
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"
+
+[[example]]
+name = "advanced"
+path = "examples/advanced.rs"

@@ -33,7 +33,7 @@ use axum::http::{HeaderMap, Method, StatusCode, Uri};
 use axum::response::{IntoResponse, Response};
 use http_body_util::{BodyExt, Full};
 use hyper::body::Incoming;
-use hyper_util::client::legacy::{connect::HttpConnector, Client};
+use hyper_util::client::legacy::{Client, connect::HttpConnector};
 use hyper_util::rt::TokioExecutor;
 use log::{debug, error, info, trace, warn};
 use regex::Regex;
