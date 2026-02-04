@@ -1,4 +1,4 @@
-# vite-axum
+# Vite Axum
 
 A library for seamlessly integrating Vite development server with Axum web framework.
 
