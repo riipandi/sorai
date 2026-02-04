@@ -1,0 +1,23 @@
+[package]
+name = "vite-axum"
+version = "0.0.1"
+description = "A library for integrating Vite dev server with Axum web framework"
+repository = "https://github.com/riipandi/sorai"
+rust-version = "1.93"
+edition = "2024"
+license = "GPL-3.0"
+
+[dependencies]
+axum = { version = ">=0.7", optional = false }
+hyper = { version = ">=1", optional = false }
+hyper-util = { version = ">=0.1", features = ["client", "http1", "tokio"] }
+http-body-util = { version = ">=0.1", optional = false }
+log = { version = ">=0.4", optional = false }
+anyhow = { version = ">=1.0.5", optional = false }
+tokio = { version = ">=1", features = ["rt", "sync"] }
+regex = ">=1"
+strip-ansi-escapes = ">=0.2"
+tower = { version = ">=0.5", optional = false }
+
+[dev-dependencies]
+env_logger = ">=0"
