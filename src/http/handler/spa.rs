@@ -13,14 +13,47 @@ pub async fn spa_handler(AxumPath(path): AxumPath<String>) -> impl IntoResponse 
     serve_spa_file(&path)
 }
 
-/// Handler for serving assets files (no fallback to index.html)
+/// Handler for serving assets files
 pub async fn assets_handler(AxumPath(path): AxumPath<String>) -> impl IntoResponse {
-    serve_static_file(&format!("assets/{}", path))
+    let asset_path = format!("assets/{}", path);
+    let path = asset_path.trim_start_matches('/');
+
+    match Assets::get(path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(path).first_or_octet_stream().to_string();
+            let content_type = if mime.starts_with("text/") {
+                format!("{}; charset=utf-8", mime)
+            } else {
+                mime
+            };
+
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, content_type)
+                .body(Body::from(content.data.to_vec()))
+                .unwrap()
+        }
+        None => spa_fallback().await.into_response(),
+    }
 }
 
-/// Handler for serving images files (no fallback to index.html)
+/// Handler for serving images files
 pub async fn images_handler(AxumPath(path): AxumPath<String>) -> impl IntoResponse {
-    serve_static_file(&format!("images/{}", path))
+    let asset_path = format!("images/{}", path);
+    let path = asset_path.trim_start_matches('/');
+
+    match Assets::get(path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(path).first_or_octet_stream().to_string();
+
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, mime)
+                .body(Body::from(content.data.to_vec()))
+                .unwrap()
+        }
+        None => spa_fallback().await.into_response(),
+    }
 }
 
 /// Internal function to serve SPA files with fallback to index.html
@@ -53,32 +86,18 @@ fn serve_spa_file(path: &str) -> Response {
             .header(header::CACHE_CONTROL, "no-cache, no-store, must-revalidate")
             .body(Body::from(content.data.to_vec()))
             .unwrap(),
-        None => (StatusCode::NOT_FOUND, "Not Found").into_response(),
-    }
-}
-
-/// Internal function to serve static files (no fallback)
-fn serve_static_file(path: &str) -> Response {
-    let path = path.trim_start_matches('/');
-
-    let asset = Assets::get(path);
-
-    match asset {
-        Some(content) => {
-            let mime = mime_guess::from_path(path).first_or_octet_stream().to_string();
-            let content_type = if mime.starts_with("text/") {
-                format!("{}; charset=utf-8", mime)
-            } else {
-                mime
-            };
-
-            Response::builder()
-                .status(StatusCode::OK)
-                .header(header::CONTENT_TYPE, content_type)
-                .body(Body::from(content.data.to_vec()))
-                .unwrap()
+        None => {
+            // Fall back to SPA index page for client-side routing
+            match Assets::get("index.html") {
+                Some(content) => Response::builder()
+                    .status(StatusCode::OK)
+                    .header(header::CONTENT_TYPE, "text/html; charset=utf-8")
+                    .header(header::CACHE_CONTROL, "no-cache, no-store, must-revalidate")
+                    .body(Body::from(content.data.to_vec()))
+                    .unwrap(),
+                None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+            }
         }
-        None => (StatusCode::NOT_FOUND, "Static file not found").into_response(),
     }
 }
 
@@ -93,12 +112,12 @@ pub async fn spa_index() -> impl IntoResponse {
             .header(header::CACHE_CONTROL, "no-cache, no-store, must-revalidate")
             .body(Body::from(content.data.to_vec()))
             .unwrap(),
-        None => (StatusCode::NOT_FOUND, "index.html not found").into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
     }
 }
 
 /// Fallback handler for SPA routes - serves index.html for client-side routing
-pub async fn spa_fallback() -> impl IntoResponse {
+pub async fn spa_fallback() -> Response {
     let asset = Assets::get("index.html");
 
     match asset {
@@ -108,17 +127,14 @@ pub async fn spa_fallback() -> impl IntoResponse {
             .header(header::CACHE_CONTROL, "no-cache, no-store, must-revalidate")
             .body(Body::from(content.data.to_vec()))
             .unwrap(),
-        None => (StatusCode::INTERNAL_SERVER_ERROR, "index.html not found").into_response(),
+        None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
 }
 
-/// Handler for serving specific static file by name
-pub async fn serve_file(filename: &str) -> impl IntoResponse {
-    let asset = Assets::get(filename);
-
-    match asset {
+pub async fn favicon_ico() -> impl IntoResponse {
+    match Assets::get("favicon.ico") {
         Some(content) => {
-            let mime = mime_guess::from_path(filename).first_or_octet_stream().to_string();
+            let mime = mime_guess::from_path("favicon.ico").first_or_octet_stream().to_string();
 
             Response::builder()
                 .status(StatusCode::OK)
@@ -126,22 +142,47 @@ pub async fn serve_file(filename: &str) -> impl IntoResponse {
                 .body(Body::from(content.data.to_vec()))
                 .unwrap()
         }
-        None => (StatusCode::NOT_FOUND, "File not found").into_response(),
+        None => spa_fallback().await.into_response(),
     }
 }
 
-pub async fn favicon_ico() -> impl IntoResponse {
-    serve_file("favicon.ico").await
-}
-
 pub async fn favicon_png() -> impl IntoResponse {
-    serve_file("favicon.png").await
+    match Assets::get("favicon.png") {
+        Some(content) => {
+            let mime = mime_guess::from_path("favicon.png").first_or_octet_stream().to_string();
+
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, mime)
+                .body(Body::from(content.data.to_vec()))
+                .unwrap()
+        }
+        None => spa_fallback().await.into_response(),
+    }
 }
 
 pub async fn favicon_svg() -> impl IntoResponse {
-    serve_file("favicon.svg").await
+    match Assets::get("favicon.svg") {
+        Some(content) => {
+            let mime = mime_guess::from_path("favicon.svg").first_or_octet_stream().to_string();
+
+            Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, mime)
+                .body(Body::from(content.data.to_vec()))
+                .unwrap()
+        }
+        None => spa_fallback().await.into_response(),
+    }
 }
 
 pub async fn robots_txt() -> impl IntoResponse {
-    serve_file("robots.txt").await
+    match Assets::get("robots.txt") {
+        Some(content) => Response::builder()
+            .status(StatusCode::OK)
+            .header(header::CONTENT_TYPE, "text/plain; charset=utf-8")
+            .body(Body::from(content.data.to_vec()))
+            .unwrap(),
+        None => spa_fallback().await.into_response(),
+    }
 }
