@@ -21,7 +21,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Start the web server
+    /// Start the web server (default port: 8000)
     Serve {
         /// Override host from config
         #[arg(long)]
