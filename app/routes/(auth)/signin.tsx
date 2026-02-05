@@ -77,7 +77,9 @@ function RouteComponent() {
       <Card className='w-full min-w-sm'>
         <CardHeader>
           <CardTitle>Sign in to your account</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardDescription className='text-sm'>
+            Enter your credentials to access your account
+          </CardDescription>
         </CardHeader>
         <CardBody>
           <Activity mode={search.message || submitError ? 'visible' : 'hidden'}>
