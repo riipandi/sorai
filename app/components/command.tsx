@@ -33,7 +33,7 @@ const commandVariants = tv({
     ],
     footer: 'flex items-center gap-5 px-4 pt-2 pb-1',
     footerItem: 'flex items-center gap-2 p-0.5',
-    footerText: 'text-muted text-base font-medium'
+    footerText: 'text-muted text-sm font-medium'
   }
 })
 
