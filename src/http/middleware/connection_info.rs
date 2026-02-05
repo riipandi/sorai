@@ -39,10 +39,10 @@ pub fn extract_client_ip(request: &Request) -> String {
     // Check X-Forwarded header (less common)
     if let Some(forwarded) = request.headers().get("x-forwarded").and_then(|v| v.to_str().ok()) {
         // Parse "for=ip" format
-        if let Some(for_part) = forwarded.split(';').find(|part| part.trim().starts_with("for=")) {
-            if let Some(ip) = for_part.trim().strip_prefix("for=") {
-                return ip.trim_matches('"').to_string();
-            }
+        if let Some(for_part) = forwarded.split(';').find(|part| part.trim().starts_with("for="))
+            && let Some(ip) = for_part.trim().strip_prefix("for=")
+        {
+            return ip.trim_matches('"').to_string();
         }
     }
 
@@ -94,12 +94,11 @@ impl ConnectionInfo {
         // Extract browser name and version from user agent
         let ua = &self.user_agent;
 
-        if ua.contains("Chrome/") {
-            if let Some(start) = ua.find("Chrome/") {
-                if let Some(end) = ua[start..].find(' ') {
-                    return ua[start..start + end].to_string();
-                }
-            }
+        if ua.contains("Chrome/")
+            && let Some(start) = ua.find("Chrome/")
+            && let Some(end) = ua[start..].find(' ')
+        {
+            return ua[start..start + end].to_string();
         } else if ua.contains("Firefox/") {
             if let Some(start) = ua.find("Firefox/") {
                 if let Some(end) = ua[start..].find(' ') {
@@ -108,19 +107,19 @@ impl ConnectionInfo {
                     return ua[start..].to_string();
                 }
             }
-        } else if ua.contains("Safari/") && !ua.contains("Chrome") {
-            if let Some(start) = ua.find("Version/") {
-                if let Some(end) = ua[start..].find(' ') {
-                    return format!("Safari/{}", &ua[start + 8..start + end]);
-                }
-            }
-        } else if ua.contains("curl/") {
-            if let Some(start) = ua.find("curl/") {
-                if let Some(end) = ua[start..].find(' ') {
-                    return ua[start..start + end].to_string();
-                } else {
-                    return ua[start..].to_string();
-                }
+        } else if ua.contains("Safari/")
+            && !ua.contains("Chrome")
+            && let Some(start) = ua.find("Version/")
+            && let Some(end) = ua[start..].find(' ')
+        {
+            return format!("Safari/{}", &ua[start + 8..start + end]);
+        } else if ua.contains("curl/")
+            && let Some(start) = ua.find("curl/")
+        {
+            if let Some(end) = ua[start..].find(' ') {
+                return ua[start..start + end].to_string();
+            } else {
+                return ua[start..].to_string();
             }
         }
 

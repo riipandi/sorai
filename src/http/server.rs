@@ -100,7 +100,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&&self.get_log_dir())
+                        .build(self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -122,7 +122,7 @@ impl HttpServer {
             }
             // File and console, with timestamp but without module for console
             (true, true, false) => {
-                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                if let Err(e) = std::fs::create_dir_all(self.get_log_dir()) {
                     eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
@@ -136,7 +136,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&&self.get_log_dir())
+                        .build(self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -158,7 +158,7 @@ impl HttpServer {
             }
             // File and console, without timestamp but with module for console
             (true, false, true) => {
-                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                if let Err(e) = std::fs::create_dir_all(self.get_log_dir()) {
                     eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
@@ -172,7 +172,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&&self.get_log_dir())
+                        .build(self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -194,7 +194,7 @@ impl HttpServer {
             }
             // File and console, without timestamp and without module for console
             (true, false, false) => {
-                if let Err(e) = std::fs::create_dir_all(&&self.get_log_dir()) {
+                if let Err(e) = std::fs::create_dir_all(self.get_log_dir()) {
                     eprintln!("Failed to create log directory '{}': {}", &self.get_log_dir(), e);
                     eprintln!("Falling back to console-only logging");
 
@@ -208,7 +208,7 @@ impl HttpServer {
                         .rotation(rotation)
                         .filename_prefix(LOG_NAME_PREFIX)
                         .filename_suffix("log")
-                        .build(&&self.get_log_dir())
+                        .build(self.get_log_dir())
                         .expect("failed to initialize rolling file appender");
 
                     // Use non-blocking writer for better performance
@@ -323,9 +323,15 @@ impl HttpServer {
 
         if self.config.logging.level.to_lowercase().as_str() == "none" {
             println!("Starting Sorai HTTP Server ({})", app_env);
+            if let Some(ref env_file) = self.config.env_file {
+                println!("Environment config from: {}", env_file);
+            }
             println!("Server listening on: http://{}", address);
         } else {
             tracing::info!("Starting Sorai HTTP Server ({})", app_env);
+            if let Some(ref env_file) = self.config.env_file {
+                tracing::info!("Environment config from: {}", env_file);
+            }
             tracing::info!("Server listening on: http://{}", address);
         }
 
@@ -353,7 +359,7 @@ impl HttpServer {
                 [origin] if origin == "*" => {
                     tracing::info!("CORS enabled. Allow origins = * (any)");
                 }
-                origins if origins.is_empty() => {
+                [] => {
                     tracing::warn!("CORS enabled but no origins configured");
                 }
                 origins => {

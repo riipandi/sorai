@@ -134,11 +134,11 @@ async fn build_axum_response(response: hyper::Response<Incoming>) -> Response {
 /// Find Vite executable by trying multiple strategies
 fn find_vite_executable(options: &ViteProxyOptions) -> anyhow::Result<String> {
     // Strategy 1: Check environment variable
-    if let Ok(vite_path) = std::env::var("VITE_PATH") {
-        if std::path::Path::new(&vite_path).exists() {
-            debug!("Using VITE_PATH: {}", vite_path);
-            return Ok(vite_path);
-        }
+    if let Ok(vite_path) = std::env::var("VITE_PATH")
+        && std::path::Path::new(&vite_path).exists()
+    {
+        debug!("Using VITE_PATH: {}", vite_path);
+        return Ok(vite_path);
     }
 
     let working_dir = &options.working_directory;

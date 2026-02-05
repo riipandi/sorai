@@ -1,5 +1,5 @@
 use axum::response::{IntoResponse, Response};
-use axum::{extract::FromRequestParts, http::StatusCode, Json};
+use axum::{Json, extract::FromRequestParts, http::StatusCode};
 use serde::{Deserialize, Serialize};
 use type_safe_id::{StaticType, TypeSafeId};
 
@@ -152,11 +152,11 @@ where
     }
 }
 
-impl ErrorReason {
-    pub fn to_string(&self) -> String {
+impl std::fmt::Display for ErrorReason {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ErrorReason::Single(s) => s.clone(),
-            ErrorReason::Multiple(v) => v.join(", "),
+            ErrorReason::Single(s) => write!(f, "{}", s),
+            ErrorReason::Multiple(v) => write!(f, "{}", v.join(", ")),
         }
     }
 }

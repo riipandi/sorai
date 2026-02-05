@@ -167,7 +167,8 @@ USER nonroot:nonroot
 EXPOSE $PORT/tcp
 
 # Healthcheck to monitor application status
-# HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 CMD sorai healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD ["/usr/bin/sorai", "--data-dir", "/data", "hc"]
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["sorai", "--data-dir", "/data", "serve"]

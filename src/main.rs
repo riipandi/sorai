@@ -32,6 +32,9 @@ enum Commands {
     },
     /// Display configuration values in debug mode
     Debug,
+    /// System health check (alias: hc)
+    #[command(alias = "hc")]
+    Healthcheck,
 }
 
 #[tokio::main]
@@ -93,6 +96,20 @@ async fn main() {
             }
 
             config.display_debug_table();
+        }
+        Commands::Healthcheck => {
+            let env_file = cli.env_file.as_ref().map(|p| p.to_string_lossy().to_string());
+
+            match Config::load(env_file) {
+                Ok(_) => {
+                    println!("healthy");
+                    std::process::exit(0);
+                }
+                Err(e) => {
+                    eprintln!("unhealthy: {}", e);
+                    std::process::exit(1);
+                }
+            }
         }
     }
 }

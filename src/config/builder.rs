@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use tabled::{Table, Tabled, settings::Style};
 
 use crate::providers::anthropic::AnthropicConfig;
@@ -17,7 +17,7 @@ use super::session::SessionConfig;
 use super::sorai::SoraiConfig;
 use super::storage::StorageConfig;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Default)]
 pub struct Config {
     #[serde(default)]
     pub sorai: SoraiConfig,
@@ -47,6 +47,8 @@ pub struct Config {
     pub azure_openai: AzureOpenAIConfig,
     #[serde(default)]
     pub vertex: VertexConfig,
+    #[serde(skip)]
+    pub env_file: Option<String>,
 }
 
 #[derive(Tabled)]
@@ -61,14 +63,16 @@ pub struct ConfigItem {
 
 impl Config {
     pub fn load(env_file: Option<String>) -> Result<Self, Box<dyn std::error::Error>> {
-        if let Some(path) = env_file {
-            println!("Loading env file from: {}", path);
+        if let Some(ref path) = env_file {
             dotenvy::from_path(path)?;
         } else {
             dotenvy::dotenv().ok();
         }
 
-        let mut config = Config::default();
+        let mut config = Config {
+            env_file,
+            ..Default::default()
+        };
 
         config.sorai.host = std::env::var("HOST").unwrap_or_else(|_| config.sorai.host.clone());
         config.sorai.port = std::env::var("PORT")

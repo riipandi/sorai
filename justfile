@@ -46,13 +46,13 @@ build *args:
   @cargo build --release --locked {{args}}
   @echo "Compiling {{app_identifier}} v{{app_version}} in debug mode..."
   @cargo build --locked {{args}}
+  @echo "List compiled {{app_identifier}} v{{app_version}} binaries:"
   @ls -lh target/{debug,release}/{{app_identifier}}
 
 [group('Development Tasks')]
 [doc('Start the application from build (release)')]
 [no-exit-message]
 start *args:
-  @echo "Starting {{app_identifier}} v{{app_version}} in release mode..."
   @target/release/{{app_identifier}} --env-file .env.local {{args}}
 
 [group('Development Tasks')]
