@@ -114,7 +114,7 @@ function RouteComponent() {
       <Card className='w-full min-w-sm'>
         <CardHeader>
           <CardTitle>Reset your password</CardTitle>
-          <CardDescription>
+          <CardDescription className='text-sm'>
             {isInvalidToken ? 'Invalid or expired reset token' : 'Enter your new password below'}
           </CardDescription>
         </CardHeader>
@@ -124,8 +124,8 @@ function RouteComponent() {
               <Alert variant='danger'>
                 <Lucide.XCircleIcon />
                 <div>
-                  <AlertTitle>Invalid or expired link</AlertTitle>
-                  <AlertDescription>
+                  <AlertTitle className='text-sm'>Invalid or expired link</AlertTitle>
+                  <AlertDescription className='text-sm'>
                     This password reset link is invalid or has expired. Please request a new one.
                   </AlertDescription>
                 </div>

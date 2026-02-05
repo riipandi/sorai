@@ -14,9 +14,9 @@ import { tv, type VariantProps } from '#/utils/variant'
 
 export const alertStyles = tv({
   base: [
-    'min-h-10 w-full rounded px-2.5 py-1 font-normal',
+    'min-h-10 w-full rounded px-3 py-2 font-normal',
     '[&_svg:not([class*=size-])]:size-4 *:[svg]:shrink-0',
-    'text-foreground flex items-center gap-x-2 gap-y-0.5',
+    'text-foreground flex items-center gap-x-3 gap-y-0.5',
     'has-[>[data-slot=alert-description]]:grid',
     'has-[>[data-slot=alert-description]]:py-2',
     'has-[>svg]:grid-cols-[calc(var(--spacing)*4.5)_1fr_auto]',
@@ -24,8 +24,8 @@ export const alertStyles = tv({
     'not-[:has(>svg)]:*:data-[slot=alert-description]:col-start-1'
   ],
   slots: {
-    title: 'font-medium tracking-tight',
-    description: 'text-muted col-start-2 pt-0.5 leading-normal',
+    title: 'pt-0.5 font-medium tracking-tight',
+    description: 'text-muted col-start-2 pt-0.5 pb-1 leading-normal',
     action: 'col-start-3 row-span-2 row-start-1 ml-auto flex items-center gap-1 self-center'
   },
   variants: {

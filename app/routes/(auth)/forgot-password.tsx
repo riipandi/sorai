@@ -85,7 +85,7 @@ function RouteComponent() {
       <Card className='w-full min-w-sm'>
         <CardHeader>
           <CardTitle>Forgot your password?</CardTitle>
-          <CardDescription>
+          <CardDescription className='text-sm'>
             Enter your email address and we'll send you a link to reset your password
           </CardDescription>
         </CardHeader>
