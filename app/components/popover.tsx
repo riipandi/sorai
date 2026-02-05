@@ -40,8 +40,8 @@ const popoverVariants = tv({
       'data-[side=right]:-left-3 data-[side=right]:-rotate-90 data-[side=top]:-bottom-2',
       'data-[side=top]:rotate-180'
     ],
-    title: 'text-lg font-semibold',
-    description: 'text-muted mb-1.5 leading-normal'
+    title: 'text-base font-semibold',
+    description: 'text-muted mb-1.5 text-sm leading-normal'
   }
 })
 

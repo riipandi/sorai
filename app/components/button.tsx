@@ -12,7 +12,7 @@ import { clx, tv, type VariantProps } from '#/utils/variant'
 
 export const buttonStyles = tv({
   base: [
-    'relative cursor-pointer font-medium select-none',
+    'relative cursor-pointer text-sm font-medium select-none',
     'inline-flex items-center justify-center gap-2 transition-colors',
     'after:absolute after:inset-0 after:bg-white/15 after:opacity-0 hover:not-data-disabled:after:opacity-100',
     'after:transition-opacity active:not-data-disabled:after:opacity-100 data-popup-open:after:opacity-100',
@@ -58,7 +58,7 @@ export const buttonStyles = tv({
       ]
     },
     size: {
-      xs: 'h-6.5 gap-1 rounded-sm px-2 text-sm before:-mr-5 after:rounded-sm [&>svg:not([class*=size-])]:size-3.5',
+      xs: 'h-6.5 gap-1 rounded-sm px-2 text-xs before:-mr-5 after:rounded-sm [&>svg:not([class*=size-])]:size-3.5',
       sm: 'h-8 rounded px-2.5 after:rounded [&>svg:not([class*=size-])]:size-4',
       md: 'h-9 rounded px-3.5 [&>svg:not([class*=size-])]:size-4',
       lg: 'h-11 rounded-lg px-5 after:rounded-lg [&>svg:not([class*=size-])]:size-4',

@@ -45,9 +45,8 @@ export type SelectItem = {
 
 const selectVariants = tv({
   base: [
-    'bg-input placeholder:text-dimmed h-9 w-full rounded px-3 transition-all',
-    'focus:ring-primary focus:ring-2 focus:outline-0',
-    'flex cursor-pointer items-center gap-2',
+    'bg-input placeholder:text-dimmed h-9 w-full rounded px-3 text-sm transition-all',
+    'focus:ring-primary flex cursor-pointer items-center gap-2 focus:ring-2 focus:outline-0',
     'data-disabled:cursor-not-allowed data-disabled:opacity-70'
   ],
   slots: {
@@ -55,8 +54,8 @@ const selectVariants = tv({
     positioner: [],
     backdrop: [],
     popup: [
-      'group bg-popover ring-popover-border shadow-popover origin-(--transform-origin) rounded ring',
-      'p-1 outline-none max-lg:w-(--anchor-width)'
+      'group bg-popover ring-popover-border shadow-popover origin-(--transform-origin)',
+      'rounded p-1 ring outline-none max-lg:w-(--anchor-width)'
     ],
     arrow: [],
     scrollUpArrow: [
@@ -75,7 +74,7 @@ const selectVariants = tv({
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
       'data-disabled:text-dimmed/80 focus-visible:outline-none data-disabled:cursor-not-allowed'
     ],
-    itemText: 'flex items-center gap-2 [&_svg:not([class*=size-])]:size-3.5',
+    itemText: 'flex items-center gap-2 text-sm [&_svg:not([class*=size-])]:size-3.5',
     itemIndicator: 'ml-auto',
     group: 'space-y-0',
     groupLabel: 'text-dimmed px-2.5 py-1 text-sm font-medium',
@@ -84,7 +83,9 @@ const selectVariants = tv({
     placeholder: 'text-dimmed',
     chip: 'ml-1.5',
     valueWrapper: [
-      '[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2 select-none [&_svg:not([class*=size-])]:size-3.5'
+      'flex items-center gap-2 select-none',
+      '[&_svg:not([class*=size-])]:size-3.5',
+      '[&_svg:not([class*=text-])]:text-popover-foreground'
     ],
     valueLabel: 'text-popover-foreground',
     valueText: 'text-popover-foreground select-none'

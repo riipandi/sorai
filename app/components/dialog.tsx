@@ -27,7 +27,7 @@ const dialogStyles = tv({
   base: '',
   slots: {
     backdrop: [
-      'fixed inset-0 min-h-dvh bg-black/60 backdrop-blur-sm transition-[color,opacity]',
+      'bg-dimmed fixed inset-0 min-h-dvh backdrop-blur-sm transition-[color,opacity]',
       'data-ending-style:opacity-0 data-starting-style:opacity-0'
     ],
     popup: [

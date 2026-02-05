@@ -142,9 +142,9 @@ export const Example: Story = {
           </NumberFieldGroup>
         </NumberField>
         <ToolbarSeparator />
-        <ToolbarLink className='text-muted px-1.5 text-nowrap'>Saved 5 min ago</ToolbarLink>
+        <ToolbarLink className='text-muted px-1 text-nowrap'>Saved 5 min ago</ToolbarLink>
         <ToolbarSeparator className='mr-3' />
-        <Button variant='tertiary' size='sm'>
+        <Button variant='tertiary' size='xs'>
           Save
         </Button>
       </Toolbar>

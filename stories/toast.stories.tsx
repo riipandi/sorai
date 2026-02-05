@@ -33,7 +33,7 @@ const meta = {
   tags: [],
   args: {
     position: 'bottom-right',
-    timeout: 5000,
+    timeout: 3000,
     limit: 5,
     showCloseButton: false
   },

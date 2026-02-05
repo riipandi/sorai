@@ -19,16 +19,15 @@ import * as React from 'react'
 import { clx, tv } from '#/utils/variant'
 
 export const fieldStyles = tv({
-  base: 'flex flex-col gap-2',
+  base: 'flex flex-col gap-2 text-base',
   slots: {
     item: [
-      'grid items-center gap-x-2.5 gap-y-1 not-last:mb-2',
-      'grid-cols-[auto_1fr]',
+      'grid grid-cols-[auto_1fr] items-center gap-x-2.5 gap-y-1 not-last:mb-2',
       '**:data-[slot=field-description]:col-start-2'
     ],
     label: 'text-foreground flex items-center gap-2.5',
-    description: 'text-muted text-base leading-relaxed',
-    error: 'text-danger',
+    description: 'text-muted px-0.5 text-sm leading-relaxed',
+    error: 'text-danger text-sm',
     validity: '',
     control: ''
   }

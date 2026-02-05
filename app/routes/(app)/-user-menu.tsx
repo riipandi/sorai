@@ -38,7 +38,7 @@ export function UserMenu({ user, logoutFn, minimal, noAvatar, className }: UserM
           </Activity>
           <div className='flex flex-col'>
             <span className='font-medium'>{user?.name}</span>
-            <span className='text-muted text-sm'>{user?.email}</span>
+            <span className='text-muted text-xs'>{user?.email}</span>
           </div>
           <Button variant='plain' size='icon' className='ml-auto' onClick={logoutFn}>
             <Lucide.LogOutIcon />
@@ -63,7 +63,7 @@ export function UserMenu({ user, logoutFn, minimal, noAvatar, className }: UserM
             </Activity>
             <div className='flex flex-col'>
               <span className='font-medium'>{user?.name}</span>
-              <span className='text-muted text-sm'>{user?.email}</span>
+              <span className='text-muted text-xs'>{user?.email}</span>
             </div>
             <Lucide.ChevronsUpDown className='ml-auto' />
           </MenuTrigger>

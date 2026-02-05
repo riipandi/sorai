@@ -12,7 +12,7 @@ import { clx, tv, type VariantProps } from '#/utils/variant'
 export const kbdStyles = tv({
   base: [
     'inline-flex h-5 min-w-5 items-center justify-center gap-0.5 px-1.5',
-    'ring-kbd-border rounded-sm text-base font-medium ring'
+    'ring-kbd-border tsext-sm rounded-sm font-medium tracking-tight ring'
   ],
   variants: {
     variant: {

@@ -42,7 +42,7 @@ export const Example: Story = {
         <InputGroupAddon>
           <InputGroupText>https://</InputGroupText>
         </InputGroupAddon>
-        <Input placeholder='example.com' className='pl-1' />
+        <Input placeholder='example.com' />
       </InputGroup>
       <InputGroup>
         <Input placeholder='yourname' />
@@ -148,37 +148,25 @@ export const WithTextArea: Story = {
   args: {},
   render: () => {
     const books = [
-      {
-        value: 'da-vinci',
-        label: 'Da Vinci'
-      },
-      {
-        value: 'angels',
-        label: 'Angels'
-      },
-      {
-        value: 'inferno',
-        label: 'Inferno'
-      },
-      {
-        value: 'sorcerer',
-        label: 'Sorcerer'
-      },
-      {
-        value: 'azkaban',
-        label: 'Azkaban'
-      }
+      { value: 'da-vinci', label: 'Da Vinci' },
+      { value: 'angels', label: 'Angels' },
+      { value: 'inferno', label: 'Inferno' },
+      { value: 'sorcerer', label: 'Sorcerer' },
+      { value: 'azkaban', label: 'Azkaban' }
     ]
 
     return (
       <div className='w-full max-w-md'>
         <InputGroup className='w-full'>
           <Textarea placeholder='Ask the sorting hat ...' className='resize-none' />
-          <InputGroupAddon align='block-end'>
+          <InputGroupAddon
+            align='block-end'
+            className='border-border rounded-tl-none rounded-tr-none border-t pt-2.5'
+          >
             <Menu>
               <MenuTrigger
                 render={
-                  <Button size='icon-sm' variant='outline' pill>
+                  <Button size='icon-xs' variant='outline' pill>
                     <Lucide.PlusIcon />
                   </Button>
                 }
@@ -189,8 +177,9 @@ export const WithTextArea: Story = {
                 </MenuItem>
               </MenuPopup>
             </Menu>
+
             <Select defaultValue={books[1]} items={books}>
-              <SelectTrigger className='mr-2 ml-auto w-auto' variant='plain'>
+              <SelectTrigger className='ml-auto w-auto' variant='plain'>
                 <SelectValue placeholder='Book' />
               </SelectTrigger>
               <SelectPopup align='center'>
@@ -203,7 +192,8 @@ export const WithTextArea: Story = {
                 </SelectList>
               </SelectPopup>
             </Select>
-            <Button size='icon-sm' pill>
+
+            <Button size='icon-xs' className='ml-auto'>
               <Lucide.ArrowUpIcon />
             </Button>
           </InputGroupAddon>

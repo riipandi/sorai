@@ -24,8 +24,8 @@ export const alertStyles = tv({
     'not-[:has(>svg)]:*:data-[slot=alert-description]:col-start-1'
   ],
   slots: {
-    title: 'font-medium',
-    description: 'text-muted col-start-2 leading-relaxed',
+    title: 'font-medium tracking-tight',
+    description: 'text-muted col-start-2 pt-0.5 leading-normal',
     action: 'col-start-3 row-span-2 row-start-1 ml-auto flex items-center gap-1 self-center'
   },
   variants: {

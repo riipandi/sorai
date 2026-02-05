@@ -24,7 +24,7 @@ import { tv, type VariantProps } from '#/utils/variant'
 
 export const tableStyles = tv({
   slots: {
-    table: 'text-table-foreground w-full text-left',
+    table: 'text-table-foreground w-full text-left text-sm',
     container: 'overflow-x-auto',
     header: '',
     head: 'text-muted bg-table-head border-table-separator border-y px-5 py-1.5 font-medium',

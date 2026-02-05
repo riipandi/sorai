@@ -11,7 +11,7 @@ import { useRender } from '@base-ui/react/use-render'
 import { clx, tv, type VariantProps } from '#/utils/variant'
 
 export const chipStyles = tv({
-  base: 'inline-flex items-center text-base font-medium ring',
+  base: 'inline-flex items-center text-sm font-medium ring',
   slots: {
     button:
       'cursor-pointer opacity-60 transition-opacity hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-30'

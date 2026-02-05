@@ -20,7 +20,7 @@ export const itemStyles = tv({
     base: [
       'relative flex text-left transition-colors [a]:cursor-pointer',
       'focus-visible:ring-primary focus-visible:ring-2 focus-visible:outline-0',
-      '[a,button]:hover:bg-accent'
+      '[a,button]:hover:bg-accent text-sm'
     ],
     content: 'flex flex-col items-start gap-0.5',
     title: 'text-foreground font-medium',

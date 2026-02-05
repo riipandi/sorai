@@ -119,7 +119,7 @@ export const Default: Story = {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink
-            href='https://github.com/riipandi/sorai'
+            href='https://github.com/riipandi/vinto'
             render={(props) => (
               <a
                 {...props}
@@ -174,7 +174,7 @@ export const Compact: Story = {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink
-            href='https://github.com/riipandi/sorai'
+            href='https://github.com/riipandi/vinto'
             render={(props) => (
               <a
                 {...props}

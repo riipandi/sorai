@@ -14,7 +14,6 @@ import { Input, inputStyles } from './input'
 import { InputGroup, InputGroupAddon } from './input-group'
 
 export const inputPasswordVariants = tv({
-  base: [],
   slots: {
     wrapper: 'relative space-y-1.5',
     inputWrapper: 'relative',

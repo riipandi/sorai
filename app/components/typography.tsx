@@ -16,13 +16,13 @@ import * as React from 'react'
 import { tv, type VariantProps } from '#/utils/variant'
 
 export const headingStyles = tv({
-  base: 'text-foreground tracking-tight',
+  base: 'text-foreground tracking-normal',
   variants: {
     size: {
       xs: 'text-base font-semibold',
-      sm: 'scroll-m-20 text-xl font-semibold',
+      sm: 'scroll-m-20 text-2xl font-semibold',
       md: 'scroll-m-20 text-3xl font-semibold',
-      lg: 'scroll-m-20 text-4xl font-semibold first:mt-0',
+      lg: 'scroll-m-20 text-4xl font-semibold tracking-tight first:mt-0',
       xl: 'scroll-m-20 text-6xl font-extrabold text-balance'
     }
   },
@@ -40,12 +40,12 @@ export const textStyles = tv({
 })
 
 export const leadStyles = tv({
-  base: 'text-muted text-xl leading-relaxed not-first:mt-1'
+  base: 'text-muted text-lg leading-relaxed not-first:mt-1'
 })
 
 export const textLinkStyles = tv({
   base: [
-    'text-foreground hover:text-primary items-end underline underline-offset-4',
+    'text-foreground hover:text-primary items-end text-base underline underline-offset-4',
     'inline-flex gap-0.5 transition-all [&_svg:not([class*=size-])]:size-5'
   ]
 })
@@ -55,11 +55,15 @@ export const strongStyles = tv({
 })
 
 export const blockquoteStyles = tv({
-  base: 'text-muted border-border border-l-2 pl-6 text-lg italic not-first:mt-1'
+  base: 'text-muted border-border border-l-2 pl-6 text-base italic not-first:mt-1'
 })
 
 export const codeStyles = tv({
-  base: 'text-foreground font-mono text-sm font-semibold before:content-["`"] after:content-["`"]'
+  base: [
+    'bg-dimmed/20 rounded-xs px-1.5 py-1 font-semibold',
+    'text-foreground font-mono text-xs tracking-tight'
+    // 'before:content-["`"] after:content-["`"]'
+  ]
 })
 
 export type HeadingProps = useRender.ComponentProps<'h1'> &

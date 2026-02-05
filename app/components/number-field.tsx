@@ -39,7 +39,7 @@ const numberFieldVariants = tv({
     ],
     decrement: '',
     input: [
-      'z-10 w-16 px-2 text-center outline-none',
+      'z-10 w-16 px-2 text-center text-sm outline-none',
       'text-foreground placeholder:text-dimmed transition-all',
       'disabled:pointer-events-none disabled:opacity-70'
     ],

@@ -323,7 +323,7 @@ export const LoginForm: Story = {
           <Field>
             <div className='flex items-center'>
               <FieldLabel htmlFor='password'>Password</FieldLabel>
-              <TextLink href='#' className='ml-auto'>
+              <TextLink href='#' className='text-muted ml-auto no-underline'>
                 Forgot password?
               </TextLink>
             </div>

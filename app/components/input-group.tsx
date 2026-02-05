@@ -19,6 +19,7 @@ export const inputGroupVariants = tv({
     'relative flex flex-wrap transition-all',
     '[&>input,&>[role="combobox"],textarea]:flex-1',
     '[&>input,&>[role="combobox"],textarea]:bg-transparent',
+    '[&>input,&>[role="combobox"],textarea]:rounded-l-none',
     '[&>input,&>[role="combobox"],textarea]:ring-0',
     '[&>input,&>[role="combobox"],textarea]:shadow-none',
     '[&>input,&>[role="combobox"],textarea]:focus:ring-0',
@@ -26,13 +27,13 @@ export const inputGroupVariants = tv({
   ],
   slots: {
     addon: [
-      // FIXME: left border when using select
-      'flex shrink-0 items-center gap-1',
+      'flex shrink-0 items-center gap-1.5',
       '[&_svg:not([class*=text-])]:text-dimmed [&_svg:not([class*=size-])]:size-3.5',
-      '[&_[role="combobox"]]:not-focus:ring-0',
-      '[&_[role="combobox"]]:not-focus:ring-transparent',
+      '[&_[role="combobox"]]:not-focus:ring-0 [&_[role="combobox"]]:not-focus:ring-transparent',
+      '[&_[role="combobox"]]:hover:not-data-disabled:bg-transparent',
+      '[&_[role="combobox"]]:ml-0.5 [&_[role="combobox"]]:pr-2',
       '[&_[role="combobox"]]:shadow-none',
-      '[&.items-start,&.items-end]:py-2.5'
+      '[&.items-start,&.items-end]:py-2.5 [&>button]:rounded-sm'
     ],
     text: [
       'text-muted inline-flex items-center gap-1 select-none',
@@ -83,6 +84,14 @@ export const inputGroupVariants = tv({
           'has-[>button:not([role="combobox"])]:-mx-1'
         ]
       }
+    },
+    {
+      align: ['start', 'block-start'],
+      className: { addon: 'rounded-l' }
+    },
+    {
+      align: ['end', 'block-end'],
+      className: { addon: 'rounded-r' }
     }
   ],
   defaultVariants: {

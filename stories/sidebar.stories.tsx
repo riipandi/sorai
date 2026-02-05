@@ -132,7 +132,7 @@ export const Example: Story = {
                       </Avatar>
                       <div className='flex flex-col'>
                         <span className='font-medium'>John Doe</span>
-                        <span className='text-muted text-sm'>john@example.com</span>
+                        <span className='text-muted text-xs'>john@example.com</span>
                       </div>
                       <Lucide.ChevronsUpDownIcon className='ml-auto' />
                     </SidebarItemButton>

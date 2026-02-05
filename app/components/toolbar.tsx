@@ -23,10 +23,10 @@ const toolbarVariants = tv({
   slots: {
     root: [
       'bg-background ring-card-border flex items-center rounded-lg ring',
-      'px-1.5 py-1 *:data-[slot=toggle-group]:p-0'
+      'px-1.5 py-1 *:data-[slot=toggle-group]:p-0 [&>button]:rounded-sm [&>button]:py-4'
     ],
-    button: '',
-    link: '',
+    button: 'rounded-sm',
+    link: 'text-sm',
     input: '',
     group: 'flex gap-1',
     separator: 'bg-separator mx-1.5 h-5 w-px'

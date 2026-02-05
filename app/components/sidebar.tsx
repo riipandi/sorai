@@ -40,7 +40,7 @@ const sidebarVariants = tv({
     footer: 'mt-auto',
     menu: 'flex flex-col gap-3.5',
     list: 'flex w-full flex-col gap-0.5',
-    item: 'group/sidebar-item relative flex **:data-[slot=sidebar-submenu]:w-auto',
+    item: 'group/sidebar-item relative flex text-sm **:data-[slot=sidebar-submenu]:w-auto',
     itemButton: [
       'relative z-10 flex w-full items-center gap-2.5',
       'text-foreground cursor-pointer text-left',
@@ -56,7 +56,7 @@ const sidebarVariants = tv({
       '*:[button]:cursor-pointer'
     ],
     group: 'flex flex-wrap gap-0.5 *:data-[slot=sidebar-list]:p-0',
-    groupTitle: 'text-dimmed mb-1 inline-flex items-center text-base font-medium **:[svg]:size-3.5',
+    groupTitle: 'text-dimmed mb-1 inline-flex items-center text-sm font-medium **:[svg]:size-3.5',
     groupAction: 'ml-auto flex items-center gap-1 **:[svg]:size-3',
     submenu: 'border-border w-full border-l py-0.5',
     collapsibleRoot: 'w-full',

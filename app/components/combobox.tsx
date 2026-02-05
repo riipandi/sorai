@@ -89,18 +89,19 @@ const comboboxVariants = tv({
       'max-h-[min(23rem,var(--available-height))] space-y-0.5 overflow-y-auto p-1 outline-none empty:p-0 dark:scheme-dark'
     ],
     item: [
-      'text-popover-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 select-none',
-      'group-data-[side=none]:min-w-[calc(var(--anchor-width))]',
+      'text-popover-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 text-sm select-none',
+      'group-data-[side=none]:min-w-[calc(var(--anchor-width))] focus-visible:outline-none',
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
-      'focus-visible:outline-none',
       'data-disabled:cursor-not-allowed data-disabled:opacity-70'
     ],
     itemIndicator: 'text-primary ml-auto size-4',
     group: 'space-y-0.5',
-    groupLabel: 'text-dimmed px-2 py-1 text-base font-medium',
+    groupLabel: 'text-dimmed px-2 py-1 text-sm font-medium',
     separator: 'bg-popover-separator my-1 h-px',
-    renderValueWrapper:
-      '[&_svg:not([class*=text-])]:text-popover-foreground flex items-center gap-2 [&_svg:not([class*=size-])]:size-3.5',
+    renderValueWrapper: [
+      'flex items-center gap-2',
+      '[&_svg:not([class*=text-])]:text-popover-foreground [&_svg:not([class*=size-])]:size-3.5'
+    ],
     renderValueLabel: 'text-popover-foreground',
     renderValuePlaceholder: 'text-dimmed'
   },

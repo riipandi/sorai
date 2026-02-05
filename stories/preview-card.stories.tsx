@@ -34,10 +34,10 @@ export const Example: Story = {
       </Text>
       <PreviewCardPopup className='max-w-72'>
         <img
-          src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=500'
+          src='https://images.unsplash.com/photo-1618944913480-b67ee16d7b77?q=80&w=2670&auto=format&fit=crop'
           className='mb-2 h-auto w-full rounded-sm'
         />
-        <Text className='text-base/relaxed'>
+        <Text className='text-justify text-sm/relaxed'>
           In Harry Potter and the Philosopher's Stone, this legendary stone is guarded by Dumbledore
           at Hogwarts. It was created by Nicolas Flampel and is the only known stone to exist. The
           stone plays a crucial role in the first book's plot.

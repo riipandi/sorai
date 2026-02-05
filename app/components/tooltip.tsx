@@ -25,7 +25,7 @@ export const tooltipStyles = tv({
   slots: {
     popup: [
       'bg-tertiary text-tertiary-foreground rounded-sm shadow outline-none',
-      'px-2 pt-0.5 pb-1 text-base transition-[transform,scale,opacity]',
+      'px-2 py-1 text-sm transition-[transform,scale,opacity]',
       'data-ending-style:scale-90 data-ending-style:opacity-0',
       'data-starting-style:scale-90 data-starting-style:opacity-0'
     ],

@@ -23,7 +23,7 @@ export const tabsStyles = tv({
   slots: {
     root: 'flex gap-4',
     list: [
-      'bg-tabs relative z-0 flex rounded-lg',
+      'bg-tabs relative z-0 flex rounded-lg text-sm',
       'inset-shadow-xs inset-shadow-black/10 dark:inset-shadow-none'
     ],
     indicator: [

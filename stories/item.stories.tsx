@@ -38,7 +38,7 @@ export const Example: Story = {
   args: {},
   render: () => (
     <div className='flex w-full min-w-md flex-col gap-4'>
-      <Item className='items-center rounded-full'>
+      <Item>
         <ItemMedia>
           <img
             src='https://api.dicebear.com/9.x/avataaars/svg?radius=50&seed=Harry+Potter'
@@ -51,9 +51,7 @@ export const Example: Story = {
           <ItemDescription>The Boy Who Lived</ItemDescription>
         </ItemContent>
         <ItemAction>
-          <Button size='sm' pill>
-            Add Friend
-          </Button>
+          <Button size='sm'>Add Friend</Button>
         </ItemAction>
       </Item>
       <Item variant='plain'>
@@ -67,7 +65,7 @@ export const Example: Story = {
           <ItemDescription>Dan Brown's bestseller novel</ItemDescription>
         </ItemContent>
         <ItemAction>
-          <Button size='sm' variant='secondary' pill>
+          <Button size='sm' variant='secondary'>
             Read
           </Button>
         </ItemAction>

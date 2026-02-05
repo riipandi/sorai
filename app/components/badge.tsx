@@ -27,7 +27,7 @@ export const badgeStyles = tv({
       'danger-outline': 'border-danger text-danger'
     },
     size: {
-      sm: 'h-4 rounded-xs px-1.5 text-sm [&_svg:not([class*=size-])]:size-2.5',
+      sm: 'h-4 rounded-sm px-1 py-2 text-sm [&_svg:not([class*=size-])]:size-2.5',
       md: 'h-5 rounded-sm px-2 text-base [&_svg:not([class*=size-])]:size-3.5',
       lg: 'h-7 rounded px-2.5 [&_svg:not([class*=size-])]:size-4'
     },

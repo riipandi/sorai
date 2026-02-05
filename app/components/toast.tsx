@@ -133,10 +133,10 @@ export const toastVariants = tv({
     bodyWithClose: 'pr-8',
     body: 'flex min-w-0 flex-1 flex-col gap-3',
     textContainer: 'flex min-w-0 flex-1 flex-col gap-0.5',
-    icon: 'shrink-0 *:[svg]:h-5 *:[svg]:w-5',
+    icon: 'shrink-0 *:[svg]:h-5 *:[svg]:w-4',
     iconWrapper: 'p-0.5',
-    title: 'text-foreground text-base leading-snug font-medium',
-    description: 'text-muted text-base leading-normal',
+    title: 'text-foreground text-sm/snug font-medium',
+    description: 'text-muted text-sm/normal',
     action: 'shrink-0 self-start',
     closeButton: [
       'text-muted hover:bg-accent hover:text-foreground absolute top-1.5 right-1.5 flex size-7 shrink-0',
@@ -216,7 +216,7 @@ export interface ToastProps extends Omit<
 }
 
 export function Toast({
-  timeout = 5000,
+  timeout = 3000,
   limit = 5,
   showCloseButton = false,
   ...props

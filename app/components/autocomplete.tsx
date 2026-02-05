@@ -38,7 +38,7 @@ import * as React from 'react'
 import { clx, tv, type VariantProps } from '#/utils/variant'
 
 const autocompleteVariants = tv({
-  base: 'text-foreground placeholder:text-dimmed h-9 w-full px-3 transition-all disabled:cursor-not-allowed disabled:opacity-70',
+  base: 'text-foreground placeholder:text-dimmed h-9 w-full px-3 leading-tight transition-all disabled:cursor-not-allowed disabled:opacity-70',
   slots: {
     positioner: [],
     popup: [
@@ -57,13 +57,12 @@ const autocompleteVariants = tv({
       'max-h-[min(23rem,var(--available-height))] overflow-y-auto p-1 dark:scheme-dark'
     ],
     group: 'pb-1.5 last:pb-0',
-    groupLabel: 'text-dimmed px-2.5 py-1 text-base',
+    groupLabel: 'text-dimmed px-2.5 py-1 text-sm font-medium',
     row: '',
     item: [
-      'text-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2',
+      'text-foreground flex cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 text-sm',
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
-      'focus-visible:outline-none',
-      '[&_svg:not([class*=text-])]:text-foreground [&_svg:not([class*=size-])]:size-3.5',
+      '[&_svg:not([class*=text-])]:text-foreground focus-visible:outline-none [&_svg:not([class*=size-])]:size-3.5',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50'
     ],
     separator: 'bg-popover-separator my-1 h-px'

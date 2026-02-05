@@ -26,7 +26,7 @@ import { buttonStyles } from './button'
 const alertDialogVariants = tv({
   slots: {
     backdrop: [
-      'fixed inset-0 min-h-dvh bg-black/60 backdrop-blur-sm transition-[color,opacity]',
+      'bg-dimmed fixed inset-0 min-h-dvh backdrop-blur-sm transition-[color,opacity]',
       'data-ending-style:opacity-0 data-starting-style:opacity-0'
     ],
     popup: [
@@ -46,8 +46,8 @@ const alertDialogVariants = tv({
     ],
     header: 'flex items-center gap-2.5 px-5 pt-4',
     title: 'text-xl font-semibold',
-    body: 'px-5 py-4',
-    description: 'text-muted leading-relaxed',
+    body: 'px-5 pt-2 pb-4',
+    description: 'text-muted leading-normal',
     footer: [
       'flex items-center justify-end gap-2',
       'bg-dialog-footer border-dialog-border rounded-b-xl border-t px-5 py-3'

@@ -24,7 +24,7 @@ type Story = StoryObj<typeof meta>
 
 export const Example: Story = {
   render: () => (
-    <div className='w-full space-y-4'>
+    <div className='w-full max-w-lg space-y-4'>
       <Alert>
         <Lucide.InfoIcon />
         Welcome to the wizarding world of Harry Potter.
@@ -40,7 +40,7 @@ export const Example: Story = {
 
 export const VariantShowcase: Story = {
   render: () => (
-    <div className='w-full space-y-4'>
+    <div className='w-full max-w-lg space-y-4'>
       <Alert>
         <Lucide.InfoIcon />
         The Da Vinci Code has been discovered.
@@ -71,7 +71,7 @@ export const VariantShowcase: Story = {
 
 export const WithDescription: Story = {
   render: () => (
-    <div className='w-full space-y-4'>
+    <div className='w-full max-w-lg space-y-4'>
       <Alert>
         <Lucide.InfoIcon />
         <AlertTitle>Angels & Demons Discovered</AlertTitle>
@@ -85,7 +85,7 @@ export const WithDescription: Story = {
 
 export const WithActionButton: Story = {
   render: () => (
-    <div className='w-full space-y-4'>
+    <div className='w-full max-w-lg space-y-4'>
       <Alert>
         <Lucide.InfoIcon />
         Spell successfully cast. The chamber is now open.

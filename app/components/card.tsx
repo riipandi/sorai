@@ -29,8 +29,8 @@ export const cardStyles = tv({
       '*:[[data-slot=card-title]:not(:has(+[data-slot=card-description]))]:row-span-2'
     ],
     headerAction: 'col-start-3 row-span-2 row-start-1 ml-auto flex items-center gap-1.5',
-    title: 'text-xl leading-tight font-semibold',
-    description: 'text-muted',
+    title: 'text-lg leading-tight font-semibold',
+    description: 'text-muted text-base',
     body: [
       'p-5 **:data-[slot=item]:px-5 *:data-[slot=stack]:-m-5',
       '*:data-[slot=table-container]:-m-5 **:data-[slot=table-head]:border-t-0',

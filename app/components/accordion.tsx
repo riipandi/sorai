@@ -23,8 +23,7 @@ export const accordionStyles = tv({
     item: 'border-card-border border-b last:border-b-0',
     header: '',
     trigger: [
-      'flex cursor-pointer items-center gap-1.5 select-none',
-      'py-3 transition-colors duration-100',
+      'flex cursor-pointer items-center gap-1.5 py-3 transition-colors duration-100 select-none',
       'focus-visible:outline-primary focus:outline-0 focus-visible:outline-2 focus-visible:outline-offset-2',
       'w-full text-left leading-relaxed font-medium',
       '[&>svg:not([class*=size-])]:size-4 [&>svg:not([class*=text-])]:text-current',
@@ -38,7 +37,7 @@ export const accordionStyles = tv({
       'h-(--accordion-panel-height) [&[hidden]:not([hidden=until-found])]:hidden',
       'data-ending-style:h-0 data-starting-style:h-0'
     ],
-    panelContent: 'pb-1.5'
+    panelContent: 'pb-3'
   },
   variants: {
     expandableIndicator: {

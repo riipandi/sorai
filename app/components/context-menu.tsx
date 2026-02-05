@@ -42,19 +42,15 @@ export const contextMenuVariants = tv({
       'min-w-32 **:data-[slot=item]:p-0'
     ],
     item: [
-      'text-popover-foreground flex items-center',
-      'cursor-pointer select-none',
+      'text-popover-foreground flex cursor-pointer items-center text-sm select-none',
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
-      'data-popup-open:bg-popover-accent',
-      'focus-visible:outline-none',
+      'data-popup-open:bg-popover-accent focus-visible:outline-none',
       '[&_svg:not([class*=text-])]:text-popover-foreground [&_svg:not([class*=size-])]:size-3.5',
-      '*:data-[slot=switch]:ml-auto',
-      'data-disabled:cursor-not-allowed data-disabled:opacity-70'
+      'data-disabled:cursor-not-allowed data-disabled:opacity-70 *:data-[slot=switch]:ml-auto'
     ],
     separator: 'bg-popover-separator my-1 h-px',
     submenuTrigger: [
-      'text-popover-foreground flex items-center',
-      'cursor-pointer select-none',
+      'text-popover-foreground flex cursor-pointer items-center text-sm select-none',
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
       'data-popup-open:bg-popover-accent',
       'focus-visible:outline-none',
@@ -63,10 +59,9 @@ export const contextMenuVariants = tv({
       'data-disabled:cursor-not-allowed data-disabled:opacity-70',
       'after:bg-chevron-right-dark dark:after:bg-chevron-right after:ml-auto after:size-3.5'
     ],
-    groupLabel: 'text-dimmed px-2.5 py-1 text-base font-medium',
+    groupLabel: 'text-dimmed px-2.5 py-1 text-sm font-medium',
     radioItem: [
-      'text-popover-foreground flex items-center',
-      'cursor-pointer select-none',
+      'text-popover-foreground flex cursor-pointer items-center text-sm select-none',
       'data-highlighted:not-data-disabled:bg-popover-accent data-selected:not-data-disabled:bg-popover-accent',
       'data-popup-open:bg-popover-accent',
       'focus-visible:outline-none',
