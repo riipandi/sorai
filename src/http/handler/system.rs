@@ -26,7 +26,7 @@ pub async fn health_check(RequestId(request_id): RequestId) -> impl IntoResponse
     ApiResponse::success_with_message(
         HealthStatus {
             status: "OK".to_string(),
-            service: "Radium".to_string(),
+            service: "Sorai".to_string(),
             version: env!("CARGO_PKG_VERSION").to_string(),
         },
         "healthy".to_string(),

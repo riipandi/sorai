@@ -117,7 +117,7 @@ pub struct UsageInfo {
     pub total_tokens: i32,
 }
 
-/// Extra fields for Radium-specific information
+/// Extra fields for Sorai-specific information
 #[derive(Debug, Serialize)]
 pub struct ExtraFields {
     pub provider: String,
