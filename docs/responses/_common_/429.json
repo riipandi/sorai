@@ -1,5 +1,5 @@
 {
-  "is_radium_error": false,
+  "is_sorai_error": false,
   "status_code": 429,
   "error": {
     "type": "rate_limit_error",

@@ -1,13 +1,13 @@
-# Radium Application Configuration
+# Sorai Application Configuration
 
-Radium uses environment variables for configuration. You can set these variables in a `.env` file or pass them directly to the system environment.
+Sorai uses environment variables for configuration. You can set these variables in a `.env` file or pass them directly to the system environment.
 
 ## CLI Flags
 
 | Flag                | Description                                              | Example                      |
 |---------------------|----------------------------------------------------------|------------------------------|
 | `--env-file <FILE>` | Load environment variables from a custom file            | `--env-file .env.production` |
-| `--data-dir <DIR>`  | Set the data directory for application data (logs, etc.) | `--data-dir /var/lib/radium` |
+| `--data-dir <DIR>`  | Set the data directory for application data (logs, etc.) | `--data-dir /var/lib/sorai`  |
 | `--host <HOST>`     | Override server host (only in `serve` command)           | `--host 0.0.0.0`             |
 | `--port <PORT>`     | Override server port (only in `serve` command)           | `--port 8000`                |
 
@@ -20,50 +20,50 @@ Radium uses environment variables for configuration. You can set these variables
 
 ## Application Configuration
 
-| Variable                          | Default       | Description                                      | Required |
-|-----------------------------------|---------------|--------------------------------------------------|----------|
-| `RADIUM_APP_MODE`                 | `development` | Application mode (`development` or `production`) | No       |
-| `RADIUM_APP_SECRET_KEY`           | -             | Secret key for application encryption            | Yes*     |
-| `RADIUM_JWT_SECRET_KEY`           | -             | Secret key for JWT token encryption              | Yes*     |
-| `RADIUM_JWT_ACCESS_TOKEN_EXPIRY`  | `900`         | JWT access token expiry time in seconds          | No       |
-| `RADIUM_JWT_REFRESH_TOKEN_EXPIRY` | `7200`        | JWT refresh token expiry time in seconds         | No       |
-| `RADIUM_SESSION_STORAGE`          | `database`    | Session storage type: `database`, `redis`        | No       |
+| Variable                         | Default       | Description                                      | Required |
+|----------------------------------|---------------|--------------------------------------------------|----------|
+| `SORAI_APP_MODE`                 | `development` | Application mode (`development` or `production`) | No       |
+| `SORAI_APP_SECRET_KEY`           | -             | Secret key for application encryption            | Yes*     |
+| `SORAI_JWT_SECRET_KEY`           | -             | Secret key for JWT token encryption              | Yes*     |
+| `SORAI_JWT_ACCESS_TOKEN_EXPIRY`  | `900`         | JWT access token expiry time in seconds          | No       |
+| `SORAI_JWT_REFRESH_TOKEN_EXPIRY` | `7200`        | JWT refresh token expiry time in seconds         | No       |
+| `SORAI_SESSION_STORAGE`          | `database`    | Session storage type: `database`, `redis`        | No       |
 
 *Required in production mode
 
 ## Logging Configuration
 
-| Variable                        | Default | Description                                                  | Required |
-|---------------------------------|---------|--------------------------------------------------------------|----------|
-| `RADIUM_LOG_LEVEL`              | `info`  | Log level: `trace`, `debug`, `info`, `warn`, `error`, `none` | No       |
-| `RADIUM_LOG_SHOW_TIMESTAMP`     | `true`  | Show timestamp in logs                                       | No       |
-| `RADIUM_LOG_ROTATION`           | `daily` | Log rotation: `daily`, `hourly`, `none`                      | No       |
-| `RADIUM_LOG_SHOW_MODULE`        | `true`  | Show module name in logs                                     | No       |
-| `RADIUM_LOG_REQUEST_SAMPLING`   | `100`   | Request sampling percentage (1-100)                          | No       |
-| `RADIUM_LOG_SLOW_REQUESTS_ONLY` | `false` | Only log slow requests                                       | No       |
-| `RADIUM_LOG_SLOW_THRESHOLD_MS`  | `1000`  | Slow request threshold in milliseconds                       | No       |
-| `RADIUM_LOG_ANALYTICS_MODE`     | `full`  | Analytics mode: `full`, `minimal`, `none`                    | No       |
+| Variable                       | Default | Description                                                  | Required |
+|--------------------------------|---------|--------------------------------------------------------------|----------|
+| `SORAI_LOG_LEVEL`              | `info`  | Log level: `trace`, `debug`, `info`, `warn`, `error`, `none` | No       |
+| `SORAI_LOG_SHOW_TIMESTAMP`     | `true`  | Show timestamp in logs                                       | No       |
+| `SORAI_LOG_ROTATION`           | `daily` | Log rotation: `daily`, `hourly`, `none`                      | No       |
+| `SORAI_LOG_SHOW_MODULE`        | `true`  | Show module name in logs                                     | No       |
+| `SORAI_LOG_REQUEST_SAMPLING`   | `100`   | Request sampling percentage (1-100)                          | No       |
+| `SORAI_LOG_SLOW_REQUESTS_ONLY` | `false` | Only log slow requests                                       | No       |
+| `SORAI_LOG_SLOW_THRESHOLD_MS`  | `1000`  | Slow request threshold in milliseconds                       | No       |
+| `SORAI_LOG_ANALYTICS_MODE`     | `full`  | Analytics mode: `full`, `minimal`, `none`                    | No       |
 
 **Note:** Log files are stored in `{data_dir}/logs` directory. Default `data_dir` is `./data`.
 
 ## CORS Configuration
 
-| Variable                        | Default                                                                       | Description                                    | Required |
-|---------------------------------|-------------------------------------------------------------------------------|------------------------------------------------|----------|
-| `RADIUM_CORS_ENABLED`           | `true`                                                                        | Enable CORS                                    | No       |
-| `RADIUM_CORS_ALLOW_ORIGINS`     | `*`                                                                           | Allowed origins (comma-separated, `*` for all) | No       |
-| `RADIUM_CORS_ALLOW_METHODS`     | `GET,POST,PUT,DELETE,HEAD,OPTIONS,PATCH`                                      | Allowed HTTP methods (comma-separated)         | No       |
-| `RADIUM_CORS_ALLOW_HEADERS`     | `accept,accept-language,authorization,content-type,user-agent,x-requested-id` | Allowed headers (comma-separated)              | No       |
-| `RADIUM_CORS_ALLOW_CREDENTIALS` | `false`                                                                       | Allow credentials                              | No       |
-| `RADIUM_CORS_MAX_AGE`           | `3600`                                                                        | Preflight cache max age in seconds             | No       |
+| Variable                       | Default                                                                       | Description                                    | Required |
+|--------------------------------|-------------------------------------------------------------------------------|------------------------------------------------|----------|
+| `SORAI_CORS_ENABLED`           | `true`                                                                        | Enable CORS                                    | No       |
+| `SORAI_CORS_ALLOW_ORIGINS`     | `*`                                                                           | Allowed origins (comma-separated, `*` for all) | No       |
+| `SORAI_CORS_ALLOW_METHODS`     | `GET,POST,PUT,DELETE,HEAD,OPTIONS,PATCH`                                      | Allowed HTTP methods (comma-separated)         | No       |
+| `SORAI_CORS_ALLOW_HEADERS`     | `accept,accept-language,authorization,content-type,user-agent,x-requested-id` | Allowed headers (comma-separated)              | No       |
+| `SORAI_CORS_ALLOW_CREDENTIALS` | `false`                                                                       | Allow credentials                              | No       |
+| `SORAI_CORS_MAX_AGE`           | `3600`                                                                        | Preflight cache max age in seconds             | No       |
 
 ## Database Configuration
 
-| Variable                       | Default | Description                        | Required    |
-|--------------------------------|---------|------------------------------------|-------------|
-| `RADIUM_DATABASE_URL`          | -       | Database connection URL            | Conditional |
-| `RADIUM_DATABASE_TOKEN`        | -       | Database authentication token      | Conditional |
-| `RADIUM_DATABASE_AUTO_MIGRATE` | `false` | Run database migrations on startup | No          |
+| Variable                      | Default | Description                        | Required    |
+|-------------------------------|---------|------------------------------------|-------------|
+| `SORAI_DATABASE_URL`          | -       | Database connection URL            | Conditional |
+| `SORAI_DATABASE_TOKEN`        | -       | Database authentication token      | Conditional |
+| `SORAI_DATABASE_AUTO_MIGRATE` | `false` | Run database migrations on startup | No          |
 
 
 ## Mailer Configuration
@@ -71,7 +71,7 @@ Radium uses environment variables for configuration. You can set these variables
 | Variable               | Default               | Description                  | Required    |
 |------------------------|-----------------------|------------------------------|-------------|
 | `MAILER_FROM_EMAIL`    | `noreply@example.com` | Default sender email address | No          |
-| `MAILER_FROM_NAME`     | `Radium`              | Default sender name          | No          |
+| `MAILER_FROM_NAME`     | `Sorai`               | Default sender name          | No          |
 | `MAILER_SMTP_HOST`     | `localhost`           | SMTP server host             | No          |
 | `MAILER_SMTP_PORT`     | `587`                 | SMTP server port             | No          |
 | `MAILER_SMTP_USERNAME` | -                     | SMTP username                | Conditional |
@@ -159,7 +159,7 @@ Configuration is loaded in the following priority order (highest to lowest):
 # .env file
 HOST=127.0.0.1
 PORT=8000
-RADIUM_LOG_LEVEL=debug
+SORAI_LOG_LEVEL=debug
 PROVIDER_OPENAI_API_KEY=sk-your-key-here
 ```
 
@@ -168,7 +168,7 @@ PROVIDER_OPENAI_API_KEY=sk-your-key-here
 cargo run -- serve
 
 # Run with custom data directory
-cargo run -- --data-dir /var/lib/radium serve
+cargo run -- --data-dir /var/lib/sorai serve
 
 # Run with custom port
 cargo run -- serve --port 3000
@@ -180,11 +180,11 @@ cargo run -- serve --port 3000
 # .env.production file
 HOST=0.0.0.0
 PORT=8000
-RADIUM_APP_MODE=production
-RADIUM_APP_SECRET_KEY=your-secure-secret-key
-RADIUM_JWT_SECRET_KEY=your-jwt-secret-key
-RADIUM_LOG_LEVEL=info
-RADIUM_LOG_ROTATION=daily
+SORAI_APP_MODE=production
+SORAI_APP_SECRET_KEY=your-secure-secret-key
+SORAI_JWT_SECRET_KEY=your-jwt-secret-key
+SORAI_LOG_LEVEL=info
+SORAI_LOG_ROTATION=daily
 PROVIDER_OPENAI_API_KEY=sk-prod-key-here
 PROVIDER_ANTHROPIC_API_KEY=sk-ant-prod-key-here
 ```
@@ -198,9 +198,9 @@ cargo run -- --env-file .env.production serve
 
 ```bash
 # Store all data in custom location
-cargo run -- --data-dir /opt/radium/data serve
+cargo run -- --data-dir /opt/sorai/data serve
 
-# This will create logs at /opt/radium/data/logs
+# This will create logs at /opt/sorai/data/logs
 ```
 
 ## Environment File Format
@@ -213,12 +213,12 @@ HOST=0.0.0.0
 PORT=8000
 
 # App
-RADIUM_APP_MODE=development
-RADIUM_APP_SECRET_KEY=change-me-in-production
+SORAI_APP_MODE=development
+SORAI_APP_SECRET_KEY=change-me-in-production
 
 # Logging
-RADIUM_LOG_LEVEL=info
-RADIUM_LOG_ROTATION=daily
+SORAI_LOG_LEVEL=info
+SORAI_LOG_ROTATION=daily
 
 # Providers
 PROVIDER_OPENAI_API_KEY=sk-...

@@ -1,14 +1,14 @@
-# Radium LLM Proxy Gateway
+# Sorai LLM Proxy Gateway
 
-[![GitHub Release](https://img.shields.io/github/v/release/riipandi/radium?logo=docker)](https://github.com/riipandi/radium/releases)
-[![MSRV](https://img.shields.io/badge/rust-v1.93+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
-[![Dependencies](https://deps.rs/repo/github/riipandi/radium/status.svg)](https://deps.rs/repo/github/riipandi/radium)
+[![GitHub Release](https://img.shields.io/github/v/release/riipandi/sorai?logo=docker)](https://github.com/riipandi/sorai/releases)
+[![MSRV](https://img.shields.io/badge/rust-v1.95+-orange.svg?logo=rust&label=Rust)](https://www.rust-lang.org)
+[![Dependencies](https://deps.rs/repo/github/riipandi/sorai/status.svg)](https://deps.rs/repo/github/riipandi/sorai)
 ![License Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
-[![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/radium/graphs/contributors)
-<!-- ![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/radium/ci.yml?branch=main) -->
+[![Contribution](https://img.shields.io/badge/Contribute-GitHub-brightgreen)](https://github.com/riipandi/sorai/graphs/contributors)
+<!-- ![Build Status](https://img.shields.io/github/actions/workflow/status/riipandi/sorai/ci.yml?branch=main) -->
 
-Radium is an open-source, unified HTTP API gateway for accessing multiple AI model providers. Built in Rust
-as a resource-efficient, high-performance open-source LLM proxy, Radium acts as a central orchestrator,
+Sorai is an open-source, unified HTTP API gateway for accessing multiple AI model providers. Built in Rust
+as a resource-efficient, high-performance open-source LLM proxy, Sorai acts as a central orchestrator,
 handling every request and response with precision. It delivers uniform endpoints for text and chat
 completions, intelligent fallback logic, and complete observability, transforming client-to-LLM interactions
 into a seamless, elegantly managed experience.
@@ -42,7 +42,7 @@ into a seamless, elegantly managed experience.
 
 ### Prerequisites
 
-- **Rust**: Ensure you have Rust installed (version 1.93 or later). Install via [rustup](https://rustup.rs/)
+- **Rust**: Ensure you have Rust installed (version 1.95 or later). Install via [rustup](https://rustup.rs/)
 - **Git**: Required to clone the repository
 - **API Keys**: Valid API keys for your chosen LLM providers
 - **Optional**: Docker for containerized deployment
@@ -51,7 +51,8 @@ into a seamless, elegantly managed experience.
 
 1. Clone the repository:
 ```sh
-git clone https://github.com/riipandi/radium.git && cd radium
+git clone <repository-url>
+cd sorai
 ```
 
 2. Build the project:
@@ -86,15 +87,15 @@ cargo run -- serve
 just dev
 
 # Using built binary
-./target/release/radium serve
+./target/release/sorai serve
 
 # With custom config path
-./target/release/radium serve -config /path/to/config.toml
+./target/release/sorai serve -config /path/to/config.toml
 ```
 
 ## API Endpoints
 
-Radium provides OpenAI-compatible API endpoints:
+Sorai provides OpenAI-compatible API endpoints:
 
 - `POST /v1/chat/completions` - Chat completions with conversation context
 - `POST /v1/text/completions` - Simple text completions
@@ -176,7 +177,7 @@ For detailed documentation, see:
 
 ## Monitoring
 
-Radium provides comprehensive monitoring through Prometheus metrics at `/metrics` endpoint, including:
+Sorai provides comprehensive monitoring through Prometheus metrics at `/metrics` endpoint, including:
 - Request counts by provider, model, and status
 - Request latency histograms
 - Token usage statistics
@@ -185,7 +186,7 @@ Radium provides comprehensive monitoring through Prometheus metrics at `/metrics
 
 ## Docker Support
 
-Radium includes full Docker support with multi-platform builds:
+Sorai includes full Docker support with multi-platform builds:
 
 ```sh
 # Build Docker image
@@ -200,18 +201,23 @@ just compose-up
 
 ## Contributing
 
-We welcome contributions to make Radium even better!
+We welcome contributions to make Sorai even better!
 
 - Read our **[Contributing Guidelines](./CONTRIBUTING.md)** for detailed guidelines
 - Fork the repository and create a feature branch
 - Submit a pull request with a clear title and description
-- Join the discussion on [GitHub Issues](https://github.com/riipandi/radium/issues)
+- Join the discussion on [GitHub Issues](https://github.com/riipandi/sorai/issues)
 
-Join the flow. Amplify your your AI-powered applications with Radium! 🚀
+Join the flow. Amplify your your AI-powered applications with Sorai! 🚀
+
+## Why "Sorai"?
+
+Inspired from Indonesian term for *"joyous uproar"*, Sorai captures the essence of lively connection.
+More than just a proxy, it's a seamless bridge that elevates your AI workflows with speed and reliability.
 
 ## License
 
-Radium is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0).
+Sorai is licensed under the [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0).
 See the [LICENSE](./LICENSE) file for more information.
 
 > Unless you explicitly state otherwise, any contribution intentionally submitted

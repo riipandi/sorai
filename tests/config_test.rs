@@ -1,14 +1,14 @@
 #[cfg(test)]
 mod config_tests {
-    use radium::Config;
+    use sorai::Config;
 
     #[test]
     fn test_default_config() {
         let config = Config::default();
 
         // Check server defaults
-        assert_eq!(config.radium.host, "0.0.0.0");
-        assert_eq!(config.radium.port, 8000);
+        assert_eq!(config.sorai.host, "0.0.0.0");
+        assert_eq!(config.sorai.port, 8000);
 
         // Check app defaults
         assert_eq!(config.app.mode, "development");
@@ -41,7 +41,7 @@ mod config_tests {
 
         // Check mailer defaults
         assert_eq!(config.mailer.from_email, "noreply@example.com");
-        assert_eq!(config.mailer.from_name, "Radium");
+        assert_eq!(config.mailer.from_name, "Sorai");
         assert_eq!(config.mailer.smtp_host, "localhost");
         assert_eq!(config.mailer.smtp_port, 587);
         assert!(config.mailer.smtp_secure);
@@ -137,7 +137,7 @@ mod config_tests {
         let config = Config::default();
 
         assert_eq!(config.mailer.from_email, "noreply@example.com");
-        assert_eq!(config.mailer.from_name, "Radium");
+        assert_eq!(config.mailer.from_name, "Sorai");
         assert_eq!(config.mailer.smtp_host, "localhost");
         assert_eq!(config.mailer.smtp_port, 587);
         assert!(config.mailer.smtp_username.is_empty());

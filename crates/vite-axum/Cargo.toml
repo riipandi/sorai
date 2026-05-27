@@ -2,11 +2,11 @@
 name = "vite-axum"
 version = "0.0.1"
 description = "A library for integrating Vite dev server with Axum web framework"
-repository = "https://github.com/riipandi/radium"
+repository = "https://github.com/riipandi/sorai"
 keywords = ["axum", "proxy", "vite", "spa", "hmr"]
 license = "GPL-3.0"
 edition = "2024"
-rust-version = "1.93"
+rust-version = "1.95"
 
 [dependencies]
 anyhow = ">=1.0.5"

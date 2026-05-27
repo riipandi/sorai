@@ -1,5 +1,5 @@
 {
-  "name": "radium",
+  "name": "sorai",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -75,7 +75,7 @@
     "vitest": "^4.0.18"
   },
   "config": {
-    "image": "ghcr.io/riipandi/radium"
+    "image": "ghcr.io/riipandi/sorai"
   },
   "engines": {
     "node": ">=24.12.0"

@@ -1,4 +1,4 @@
-//! Prometheus metrics module for Radium HTTP server
+//! Prometheus metrics module for Sorai HTTP server
 //!
 //! This module provides metrics collection and exposition for monitoring
 //! server performance, request patterns, and system health.
@@ -26,7 +26,7 @@ pub fn setup_metrics_recorder() -> PrometheusHandle {
 
     PrometheusBuilder::new()
         .set_buckets_for_metric(
-            Matcher::Full("radium_http_requests_duration_seconds".to_string()),
+            Matcher::Full("sorai_http_requests_duration_seconds".to_string()),
             EXPONENTIAL_SECONDS,
         )
         .expect("Failed to set histogram buckets")
@@ -44,25 +44,25 @@ pub fn record_http_request(method: &str, path: &str, status: u16, duration_secon
     ];
 
     // Increment total request counter
-    metrics::counter!("radium_http_requests_total", &labels).increment(1);
+    metrics::counter!("sorai_http_requests_total", &labels).increment(1);
 
     // Record request duration histogram
-    metrics::histogram!("radium_http_requests_duration_seconds", &labels).record(duration_seconds);
+    metrics::histogram!("sorai_http_requests_duration_seconds", &labels).record(duration_seconds);
 }
 
 /// Record server startup metrics
 pub fn record_server_info(version: &str, build: &str) {
     let labels = [("version", version.to_string()), ("build", build.to_string())];
 
-    metrics::gauge!("radium_server_info", &labels).set(1.0);
+    metrics::gauge!("sorai_server_info", &labels).set(1.0);
 }
 
 /// Record connection pool metrics
 pub fn record_pool_metrics(provider: &str, active: u64, idle: u64) {
     let provider_label = [("provider", provider.to_string())];
 
-    metrics::gauge!("radium_connection_pool_active", &provider_label).set(active as f64);
-    metrics::gauge!("radium_connection_pool_idle", &provider_label).set(idle as f64);
+    metrics::gauge!("sorai_connection_pool_active", &provider_label).set(active as f64);
+    metrics::gauge!("sorai_connection_pool_idle", &provider_label).set(idle as f64);
 }
 
 /// Record token usage metrics
@@ -73,7 +73,7 @@ pub fn record_token_usage(provider: &str, model: &str, token_type: &str, count: 
         ("type", token_type.to_string()),
     ];
 
-    metrics::counter!("radium_tokens_total", &labels).increment(count);
+    metrics::counter!("sorai_tokens_total", &labels).increment(count);
 }
 
 /// Record error metrics
@@ -83,7 +83,7 @@ pub fn record_error(provider: &str, error_type: &str) {
         ("error_type", error_type.to_string()),
     ];
 
-    metrics::counter!("radium_errors_total", &labels).increment(1);
+    metrics::counter!("sorai_errors_total", &labels).increment(1);
 }
 
 /// Record fallback usage
@@ -93,5 +93,5 @@ pub fn record_fallback_usage(primary_provider: &str, fallback_provider: &str) {
         ("fallback_provider", fallback_provider.to_string()),
     ];
 
-    metrics::counter!("radium_fallback_usage_total", &labels).increment(1);
+    metrics::counter!("sorai_fallback_usage_total", &labels).increment(1);
 }

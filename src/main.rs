@@ -2,9 +2,9 @@ use clap::{CommandFactory, Parser};
 use clap_derive::{Parser, Subcommand};
 use std::path::PathBuf;
 
-use radium::{Config, http::HttpServer};
+use sorai::{Config, http::HttpServer};
 
-/// Radium Server
+/// Sorai Server
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 struct Cli {
@@ -65,10 +65,10 @@ async fn main() {
             };
 
             if let Some(host) = host {
-                config.radium.host = host;
+                config.sorai.host = host;
             }
             if let Some(port) = port {
-                config.radium.port = port;
+                config.sorai.port = port;
             }
             if let Some(data_dir) = cli.data_dir {
                 config.app.data_dir = data_dir.to_string_lossy().to_string();

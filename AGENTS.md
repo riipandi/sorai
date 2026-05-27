@@ -1,6 +1,6 @@
-# Agent Guidelines for Radium
+# Agent Guidelines for Sorai
 
-This file contains instructions for AI agents working on the Radium codebase.
+This file contains instructions for AI agents working on the Sorai codebase.
 
 ## Essential Commands
 
@@ -47,7 +47,7 @@ just start                     # Production build
 cargo run -- serve             # Run with default config
 cargo run -- debug             # Display configuration
 cargo run -- --env-file .env.production serve
-cargo run -- --data-dir /var/lib/radium serve
+cargo run -- --data-dir /var/lib/sorai serve
 ```
 
 ## Code Style Guidelines
@@ -89,7 +89,7 @@ pub struct AppConfig {
 - **Types**: `PascalCase` (e.g., `OpenAIConfig`, `HttpServer`)
 - **Functions/Methods**: `snake_case` (e.g., `load_config`, `add_to_debug`)
 - **Constants**: `SCREAMING_SNAKE_CASE` (e.g., `LOG_NAME_PREFIX`)
-- **Environment variables**: `PREFIX_SECTION__KEY` (e.g., `RADIUM_LOG_LEVEL`, `PROVIDER_OPENAI_API_KEY`)
+- **Environment variables**: `PREFIX_SECTION__KEY` (e.g., `SORAI_LOG_LEVEL`, `PROVIDER_OPENAI_API_KEY`)
 
 ### Error Handling
 - Use `Result<T, E>` for fallible operations
@@ -116,7 +116,7 @@ mod tests {
     #[test]
     fn test_default_config() {
         let config = Config::default();
-        assert_eq!(config.radium.port, 8000);
+        assert_eq!(config.sorai.port, 8000);
     }
 }
 ```
@@ -141,7 +141,7 @@ mod tests {
 ## Project-Specific Notes
 
 ### Workspace Structure
-- Main package: `radium`
+- Main package: `sorai`
 - Workspace member: `crates/vite-axum`
 - Both packages tested independently
 

@@ -1,6 +1,6 @@
-# Contributing to Radium
+# Contributing to Sorai
 
-Thank you for your interest in contributing to Radium! We welcome contributions
+Thank you for your interest in contributing to Sorai! We welcome contributions
 from everyone and are grateful for every contribution, no matter how small.
 This document provides guidelines and information for developers who want to
 contribute to the project.
@@ -28,7 +28,7 @@ welcoming environment for all contributors.
 
 ### Prerequisites
 
-- **Rust**: Version 1.93 or later. Install via [rustup](https://rustup.rs/)
+- **Rust**: Version 1.95 or later. Install via [rustup](https://rustup.rs/)
 - **Git**: For version control
 - **Just**: Task runner (optional but recommended) - `cargo install just`
 - **Watchexec**: For auto-reload during development - `cargo install watchexec-cli`
@@ -44,12 +44,12 @@ This project uses Just for comprehensive development tooling and Watchexec for h
 1. Fork the repository on GitHub
 2. Clone your fork:
 ```bash
-git clone https://github.com/YOUR_USERNAME/radium.git && cd radium
+git clone https://github.com/YOUR_USERNAME/sorai.git && cd sorai
 ```
 
 3. Add the upstream remote:
 ```bash
-git remote add upstream https://github.com/riipandi/radium.git
+git remote add upstream https://github.com/riipandi/sorai.git
 ```
 
 4. Set up configuration, edit `config.toml` with your API keys for testing:
@@ -61,7 +61,7 @@ cp config.toml.example config.toml
 
 ### Using Just (Recommended)
 
-Radium includes a `justfile` for common development tasks. List all available tasks:
+Sorai includes a `justfile` for common development tasks. List all available tasks:
 
 ```bash
 just
@@ -187,7 +187,7 @@ cargo nextest run test_name
 cargo nextest run --no-capture
 
 # Run tests for specific module
-cargo nextest run --package radium --lib config
+cargo nextest run --package sorai --lib config
 ```
 
 ### Writing Tests
@@ -312,17 +312,17 @@ just build
 
 ### CLI Commands and Subcommands
 
-Radium provides the following CLI interface:
+Sorai provides the following CLI interface:
 
 ```bash
 # Show help (default when no subcommand is provided)
-radium
+sorai
 
 # Start the web server
-radium serve [OPTIONS]
+sorai serve [OPTIONS]
 
 # Display configuration values in debug mode
-radium debug
+sorai debug
 ```
 
 ### Configuration Flags
@@ -366,7 +366,7 @@ Useful environment variables for development:
 export RUST_LOG=debug
 
 # Enable trace logging for specific modules
-export RUST_LOG=radium::http::server=trace
+export RUST_LOG=sorai::http::server=trace
 
 # Disable colored output
 export NO_COLOR=1
@@ -381,7 +381,7 @@ export NO_COLOR=1
 just docker-build
 
 # Build with specific platform
-docker build -f Dockerfile . -t radium:dev --build-arg PLATFORM=linux/amd64
+docker build -f Dockerfile . -t sorai:dev --build-arg PLATFORM=linux/amd64
 ```
 
 ### Running with Docker
@@ -432,14 +432,14 @@ curl -X POST http://localhost:8000/v1/chat/completions \
     "provider": "openai",
     "model": "gpt-4o-mini",
     "messages": [
-      {"role": "user", "content": "Hello, Radium!"}
+      {"role": "user", "content": "Hello, Sorai!"}
     ]
   }'
 ```
 
 ### API Response Format
 
-All responses include Radium-specific extra fields:
+All responses include Sorai-specific extra fields:
 
 ```json
 {
@@ -469,7 +469,7 @@ Implement proper error handling for:
 | `429`       | Too Many Requests - Rate limit exceeded                         |
 | `500`       | Internal Server Error - Server or provider error                |
 | `502`       | Bad Gateway - Provider service unavailable                      |
-| `503`       | Service Unavailable - Radium service temporarily unavailable    |
+| `503`       | Service Unavailable - Sorai service temporarily unavailable     |
 
 ## Monitoring and Debugging
 
@@ -512,10 +512,10 @@ show_module = true
 
 ## Getting Help
 
-- **GitHub Issues**: [Report bugs or ask questions](https://github.com/riipandi/radium/issues)
-- **GitHub Discussions**: [Join the conversation](https://github.com/riipandi/radium/discussions)
+- **GitHub Issues**: [Report bugs or ask questions](https://github.com/riipandi/sorai/issues)
+- **GitHub Discussions**: [Join the conversation](https://github.com/riipandi/sorai/discussions)
 - **Code Review**: Request reviews on your pull requests
 
 ---
 
-Thank you for contributing to Radium! 🚀
+Thank you for contributing to Sorai! 🚀

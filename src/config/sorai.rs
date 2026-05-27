@@ -2,14 +2,14 @@ use crate::config::ConfigItem;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct RadiumConfig {
+pub struct SoraiConfig {
     #[serde(default = "default_host")]
     pub host: String,
     #[serde(default = "default_port")]
     pub port: u16,
 }
 
-impl Default for RadiumConfig {
+impl Default for SoraiConfig {
     fn default() -> Self {
         Self {
             host: default_host(),
@@ -18,15 +18,15 @@ impl Default for RadiumConfig {
     }
 }
 
-impl RadiumConfig {
+impl SoraiConfig {
     pub fn add_to_debug(&self, items: &mut Vec<ConfigItem>) {
         items.push(ConfigItem {
-            section: "Radium".to_string(),
+            section: "Sorai".to_string(),
             key: "Host".to_string(),
             value: self.host.clone(),
         });
         items.push(ConfigItem {
-            section: "Radium".to_string(),
+            section: "Sorai".to_string(),
             key: "Port".to_string(),
             value: self.port.to_string(),
         });

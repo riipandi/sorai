@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod integration_tests {
-    use radium::Config;
-    use radium::http::HttpServer;
+    use sorai::Config;
+    use sorai::http::HttpServer;
 
     #[test]
     fn test_http_server_creation() {
@@ -15,8 +15,8 @@ mod integration_tests {
     #[test]
     fn test_http_server_with_custom_config() {
         let mut config = Config::default();
-        config.radium.host = "127.0.0.1".to_string();
-        config.radium.port = 3000;
+        config.sorai.host = "127.0.0.1".to_string();
+        config.sorai.port = 3000;
         config.logging.level = "debug".to_string();
 
         let _server = HttpServer::new(config);

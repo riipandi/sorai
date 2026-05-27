@@ -102,7 +102,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(radium_http_requests_total[5m])",
+          "expr": "rate(sorai_http_requests_total[5m])",
           "interval": "",
           "legendFormat": "{{method}} {{path}}",
           "refId": "A"
@@ -165,7 +165,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(radium_http_requests_total[5m]))",
+          "expr": "sum(rate(sorai_http_requests_total[5m]))",
           "interval": "",
           "legendFormat": "Total RPS",
           "refId": "A"
@@ -254,7 +254,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, rate(radium_http_requests_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.95, rate(sorai_http_requests_duration_seconds_bucket[5m]))",
           "interval": "",
           "legendFormat": "95th percentile",
           "refId": "A"
@@ -264,7 +264,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.50, rate(radium_http_requests_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.50, rate(sorai_http_requests_duration_seconds_bucket[5m]))",
           "interval": "",
           "legendFormat": "50th percentile",
           "refId": "B"
@@ -323,7 +323,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (status) (rate(radium_http_requests_total[5m]))",
+          "expr": "sum by (status) (rate(sorai_http_requests_total[5m]))",
           "interval": "",
           "legendFormat": "{{status}}",
           "refId": "A"
@@ -412,7 +412,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "radium_connection_pool_active",
+          "expr": "sorai_connection_pool_active",
           "interval": "",
           "legendFormat": "Active - {{provider}}",
           "refId": "A"
@@ -422,7 +422,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "radium_connection_pool_idle",
+          "expr": "sorai_connection_pool_idle",
           "interval": "",
           "legendFormat": "Idle - {{provider}}",
           "refId": "B"
@@ -511,7 +511,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(radium_tokens_total[5m])",
+          "expr": "rate(sorai_tokens_total[5m])",
           "interval": "",
           "legendFormat": "{{provider}} - {{model}} - {{type}}",
           "refId": "A"
@@ -600,7 +600,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(radium_errors_total[5m])",
+          "expr": "rate(sorai_errors_total[5m])",
           "interval": "",
           "legendFormat": "{{provider}} - {{error_type}}",
           "refId": "A"
@@ -689,7 +689,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(radium_fallback_usage_total[5m])",
+          "expr": "rate(sorai_fallback_usage_total[5m])",
           "interval": "",
           "legendFormat": "{{primary_provider}} -> {{fallback_provider}}",
           "refId": "A"
@@ -748,7 +748,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "radium_server_info",
+          "expr": "sorai_server_info",
           "interval": "",
           "legendFormat": "Version: {{version}}",
           "refId": "A"
@@ -815,7 +815,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(radium_tokens_total)",
+          "expr": "sum(sorai_tokens_total)",
           "interval": "",
           "legendFormat": "Total Tokens",
           "refId": "A"
@@ -882,7 +882,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(radium_errors_total)",
+          "expr": "sum(sorai_errors_total)",
           "interval": "",
           "legendFormat": "Total Errors",
           "refId": "A"
@@ -949,7 +949,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(radium_fallback_usage_total)",
+          "expr": "sum(sorai_fallback_usage_total)",
           "interval": "",
           "legendFormat": "Total Fallbacks",
           "refId": "A"
@@ -962,7 +962,7 @@
   "refresh": "5s",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["radium", "http", "api", "monitoring"],
+  "tags": ["sorai", "http", "api", "monitoring"],
   "templating": {
     "list": []
   },
@@ -972,8 +972,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Radium HTTP Server Dashboard",
-  "uid": "radium-dashboard",
+  "title": "Sorai HTTP Server Dashboard",
+  "uid": "sorai-dashboard",
   "version": 1,
   "weekStart": ""
 }

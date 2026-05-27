@@ -10,7 +10,7 @@ post /v1/chat/completions {
 	messages: [
 		{
 			role: "assistant",
-			content: "You are Radium, a helpful assistant."
+			content: "You are Sorai, a helpful assistant."
 		},
 		{
 			role: "user",

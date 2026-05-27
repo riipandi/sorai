@@ -13,14 +13,14 @@ use super::cors::CorsConfig;
 use super::database::DatabaseConfig;
 use super::logging::LoggingConfig;
 use super::mailer::MailerConfig;
-use super::radium::RadiumConfig;
 use super::session::SessionConfig;
+use super::sorai::SoraiConfig;
 use super::storage::StorageConfig;
 
 #[derive(Debug, Clone, Serialize, Default)]
 pub struct Config {
     #[serde(default)]
-    pub radium: RadiumConfig,
+    pub sorai: SoraiConfig,
     #[serde(default)]
     pub app: AppConfig,
     #[serde(default)]
@@ -74,11 +74,11 @@ impl Config {
             ..Default::default()
         };
 
-        config.radium.host = std::env::var("HOST").unwrap_or_else(|_| config.radium.host.clone());
-        config.radium.port = std::env::var("PORT")
+        config.sorai.host = std::env::var("HOST").unwrap_or_else(|_| config.sorai.host.clone());
+        config.sorai.port = std::env::var("PORT")
             .ok()
             .and_then(|p| p.parse::<u16>().ok())
-            .unwrap_or(config.radium.port);
+            .unwrap_or(config.sorai.port);
 
         if let Ok(val) = std::env::var("PROVIDER_OPENAI_API_KEY") {
             config.openai.api_key = val;
@@ -123,66 +123,66 @@ impl Config {
             config.vertex.base_url = val;
         }
 
-        if let Ok(val) = std::env::var("RADIUM_LOG_LEVEL") {
+        if let Ok(val) = std::env::var("SORAI_LOG_LEVEL") {
             config.logging.level = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_SHOW_TIMESTAMP") {
+        if let Ok(val) = std::env::var("SORAI_LOG_SHOW_TIMESTAMP") {
             config.logging.show_timestamp = val.parse().unwrap_or(config.logging.show_timestamp);
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_ROTATION") {
+        if let Ok(val) = std::env::var("SORAI_LOG_ROTATION") {
             config.logging.rotation = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_SHOW_MODULE") {
+        if let Ok(val) = std::env::var("SORAI_LOG_SHOW_MODULE") {
             config.logging.show_module = val.parse().unwrap_or(config.logging.show_module);
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_REQUEST_SAMPLING") {
+        if let Ok(val) = std::env::var("SORAI_LOG_REQUEST_SAMPLING") {
             config.logging.request_sampling = val.parse().unwrap_or(config.logging.request_sampling);
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_SLOW_REQUESTS_ONLY") {
+        if let Ok(val) = std::env::var("SORAI_LOG_SLOW_REQUESTS_ONLY") {
             config.logging.log_slow_requests_only = val.parse().unwrap_or(config.logging.log_slow_requests_only);
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_SLOW_THRESHOLD_MS") {
+        if let Ok(val) = std::env::var("SORAI_LOG_SLOW_THRESHOLD_MS") {
             config.logging.slow_threshold_ms = val.parse().unwrap_or(config.logging.slow_threshold_ms);
         }
-        if let Ok(val) = std::env::var("RADIUM_LOG_ANALYTICS_MODE") {
+        if let Ok(val) = std::env::var("SORAI_LOG_ANALYTICS_MODE") {
             config.logging.analytics_mode = val;
         }
 
-        if let Ok(val) = std::env::var("RADIUM_CORS_ENABLED") {
+        if let Ok(val) = std::env::var("SORAI_CORS_ENABLED") {
             config.cors.enabled = val.parse().unwrap_or(config.cors.enabled);
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_ALLOW_ORIGINS") {
+        if let Ok(val) = std::env::var("SORAI_CORS_ALLOW_ORIGINS") {
             config.cors.allow_origins = val.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_ALLOW_METHODS") {
+        if let Ok(val) = std::env::var("SORAI_CORS_ALLOW_METHODS") {
             config.cors.allow_methods = val.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_ALLOW_HEADERS") {
+        if let Ok(val) = std::env::var("SORAI_CORS_ALLOW_HEADERS") {
             config.cors.allow_headers = val.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_EXPOSE_HEADERS") {
+        if let Ok(val) = std::env::var("SORAI_CORS_EXPOSE_HEADERS") {
             config.cors.expose_headers = val.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_ALLOW_CREDENTIALS") {
+        if let Ok(val) = std::env::var("SORAI_CORS_ALLOW_CREDENTIALS") {
             config.cors.allow_credentials = val.parse().unwrap_or(config.cors.allow_credentials);
         }
-        if let Ok(val) = std::env::var("RADIUM_CORS_MAX_AGE") {
+        if let Ok(val) = std::env::var("SORAI_CORS_MAX_AGE") {
             config.cors.max_age = val.parse().unwrap_or(config.cors.max_age);
         }
 
-        if let Ok(val) = std::env::var("RADIUM_APP_MODE") {
+        if let Ok(val) = std::env::var("SORAI_APP_MODE") {
             config.app.mode = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_APP_SECRET_KEY") {
+        if let Ok(val) = std::env::var("SORAI_APP_SECRET_KEY") {
             config.app.secret_key = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_JWT_SECRET_KEY") {
+        if let Ok(val) = std::env::var("SORAI_JWT_SECRET_KEY") {
             config.app.jwt_secret_key = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_JWT_ACCESS_TOKEN_EXPIRY") {
+        if let Ok(val) = std::env::var("SORAI_JWT_ACCESS_TOKEN_EXPIRY") {
             config.app.jwt_access_token_expiry = val.parse().unwrap_or(config.app.jwt_access_token_expiry);
         }
-        if let Ok(val) = std::env::var("RADIUM_JWT_REFRESH_TOKEN_EXPIRY") {
+        if let Ok(val) = std::env::var("SORAI_JWT_REFRESH_TOKEN_EXPIRY") {
             config.app.jwt_refresh_token_expiry = val.parse().unwrap_or(config.app.jwt_refresh_token_expiry);
         }
 
@@ -208,17 +208,17 @@ impl Config {
             config.mailer.smtp_secure = val.parse().unwrap_or(config.mailer.smtp_secure);
         }
 
-        if let Ok(val) = std::env::var("RADIUM_DATABASE_URL") {
+        if let Ok(val) = std::env::var("SORAI_DATABASE_URL") {
             config.database.url = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_DATABASE_TOKEN") {
+        if let Ok(val) = std::env::var("SORAI_DATABASE_TOKEN") {
             config.database.token = val;
         }
-        if let Ok(val) = std::env::var("RADIUM_DATABASE_AUTO_MIGRATE") {
+        if let Ok(val) = std::env::var("SORAI_DATABASE_AUTO_MIGRATE") {
             config.database.auto_migrate = val.parse().unwrap_or(config.database.auto_migrate);
         }
 
-        if let Ok(val) = std::env::var("RADIUM_SESSION_STORAGE") {
+        if let Ok(val) = std::env::var("SORAI_SESSION_STORAGE") {
             config.session.storage = val;
         }
 
@@ -259,7 +259,7 @@ impl Config {
     pub fn display_debug_table(&self) {
         let mut items = Vec::new();
 
-        self.radium.add_to_debug(&mut items);
+        self.sorai.add_to_debug(&mut items);
         self.app.add_to_debug(&mut items);
         self.logging.add_to_debug(&mut items);
         self.cors.add_to_debug(&mut items);

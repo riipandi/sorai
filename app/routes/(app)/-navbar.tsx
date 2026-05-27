@@ -159,8 +159,8 @@ export function Navbar({ sidebarOpen, toggleSidebar, user, logoutFn }: NavbarPro
       <SidebarHeader>
         <div className='flex items-center justify-between'>
           <SidebarLogo className='items-center px-2'>
-            <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Radium' />
-            <span className='sr-only'>Radium Console</span>
+            <img src='/images/logoipsum-211.svg' className='h-7 w-auto dark:invert' alt='Sorai' />
+            <span className='sr-only'>Sorai Console</span>
           </SidebarLogo>
           <div className='flex items-center gap-2.5'>
             {/* Command Bar */}

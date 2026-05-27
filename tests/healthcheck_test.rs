@@ -7,7 +7,7 @@ mod healthcheck_tests {
     /// Helper function to create a temporary .env file for testing
     fn create_test_env_file(content: &str) -> PathBuf {
         let temp_dir = env::temp_dir();
-        let env_file = temp_dir.join(format!("radium_test_{}.env", std::process::id()));
+        let env_file = temp_dir.join(format!("sorai_test_{}.env", std::process::id()));
         std::fs::write(&env_file, content).expect("Failed to write test env file");
         env_file
     }
@@ -20,14 +20,14 @@ mod healthcheck_tests {
     /// Clean up environment variables that might affect other tests
     fn cleanup_env_vars() {
         let vars_to_clear = vec![
-            "RADIUM_LOG_LEVEL",
-            "RADIUM_LOG_ROTATION",
-            "RADIUM_CORS_ENABLED",
+            "SORAI_LOG_LEVEL",
+            "SORAI_LOG_ROTATION",
+            "SORAI_CORS_ENABLED",
             "PORT",
             "HOST",
-            "RADIUM_MODE",
-            "RADIUM_DATA_DIR",
-            "RADIUM_APP_MODE",
+            "SORAI_MODE",
+            "SORAI_DATA_DIR",
+            "SORAI_APP_MODE",
         ];
         for var in vars_to_clear {
             unsafe { env::remove_var(var) };
@@ -38,7 +38,7 @@ mod healthcheck_tests {
     fn test_healthcheck_default_config() {
         cleanup_env_vars();
         // Test that healthcheck passes with default configuration
-        let result = radium::Config::load(None);
+        let result = sorai::Config::load(None);
         assert!(result.is_ok(), "Default config should load successfully");
     }
 
@@ -47,13 +47,13 @@ mod healthcheck_tests {
         cleanup_env_vars();
         // Create a valid minimal env file
         let env_content = r#"
-RADIUM_APP_MODE=production
-RADIUM_DATA_DIR=./test_data
+SORAI_APP_MODE=production
+SORAI_DATA_DIR=./test_data
 "#;
         let env_file = create_test_env_file(env_content);
         let env_path = Some(env_file.to_string_lossy().to_string());
 
-        let result = radium::Config::load(env_path.clone());
+        let result = sorai::Config::load(env_path.clone());
         assert!(result.is_ok(), "Config with valid env file should load");
 
         // Verify env_file path is stored in config
@@ -69,11 +69,11 @@ RADIUM_DATA_DIR=./test_data
         cleanup_env_vars();
         // Test healthcheck with custom data directory
         let temp_dir = env::temp_dir();
-        let custom_data_dir = temp_dir.join("radium_healthcheck_test");
+        let custom_data_dir = temp_dir.join("sorai_healthcheck_test");
 
         let env_content = format!(
             r#"
-RADIUM_DATA_DIR={}
+SORAI_DATA_DIR={}
 "#,
             custom_data_dir.to_string_lossy()
         );
@@ -81,7 +81,7 @@ RADIUM_DATA_DIR={}
         let env_file = create_test_env_file(&env_content);
         let env_path = Some(env_file.to_string_lossy().to_string());
 
-        let result = radium::Config::load(env_path);
+        let result = sorai::Config::load(env_path);
         assert!(result.is_ok(), "Config with custom data dir should load");
 
         cleanup_test_env_file(&env_file);
@@ -93,8 +93,8 @@ RADIUM_DATA_DIR={}
         cleanup_env_vars();
         // Test with a non-existent env file
         // When an explicit env file path is provided, it should fail if not found
-        let nonexistent_path = Some("/tmp/nonexistent_radium_env_12345.env".to_string());
-        let result = radium::Config::load(nonexistent_path);
+        let nonexistent_path = Some("/tmp/nonexistent_sorai_env_12345.env".to_string());
+        let result = sorai::Config::load(nonexistent_path);
 
         // Should fail when explicitly provided env file doesn't exist
         assert!(result.is_err(), "Should fail when explicit env file not found");
@@ -110,12 +110,12 @@ PORT=7777
         let env_file = create_test_env_file(env_content);
         let env_path = Some(env_file.to_string_lossy().to_string());
 
-        let result = radium::Config::load(env_path);
+        let result = sorai::Config::load(env_path);
         assert!(result.is_ok(), "Config with port override should load");
 
         if let Ok(config) = result {
             // Verify the port was set to something (either from env or default)
-            assert!(config.radium.port > 0, "Port should be valid");
+            assert!(config.sorai.port > 0, "Port should be valid");
         }
 
         cleanup_test_env_file(&env_file);
@@ -126,13 +126,13 @@ PORT=7777
         cleanup_env_vars();
         // Test healthcheck with logging configuration
         let env_content = r#"
-RADIUM_LOG_LEVEL=warn
-RADIUM_LOG_ROTATION=never
+SORAI_LOG_LEVEL=warn
+SORAI_LOG_ROTATION=never
 "#;
         let env_file = create_test_env_file(env_content);
         let env_path = Some(env_file.to_string_lossy().to_string());
 
-        let result = radium::Config::load(env_path);
+        let result = sorai::Config::load(env_path);
         assert!(result.is_ok(), "Config with logging config should load");
 
         if let Ok(config) = result {
@@ -149,12 +149,12 @@ RADIUM_LOG_ROTATION=never
         cleanup_env_vars();
         // Test healthcheck with CORS configuration
         let env_content = r#"
-RADIUM_CORS_ENABLED=false
+SORAI_CORS_ENABLED=false
 "#;
         let env_file = create_test_env_file(env_content);
         let env_path = Some(env_file.to_string_lossy().to_string());
 
-        let result = radium::Config::load(env_path);
+        let result = sorai::Config::load(env_path);
         assert!(result.is_ok(), "Config with CORS config should load");
 
         // Verify config has CORS settings (either from env or defaults)
@@ -209,7 +209,7 @@ RADIUM_CORS_ENABLED=false
     fn test_healthcheck_with_custom_data_dir_cli() {
         // Integration test: Test healthcheck with --data-dir flag
         let temp_dir = env::temp_dir();
-        let custom_dir = temp_dir.join("radium_cli_test");
+        let custom_dir = temp_dir.join("sorai_cli_test");
 
         let output = Command::new("cargo")
             .args(["run", "--", "--data-dir", custom_dir.to_str().unwrap(), "healthcheck"])

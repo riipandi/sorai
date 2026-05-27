@@ -318,17 +318,17 @@ impl HttpServer {
         // Apply middleware to the app
         app = app.layer(middleware);
 
-        let address = format!("{}:{}", self.config.radium.host, self.config.radium.port);
+        let address = format!("{}:{}", self.config.sorai.host, self.config.sorai.port);
         let app_env = std::env::var("APP_MODE").unwrap_or_else(|_| "development".to_string());
 
         if self.config.logging.level.to_lowercase().as_str() == "none" {
-            println!("Starting Radium HTTP Server ({})", app_env);
+            println!("Starting Sorai HTTP Server ({})", app_env);
             if let Some(ref env_file) = self.config.env_file {
                 println!("Environment config from: {}", env_file);
             }
             println!("Server listening on: http://{}", address);
         } else {
-            tracing::info!("Starting Radium HTTP Server ({})", app_env);
+            tracing::info!("Starting Sorai HTTP Server ({})", app_env);
             if let Some(ref env_file) = self.config.env_file {
                 tracing::info!("Environment config from: {}", env_file);
             }

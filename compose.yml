@@ -2,7 +2,7 @@
 
 # echo "$GH_TOKEN" | docker login ghcr.io --password-stdin -u GITHUB_USERNAME
 
-name: radium
+name: sorai
 
 services:
   libsql:
@@ -121,7 +121,7 @@ services:
       GF_SERVER_HTTP_PORT: '3300'
       GF_SERVER_HTTP_ADDR: '0.0.0.0'
       GF_PATHS_PROVISIONING: '/etc/grafana/provisioning'
-      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/radium-dashboard.json'
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/sorai-dashboard.json'
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: 'false' # Disable initial admin creation
       GF_SECURITY_ADMIN_EMAIL: 'admin@example.com' # Default admin email for Grafana
       GF_SECURITY_ADMIN_PASSWORD: 'admin' # Default admin password for Grafana
@@ -256,7 +256,7 @@ configs:
         - job_name: "tempo"
           static_configs:
             - targets: ["tempo:3200"]
-        - job_name: "radium-api"
+        - job_name: "sorai-api"
           static_configs:
             - targets: ["host.docker.internal:8000"]
 

@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: 'radium-dashboards'
+  - name: 'sorai-dashboards'
     orgId: 1
-    folder: 'Radium'
+    folder: 'Sorai'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
